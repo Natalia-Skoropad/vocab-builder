@@ -1,0 +1,58 @@
+.toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 260px;
+  max-width: 360px;
+
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(18, 20, 23, 0.08);
+  background: #fff;
+
+  box-shadow: 0 10px 26px rgba(18, 20, 23, 0.08);
+  animation: pop 160ms ease;
+}
+
+@keyframes pop {
+  from {
+    transform: translateY(-6px);
+    opacity: 0.2;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--text-main);
+  flex: 1 1 auto;
+}
+
+.success .dot {
+  background: var(--green);
+}
+
+.error .dot {
+  background: var(--error);
+}
+
+.success {
+  border-color: rgba(56, 205, 62, 0.22);
+}
+
+.error {
+  border-color: rgba(246, 102, 102, 0.22);
+}

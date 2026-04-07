@@ -1,0 +1,54 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: rgba(18, 20, 23, 0.4);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+
+  width: min(100%, 320px);
+  height: 100%;
+  margin-left: auto;
+  padding: 20px;
+
+  background-color: var(--background);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  margin-bottom: 50px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  gap: 32px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.loginButton {
+  align-self: flex-start;
+}
+
+.registrationButton {
+  width: 100%;
+}
+
+.userBadge {
+  align-self: flex-start;
+}

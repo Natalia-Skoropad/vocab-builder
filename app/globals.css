@@ -1,0 +1,210 @@
+@import 'modern-normalize/modern-normalize.css';
+
+/* ===============================================================
+   Fonts
+   =============================================================== */
+
+@font-face {
+  font-family: 'MacPaw Fixel Display';
+  src: url('/fonts/MacPawFixelDisplay-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MacPaw Fixel Display';
+  src: url('/fonts/MacPawFixelDisplay-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MacPaw Fixel Display';
+  src: url('/fonts/MacPawFixelDisplay-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/SFProDisplay-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/SFProDisplay-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===============================================================
+   Reset
+   =============================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+ol:last-child,
+ul:last-child {
+  margin-bottom: 0;
+}
+
+a {
+  text-decoration: none;
+  color: currentColor;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  outline: none;
+}
+
+textarea {
+  resize: none;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: currentColor;
+  border: none;
+  display: block;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+address {
+  font-style: normal;
+}
+
+img,
+picture,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* ===============================================================
+   Hidden utilities
+   =============================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ===============================================================
+   Container
+   =============================================================== */
+
+.container {
+  width: 100%;
+  max-width: 375px;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
+@media only screen and (min-width: 768px) {
+  .container {
+    max-width: 768px;
+    padding: 0 32px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .container {
+    max-width: 1440px;
+    padding: 0 64px;
+  }
+}
+
+/* ===============================================================
+   Base
+   =============================================================== */
+
+:root {
+  --font-family: 'MacPaw Fixel Display', sans-serif;
+  --second-family: 'SF Pro Display', sans-serif;
+
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semiBold: 600;
+  --fw-bold: 700;
+
+  --text-main: #121417;
+  --green-main: #85aa9f;
+  --green-inactive: #a5c0b8;
+  --background-1: #fcfcfc;
+  --background-2: #f8f8f8;
+
+  --error: #d80027;
+  --success: #3cbf61;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+  color: var(--text-main);
+  background-color: var(--background-2);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

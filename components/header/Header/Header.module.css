@@ -1,0 +1,117 @@
+.header {
+  width: 100%;
+  padding: 20px 0;
+  background-color: var(--background);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.desktopNav,
+.desktopActions {
+  display: none;
+}
+
+.menuToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  background-color: transparent;
+  line-height: 0;
+  cursor: pointer;
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+
+.menuToggle:hover,
+.menuToggle:focus-visible {
+  transform: scale(1.1);
+}
+
+.menuToggle:focus-visible {
+  outline: none;
+}
+
+.menuIcon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--text-main);
+}
+
+.registrationBtn {
+  min-width: 150px;
+}
+
+.actionsPlaceholder {
+  position: relative;
+  width: 286px;
+  height: 32px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--accent);
+  pointer-events: none;
+}
+
+.actionsPlaceholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-60%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-60%);
+  }
+  100% {
+    transform: translateX(60%);
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: 32px;
+  }
+
+  .menuToggle {
+    display: none;
+  }
+
+  .desktopNav {
+    display: flex;
+    justify-self: center;
+  }
+
+  .desktopActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+    min-width: 0;
+    max-width: 360px;
+    width: 100%;
+    justify-self: end;
+  }
+
+  .registrationBtn {
+    min-width: 166px;
+  }
+}
