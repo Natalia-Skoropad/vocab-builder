@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
-
 import { API_BASE_URL } from '@/lib/constants/api';
 import { setAuthTokenCookie } from '@/lib/server/auth/token';
-import type { BackendAuthResponse } from '@/types/auth';
+import { getAuthErrorMessage } from '@/lib/auth/auth-error';
+
+import {
+  buildUserFromBackendAuth,
+  createErrorResponse,
+  createUserResponse,
+  isBackendAuthResponse,
+  parseJsonSafe,
+} from '@/lib/auth/auth-response';
 
 //===============================================================
 
@@ -27,60 +33,29 @@ export async function POST(request: Request) {
       cache: 'no-store',
     });
 
-    const data = (await response.json().catch(() => null)) as
-      | BackendAuthResponse
-      | { message?: string }
-      | null;
+    const data = await parseJsonSafe<unknown>(response);
 
     if (!response.ok) {
-      switch (response.status) {
-        case 400:
-          return NextResponse.json(
-            { message: 'Invalid registration data.' },
-            { status: 400 }
-          );
-        case 409:
-          return NextResponse.json(
-            { message: 'Such email already exists.' },
-            { status: 409 }
-          );
-        case 404:
-          return NextResponse.json(
-            { message: 'Service not found.' },
-            { status: 404 }
-          );
-        default:
-          return NextResponse.json(
-            { message: 'Registration failed.' },
-            { status: response.status || 500 }
-          );
-      }
+      return createErrorResponse(
+        getAuthErrorMessage(
+          'register',
+          response.status,
+          'Registration failed.'
+        ),
+        response.status
+      );
     }
 
-    if (!data || !('token' in data)) {
-      return NextResponse.json(
-        { message: 'Invalid server response.' },
-        { status: 500 }
-      );
+    if (!isBackendAuthResponse(data)) {
+      return createErrorResponse('Invalid server response.', 500);
     }
 
     await setAuthTokenCookie(data.token);
 
-    return NextResponse.json(
-      {
-        user: {
-          name: data.name,
-          email: data.email,
-        },
-      },
-      { status: 201 }
-    );
+    return createUserResponse(buildUserFromBackendAuth(data), 201);
   } catch (error) {
     console.error('POST /api/auth/register error:', error);
 
-    return NextResponse.json(
-      { message: 'Unable to register user.' },
-      { status: 500 }
-    );
+    return createErrorResponse(getAuthErrorMessage('register', 500), 500);
   }
 }

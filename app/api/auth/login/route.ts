@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
-
 import { API_BASE_URL } from '@/lib/constants/api';
 import { setAuthTokenCookie } from '@/lib/server/auth/token';
-import type { BackendAuthResponse } from '@/types/auth';
+import { getAuthErrorMessage } from '@/lib/auth/auth-error';
+
+import {
+  buildUserFromBackendAuth,
+  createErrorResponse,
+  createUserResponse,
+  isBackendAuthResponse,
+  parseJsonSafe,
+} from '@/lib/auth/auth-response';
 
 //===============================================================
 
@@ -26,57 +32,25 @@ export async function POST(request: Request) {
       cache: 'no-store',
     });
 
-    const data = (await response.json().catch(() => null)) as
-      | BackendAuthResponse
-      | { message?: string }
-      | null;
+    const data = await parseJsonSafe<unknown>(response);
 
     if (!response.ok) {
-      switch (response.status) {
-        case 400:
-          return NextResponse.json(
-            { message: 'Invalid login data.' },
-            { status: 400 }
-          );
-        case 401:
-          return NextResponse.json(
-            { message: 'Email or password invalid.' },
-            { status: 401 }
-          );
-        case 404:
-          return NextResponse.json(
-            { message: 'Service not found.' },
-            { status: 404 }
-          );
-        default:
-          return NextResponse.json(
-            { message: 'Login failed.' },
-            { status: response.status || 500 }
-          );
-      }
+      return createErrorResponse(
+        getAuthErrorMessage('login', response.status, 'Login failed.'),
+        response.status
+      );
     }
 
-    if (!data || !('token' in data)) {
-      return NextResponse.json(
-        { message: 'Invalid server response.' },
-        { status: 500 }
-      );
+    if (!isBackendAuthResponse(data)) {
+      return createErrorResponse('Invalid server response.', 500);
     }
 
     await setAuthTokenCookie(data.token);
 
-    return NextResponse.json({
-      user: {
-        name: data.name,
-        email: data.email,
-      },
-    });
+    return createUserResponse(buildUserFromBackendAuth(data));
   } catch (error) {
     console.error('POST /api/auth/login error:', error);
 
-    return NextResponse.json(
-      { message: 'Unable to login user.' },
-      { status: 500 }
-    );
+    return createErrorResponse(getAuthErrorMessage('login', 500), 500);
   }
 }

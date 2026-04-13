@@ -1,10 +1,16 @@
-import { NextResponse } from 'next/server';
 import { API_BASE_URL } from '@/lib/constants/api';
 
 import {
-  getAuthTokenCookie,
   clearAuthTokenCookie,
+  getAuthTokenCookie,
 } from '@/lib/server/auth/token';
+
+import { getAuthErrorMessage } from '@/lib/auth/auth-error';
+
+import {
+  createErrorResponse,
+  createOkResponse,
+} from '@/lib/auth/auth-response';
 
 //===============================================================
 
@@ -24,13 +30,10 @@ export async function POST() {
 
     await clearAuthTokenCookie();
 
-    return NextResponse.json({ ok: true });
+    return createOkResponse();
   } catch (error) {
     console.error('POST /api/auth/logout error:', error);
 
-    return NextResponse.json(
-      { message: 'Unable to sign out.' },
-      { status: 500 }
-    );
+    return createErrorResponse(getAuthErrorMessage('logout', 500), 500);
   }
 }

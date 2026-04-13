@@ -1,4 +1,5 @@
 import type { AppUser } from '@/types/auth';
+import { parseClientAuthResponse } from '@/lib/auth/auth-response';
 
 //===============================================================
 
@@ -14,8 +15,9 @@ type LoginParams = {
 };
 
 type AuthResponse = {
-  user: AppUser;
+  user?: AppUser;
   message?: string;
+  ok?: boolean;
 };
 
 //===============================================================
@@ -29,12 +31,13 @@ async function registerUser(data: RegisterParams): Promise<AppUser> {
     body: JSON.stringify(data),
   });
 
-  const result = (await response
-    .json()
-    .catch(() => null)) as AuthResponse | null;
+  const result = (await parseClientAuthResponse(
+    response,
+    'Registration failed.'
+  )) as AuthResponse;
 
-  if (!response.ok || !result?.user) {
-    throw new Error(result?.message || 'Registration failed.');
+  if (!result.user) {
+    throw new Error('Registration failed.');
   }
 
   return result.user;
@@ -51,12 +54,13 @@ async function loginUser(data: LoginParams): Promise<AppUser> {
     body: JSON.stringify(data),
   });
 
-  const result = (await response
-    .json()
-    .catch(() => null)) as AuthResponse | null;
+  const result = (await parseClientAuthResponse(
+    response,
+    'Login failed.'
+  )) as AuthResponse;
 
-  if (!response.ok || !result?.user) {
-    throw new Error(result?.message || 'Login failed.');
+  if (!result.user) {
+    throw new Error('Login failed.');
   }
 
   return result.user;
@@ -74,15 +78,12 @@ async function getCurrentUser(): Promise<AppUser | null> {
     return null;
   }
 
-  const result = (await response
-    .json()
-    .catch(() => null)) as AuthResponse | null;
+  const result = (await parseClientAuthResponse(
+    response,
+    'Failed to fetch current user.'
+  )) as AuthResponse;
 
-  if (!response.ok || !result?.user) {
-    throw new Error(result?.message || 'Failed to fetch current user.');
-  }
-
-  return result.user;
+  return result.user || null;
 }
 
 //===============================================================
@@ -92,14 +93,7 @@ async function logoutUser(): Promise<void> {
     method: 'POST',
   });
 
-  const result = (await response.json().catch(() => null)) as {
-    message?: string;
-    ok?: boolean;
-  } | null;
-
-  if (!response.ok) {
-    throw new Error(result?.message || 'Failed to sign out.');
-  }
+  await parseClientAuthResponse(response, 'Failed to sign out.');
 }
 
 //===============================================================
