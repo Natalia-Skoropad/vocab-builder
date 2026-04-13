@@ -42,7 +42,7 @@
 }
 
 .success .dot {
-  background: var(--green);
+  background: var(--success);
 }
 
 .error .dot {

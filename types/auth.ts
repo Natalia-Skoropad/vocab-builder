@@ -1,6 +1,18 @@
 export type AppUser = {
-  id: string;
+  id?: string;
   name: string;
   email: string;
-  token?: string;
+};
+
+export type BackendAuthResponse = {
+  name: string;
+  email: string;
+  token: string;
+};
+
+export type BackendCurrentUserResponse = {
+  _id: string;
+  name: string;
+  email: string;
+  token: string;
 };

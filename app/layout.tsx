@@ -1,34 +1,33 @@
 import type { Metadata } from 'next';
 
 import AuthProvider from '@/providers/AuthProvider';
-import TanStackProvider from '@/providers/TanStackProvider';
 import ToastProvider from '@/providers/ToastProvider';
 
 import './globals.css';
 
-//===========================================================================
+//===============================================================
 
 export const metadata: Metadata = {
   title: 'VocabBuilder',
-  description: 'Vocabulary learning app',
+  description: 'VocabBuilder app',
 };
 
-//===========================================================================
+//===============================================================
 
-function RootLayout({
-  children,
-}: Readonly<{
+type Props = {
   children: React.ReactNode;
-}>) {
+};
+
+//===============================================================
+
+function RootLayout({ children }: Props) {
   return (
     <html lang="en">
       <body>
-        <TanStackProvider>
-          <AuthProvider>
-            <ToastProvider />
-            {children}
-          </AuthProvider>
-        </TanStackProvider>
+        <AuthProvider>
+          {children}
+          <ToastProvider />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -9,7 +9,7 @@ import { ROUTES } from '@/lib/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
 
 import BurgerButton from '@/components/header/BurgerButton/BurgerButton';
-import CompanyLogo from '@/components/header/CompanyLogo/CompanyLogo';
+import CompanyLogo from '@/components/common/CompanyLogo/CompanyLogo';
 import LogoutButton from '@/components/header/LogoutButton/LogoutButton';
 import MenuNav from '@/components/header/MenuNav/MenuNav';
 import UserBadge from '@/components/header/UserBadge/UserBadge';

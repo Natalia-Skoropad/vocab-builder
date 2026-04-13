@@ -1,20 +1,17 @@
-import Header from '@/components/header/Header/Header';
+import type { ReactNode } from 'react';
+
+import PrivateRoute from '@/components/auth/PrivateRoute/PrivateRoute';
 
 //===========================================================================
 
-type Props = Readonly<{
-  children: React.ReactNode;
-}>;
+type Props = {
+  children: ReactNode;
+};
 
 //===========================================================================
 
 function PrivateLayout({ children }: Props) {
-  return (
-    <>
-      <Header />
-      <main>{children}</main>
-    </>
-  );
+  return <PrivateRoute>{children}</PrivateRoute>;
 }
 
 export default PrivateLayout;

@@ -12,11 +12,7 @@ import css from './CompanyLogo.module.css';
 
 function CompanyLogo() {
   return (
-    <Link
-      href={ROUTES.DICTIONARY}
-      className={css.logo}
-      aria-label="Go to dictionary"
-    >
+    <Link href={ROUTES.HOME} className={css.logo} aria-label="Go to home">
       <SvgIcon
         name="icon-Craftwork"
         className={css.icon}

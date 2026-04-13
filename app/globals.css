@@ -184,13 +184,26 @@ svg {
   --fw-bold: 700;
 
   --text-main: #121417;
+  --text-muted: rgba(18, 20, 23, 0.7);
+
   --green-main: #85aa9f;
   --green-inactive: #a5c0b8;
+
   --background-1: #fcfcfc;
   --background-2: #f8f8f8;
 
+  --border: rgba(18, 20, 23, 0.1);
+  --border-light: rgba(18, 20, 23, 0.06);
+
   --error: #d80027;
   --success: #3cbf61;
+
+  /* aliases for shared components */
+  --main: var(--green-main);
+  --accent: var(--green-inactive);
+  --background: var(--background-1);
+  --link: var(--green-main);
+  --green: var(--success);
 }
 
 html {

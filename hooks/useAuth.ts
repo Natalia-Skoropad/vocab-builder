@@ -1,16 +1,16 @@
-'use client';
+import { useAuthStore } from '@/store/auth/authStore';
 
-import { useContext } from 'react';
-import { AuthContext } from '@/providers/AuthProvider';
-
-//===========================================================================
+//===============================================================
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-
-  return context;
+  return {
+    user: useAuthStore((state) => state.user),
+    isLoading: useAuthStore((state) => state.isLoading),
+    isAuthReady: useAuthStore((state) => state.isAuthReady),
+    isAuthenticated: useAuthStore((state) => state.isAuthenticated),
+    initAuth: useAuthStore((state) => state.initAuth),
+    register: useAuthStore((state) => state.register),
+    login: useAuthStore((state) => state.login),
+    logout: useAuthStore((state) => state.logout),
+  };
 }

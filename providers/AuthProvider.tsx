@@ -1,51 +1,27 @@
 'use client';
 
-import { createContext, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 
-//===========================================================================
+import { useAuth } from '@/hooks/useAuth';
 
-type User = {
-  name: string;
-  email?: string;
-};
-
-type AuthContextValue = {
-  user: User | null;
-  isAuthenticated: boolean;
-  isAuthReady: boolean;
-  logout: () => Promise<void>;
-};
-
-//===========================================================================
-
-export const AuthContext = createContext<AuthContextValue | null>(null);
-
-//===========================================================================
+//===============================================================
 
 type Props = {
   children: React.ReactNode;
 };
 
-//===========================================================================
+//===============================================================
 
 function AuthProvider({ children }: Props) {
-  const [user, setUser] = useState<User | null>({
-    name: 'Iryna',
-  });
+  const { initAuth, isAuthReady } = useAuth();
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      user,
-      isAuthenticated: Boolean(user),
-      isAuthReady: true,
-      logout: async () => {
-        setUser(null);
-      },
-    }),
-    [user]
-  );
+  useEffect(() => {
+    if (!isAuthReady) {
+      void initAuth();
+    }
+  }, [initAuth, isAuthReady]);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <>{children}</>;
 }
 
 export default AuthProvider;

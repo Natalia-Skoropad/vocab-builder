@@ -1,0 +1,39 @@
+.card {
+  width: 100%;
+  max-width: 628px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  border-radius: 24px;
+  background-color: #f0f4f3;
+}
+
+.title {
+  margin-bottom: 16px;
+  font-size: 32px;
+  line-height: 1.1;
+  font-weight: var(--fw-semiBold);
+  color: var(--text-main);
+}
+
+.text {
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+@media only screen and (min-width: 768px) {
+  .card {
+    padding: 48px 64px;
+    border-radius: 30px;
+  }
+
+  .title {
+    margin-bottom: 20px;
+    font-size: 40px;
+  }
+
+  .text {
+    margin-bottom: 32px;
+  }
+}
