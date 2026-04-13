@@ -13,6 +13,7 @@ import CompanyLogo from '@/components/common/CompanyLogo/CompanyLogo';
 import LogoutButton from '@/components/header/LogoutButton/LogoutButton';
 import MenuNav from '@/components/header/MenuNav/MenuNav';
 import UserBadge from '@/components/header/UserBadge/UserBadge';
+import HeaderAuthPlaceholder from '@/components/header/HeaderAuthPlaceholder/HeaderAuthPlaceholder';
 
 import css from './Header.module.css';
 
@@ -31,7 +32,7 @@ function Header() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthReady } = useAuth();
 
   const userName = user?.name?.trim() || 'User';
 
@@ -71,27 +72,43 @@ function Header() {
       <div className={`container ${css.inner}`}>
         <CompanyLogo />
 
-        <div className={css.mobileRight}>
-          <UserBadge name={userName} variant="header" />
-          <BurgerButton onClick={openMenu} className={css.burger} />
-        </div>
+        {!isAuthReady ? (
+          <>
+            <div className={css.mobileRight}>
+              <HeaderAuthPlaceholder />
+            </div>
 
-        <div className={css.desktopNav}>
-          <MenuNav variant="header" />
-        </div>
+            <div className={css.desktopActions}>
+              <HeaderAuthPlaceholder />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={css.mobileRight}>
+              <UserBadge name={userName} variant="header" />
+              <BurgerButton onClick={openMenu} className={css.burger} />
+            </div>
 
-        <div className={css.desktopActions}>
-          <UserBadge name={userName} variant="header" />
-          <LogoutButton onClick={handleLogout} variant="header" />
-        </div>
+            <div className={css.desktopNav}>
+              <MenuNav variant="header" />
+            </div>
+
+            <div className={css.desktopActions}>
+              <UserBadge name={userName} variant="header" />
+              <LogoutButton onClick={handleLogout} variant="header" />
+            </div>
+          </>
+        )}
       </div>
 
-      <MobileOffcanvas
-        isOpen={isMenuOpen}
-        onClose={closeMenu}
-        userName={userName}
-        onLogout={handleLogout}
-      />
+      {isAuthReady ? (
+        <MobileOffcanvas
+          isOpen={isMenuOpen}
+          onClose={closeMenu}
+          userName={userName}
+          onLogout={handleLogout}
+        />
+      ) : null}
     </header>
   );
 }

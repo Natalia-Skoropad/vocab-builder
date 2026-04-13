@@ -1,0 +1,35 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.badge,
+.action {
+  display: inline-block;
+  border-radius: 999px;
+  background: rgba(18, 20, 23, 0.08);
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.badge {
+  width: 96px;
+  height: 40px;
+}
+
+.action {
+  width: 74px;
+  height: 20px;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}

@@ -1,9 +1,9 @@
 import { API_BASE_URL } from '@/lib/constants/api';
 
 import {
-  clearAuthTokenCookie,
-  getAuthTokenCookie,
-} from '@/lib/server/auth/token';
+  clearSessionCookie,
+  getSessionCookie,
+} from '@/lib/server/auth/session';
 
 import { getAuthErrorMessage } from '@/lib/auth/auth-error';
 
@@ -19,7 +19,7 @@ import {
 
 export async function GET() {
   try {
-    const token = await getAuthTokenCookie();
+    const token = await getSessionCookie();
 
     if (!token) {
       return createErrorResponse(getAuthErrorMessage('me', 401), 401);
@@ -34,7 +34,7 @@ export async function GET() {
     });
 
     if (response.status === 401) {
-      await clearAuthTokenCookie();
+      await clearSessionCookie();
       return createErrorResponse(getAuthErrorMessage('me', 401), 401);
     }
 

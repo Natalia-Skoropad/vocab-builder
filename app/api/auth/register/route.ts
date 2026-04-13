@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '@/lib/constants/api';
-import { setAuthTokenCookie } from '@/lib/server/auth/token';
+import { setSessionCookie } from '@/lib/server/auth/session';
 import { getAuthErrorMessage } from '@/lib/auth/auth-error';
 
 import {
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       return createErrorResponse('Invalid server response.', 500);
     }
 
-    await setAuthTokenCookie(data.token);
+    await setSessionCookie(data.token);
 
     return createUserResponse(buildUserFromBackendAuth(data), 201);
   } catch (error) {

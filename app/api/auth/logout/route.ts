@@ -1,9 +1,9 @@
 import { API_BASE_URL } from '@/lib/constants/api';
 
 import {
-  clearAuthTokenCookie,
-  getAuthTokenCookie,
-} from '@/lib/server/auth/token';
+  clearSessionCookie,
+  getSessionCookie,
+} from '@/lib/server/auth/session';
 
 import { getAuthErrorMessage } from '@/lib/auth/auth-error';
 
@@ -16,7 +16,7 @@ import {
 
 export async function POST() {
   try {
-    const token = await getAuthTokenCookie();
+    const token = await getSessionCookie();
 
     if (token) {
       await fetch(`${API_BASE_URL}/users/signout`, {
@@ -28,7 +28,7 @@ export async function POST() {
       }).catch(() => null);
     }
 
-    await clearAuthTokenCookie();
+    await clearSessionCookie();
 
     return createOkResponse();
   } catch (error) {
