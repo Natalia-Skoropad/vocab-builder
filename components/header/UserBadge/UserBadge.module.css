@@ -1,39 +1,51 @@
-.userBox {
+.userBadge {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
-  max-width: 180px;
+}
+
+.name {
+  font-family: var(--font-family);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: var(--fw-medium);
+  color: var(--text-main);
+  white-space: nowrap;
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--green-main);
+  color: var(--background-1);
   flex-shrink: 0;
-
-  background-color: var(--accent);
-  color: var(--text-main);
-  font-size: 16px;
-  font-weight: var(--fw-bold);
-  line-height: 1.5;
 }
 
-.userName {
+.icon {
   display: block;
-  min-width: 0;
-  max-width: 100%;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
 
-  font-size: 18px;
-  font-weight: var(--fw-regular);
-  line-height: 1.1;
-  color: var(--text-main);
+/* Offcanvas */
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.offcanvas .name {
+  color: var(--background-1);
+}
+
+.offcanvas .avatar {
+  background-color: var(--background-1);
+  color: var(--green-main);
+}
+
+@media only screen and (min-width: 768px) {
+  .name {
+    font-size: 20px;
+  }
 }

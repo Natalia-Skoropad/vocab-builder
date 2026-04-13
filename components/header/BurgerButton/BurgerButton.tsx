@@ -5,7 +5,7 @@ import clsx from 'clsx';
 
 import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 
-import css from './CloseButton.module.css';
+import css from './BurgerButton.module.css';
 
 //===============================================================
 
@@ -15,7 +15,11 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 //===============================================================
 
-function CloseButton({ className, label = 'Close menu', ...props }: Props) {
+function BurgerButton({
+  className,
+  label = 'Open navigation menu',
+  ...props
+}: Props) {
   return (
     <button
       type="button"
@@ -23,9 +27,9 @@ function CloseButton({ className, label = 'Close menu', ...props }: Props) {
       aria-label={label}
       {...props}
     >
-      <SvgIcon name="icon-close" className={css.icon} size={40} />
+      <SvgIcon name="icon-burger-menu" className={css.icon} size={40} />
     </button>
   );
 }
 
-export default CloseButton;
+export default BurgerButton;

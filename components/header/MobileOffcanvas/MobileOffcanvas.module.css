@@ -1,54 +1,77 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background-color: rgba(18, 20, 23, 0.4);
+  z-index: 1200;
+  background-color: rgba(18, 20, 23, 0.2);
 }
 
 .panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(88vw, 240px);
+  height: 100dvh;
+  padding: 20px 20px 24px;
+  background-color: var(--green-main);
   display: flex;
   flex-direction: column;
-
-  width: min(100%, 320px);
-  height: 100%;
-  margin-left: auto;
-  padding: 20px;
-
-  background-color: var(--background);
+  overflow: hidden;
 }
 
-.header {
+.topRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+  margin-bottom: 170px;
+}
 
-  margin-bottom: 50px;
+.userBadge {
+  color: var(--background-1);
+}
+
+.userBadge :global(span) {
+  color: inherit;
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  flex: 1;
-  gap: 32px;
-}
-
-.actions {
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  gap: 20px;
+  gap: 40px;
+  flex: 1;
 }
 
-.loginButton {
-  align-self: flex-start;
+.logoutButton {
+  color: var(--background-1);
 }
 
-.registrationButton {
-  width: 100%;
+.illustrationWrap {
+  position: relative;
+  width: 180px;
+  height: 280px;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.userBadge {
-  align-self: flex-start;
+.illustration {
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+@media only screen and (min-width: 768px) {
+  .panel {
+    width: 300px;
+    padding: 24px 24px 28px;
+  }
+
+  .content {
+    gap: 48px;
+  }
+
+  .illustrationWrap {
+    width: 220px;
+    height: 340px;
+  }
 }

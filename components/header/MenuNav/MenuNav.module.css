@@ -1,45 +1,50 @@
-.menuNav {
+.nav {
   display: block;
 }
 
-.menuList {
+.list {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: 40px;
 }
 
-.menuItem {
+.item {
   display: flex;
 }
 
 .link {
   position: relative;
-  display: inline-block;
-  padding: 15px 0;
-  font-size: 20px;
-  font-weight: var(--fw-regular);
-  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
   color: var(--text-main);
-  transition: color 200ms ease, opacity 200ms ease;
+  transition: color 200ms ease;
+}
+
+.label {
+  position: relative;
+  z-index: 1;
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: var(--fw-medium);
 }
 
 .link::after {
   content: '';
   position: absolute;
   left: 0;
-  bottom: 8px;
+  bottom: -6px;
   width: 100%;
   height: 2px;
-  background-color: var(--main);
+  border-radius: 999px;
+  background-color: var(--green-main);
   transform: scaleX(0);
-  transform-origin: left;
+  transform-origin: left center;
   transition: transform 250ms ease;
 }
 
 .link:hover::after,
-.link:focus-visible::after,
-.active::after {
+.link:focus-visible::after {
   transform: scaleX(1);
 }
 
@@ -47,60 +52,69 @@
   outline: none;
 }
 
-.linkButton {
-  border: none;
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
+.active {
+  padding: 12px 24px;
+  border-radius: 15px;
+  background-color: var(--green-main);
+  color: var(--background-1);
 }
 
-.linkLocked {
-  font-size: 20px;
-  opacity: 1;
+.active::after {
+  display: none;
 }
 
-.linkLocked::after {
-  transform: scaleX(0);
-}
+/* Offcanvas */
 
-/* Offcanvas variant */
-.offcanvasNav {
+.navOffcanvas {
   width: 100%;
 }
 
-.menuListOffcanvas {
+.listOffcanvas {
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 40px;
 }
 
 .linkOffcanvas {
-  padding: 14px 0;
-  font-size: 28px;
-  line-height: 1.15;
-  font-weight: var(--fw-medium);
+  min-height: auto;
+  color: var(--background-1);
+}
+
+.linkOffcanvas .label {
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: var(--fw-regular);
 }
 
 .linkOffcanvas::after {
-  bottom: 6px;
+  bottom: -10px;
+  background-color: var(--background-1);
+}
+
+.linkOffcanvas.active {
+  padding: 12px 24px;
+  border-radius: 15px;
+  background-color: var(--background-1);
+  color: var(--text-main);
+}
+
+.linkOffcanvas.active::after {
+  display: none;
 }
 
 @media only screen and (min-width: 768px) {
-  .linkOffcanvas {
-    font-size: 32px;
+  .listOffcanvas {
+    gap: 40px;
+  }
+
+  .linkOffcanvas.active {
+    padding: 14px 32px;
+    border-radius: 15px;
   }
 }
 
 @media only screen and (min-width: 1440px) {
-  .menuList {
-    flex-direction: row;
-    align-items: center;
-    gap: 28px;
-  }
-
-  .link {
-    font-size: 16px;
-    font-weight: var(--fw-regular);
-    padding: 15px 0;
+  .list {
+    gap: 36px;
   }
 }

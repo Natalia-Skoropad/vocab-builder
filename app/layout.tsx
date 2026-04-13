@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 
-import Providers from '@/providers';
+import AuthProvider from '@/providers/AuthProvider';
+import TanStackProvider from '@/providers/TanStackProvider';
+import ToastProvider from '@/providers/ToastProvider';
 
 import './globals.css';
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 
 //===========================================================================
 
-async function RootLayout({
+function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -21,7 +23,12 @@ async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <TanStackProvider>
+          <AuthProvider>
+            <ToastProvider />
+            {children}
+          </AuthProvider>
+        </TanStackProvider>
       </body>
     </html>
   );

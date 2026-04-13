@@ -13,7 +13,7 @@ type Props = {
 
 //===============================================================
 
-function SvgIcon({ name, className, title, size = 16 }: Props) {
+function SvgIcon({ name, className, title, size = 24 }: Props) {
   const style = { width: size, height: size } satisfies CSSProperties;
 
   return (

@@ -1,7 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
+
+import { ROUTES } from '@/lib/constants/routes';
+
+import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 
 import css from './CompanyLogo.module.css';
 
@@ -9,16 +12,19 @@ import css from './CompanyLogo.module.css';
 
 function CompanyLogo() {
   return (
-    <Link href="/" className={css.companyLogo} aria-label="Go to home page">
-      <Image
-        src="/logo-ukraine.svg"
-        alt="LearnLingo logo"
-        width={28}
-        height={28}
+    <Link
+      href={ROUTES.DICTIONARY}
+      className={css.logo}
+      aria-label="Go to dictionary"
+    >
+      <SvgIcon
+        name="icon-Craftwork"
         className={css.icon}
+        size={40}
+        title="VocabBuilder logo"
       />
 
-      <span className={css.text}>LearnLingo</span>
+      <span className={css.text}>VocabBuilder</span>
     </Link>
   );
 }

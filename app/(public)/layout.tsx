@@ -1,24 +1,11 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-//===========================================================================
-
-interface PublicLayoutProps {
+type Props = Readonly<{
   children: React.ReactNode;
-}
+}>;
 
 //===========================================================================
 
-function PublicLayout({ children }: PublicLayoutProps) {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.refresh();
-  }, [router]);
-
-  return <>{children}</>;
+function PublicLayout({ children }: Props) {
+  return <main>{children}</main>;
 }
 
 export default PublicLayout;

@@ -1,28 +1,51 @@
 'use client';
 
-/*import { useRef } from 'react';
+import { createContext, useMemo, useState } from 'react';
 
-import type { AppUser } from '@/types/auth';
-import { useAuthStore } from '@/lib/store/authStore';*/
+//===========================================================================
 
-//===============================================================
+type User = {
+  name: string;
+  email?: string;
+};
+
+type AuthContextValue = {
+  user: User | null;
+  isAuthenticated: boolean;
+  isAuthReady: boolean;
+  logout: () => Promise<void>;
+};
+
+//===========================================================================
+
+export const AuthContext = createContext<AuthContextValue | null>(null);
+
+//===========================================================================
 
 type Props = {
   children: React.ReactNode;
-  /*initialUser: AppUser | null;*/
 };
 
-//===============================================================
+//===========================================================================
 
-function AuthProvider({ children /*initialUser */ }: Props) {
-  /*  const initializedRef = useRef(false);
- 
-  if (!initializedRef.current) {
-    useAuthStore.getState().hydrateAuth(initialUser);
-    initializedRef.current = true;
-  }*/
+function AuthProvider({ children }: Props) {
+  const [user, setUser] = useState<User | null>({
+    name: 'Iryna',
+  });
 
-  return <>{children}</>;
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      isAuthenticated: Boolean(user),
+      isAuthReady: true,
+      logout: async () => {
+        setUser(null);
+      },
+    }),
+    [user]
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export default AuthProvider;

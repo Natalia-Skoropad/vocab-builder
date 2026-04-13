@@ -1,0 +1,67 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  color: var(--text-main);
+  transition: opacity 200ms ease;
+}
+
+.offcanvas {
+  color: var(--background-1);
+}
+
+.button:hover,
+.button:focus-visible {
+  opacity: 0.85;
+}
+
+.button:focus-visible {
+  outline: 2px solid rgba(18, 20, 23, 0.15);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.offcanvas:focus-visible {
+  outline: 2px solid rgba(252, 252, 252, 0.45);
+}
+
+.text {
+  position: relative;
+  display: inline-block;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: var(--fw-regular);
+}
+
+.text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background-color: var(--text-main);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 250ms ease;
+}
+
+.offcanvas .text::after {
+  background-color: var(--background-1);
+}
+
+.button:hover .text::after,
+.button:focus-visible .text::after {
+  transform: scaleX(1);
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
