@@ -1,11 +1,12 @@
 import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
+import { getWordsErrorMessage } from '@/lib/words/words-error';
 
-//===============================================================
-
-function createErrorResponse(message: string, status: number) {
-  return Response.json({ message }, { status });
-}
+import {
+  createErrorResponse,
+  createOkResponse,
+  parseJsonSafe,
+} from '@/lib/words/words-response';
 
 //===============================================================
 
@@ -14,7 +15,7 @@ export async function GET() {
     const token = await getSessionCookie();
 
     if (!token) {
-      return createErrorResponse('Unauthorized.', 401);
+      return createErrorResponse(getWordsErrorMessage('categories', 401), 401);
     }
 
     const response = await fetch(`${API_BASE_URL}/words/categories`, {
@@ -25,19 +26,15 @@ export async function GET() {
       cache: 'no-store',
     });
 
-    const data = await response.json().catch(() => null);
+    const data = await parseJsonSafe<unknown>(response);
 
     if (!response.ok) {
-      if (response.status === 401) {
-        return createErrorResponse('Unauthorized.', 401);
-      }
-
-      if (response.status === 404) {
-        return createErrorResponse('Service not found.', 404);
-      }
-
       return createErrorResponse(
-        'Failed to fetch categories.',
+        getWordsErrorMessage(
+          'categories',
+          response.status,
+          'Failed to fetch categories.'
+        ),
         response.status
       );
     }
@@ -46,9 +43,9 @@ export async function GET() {
       return createErrorResponse('Invalid server response.', 500);
     }
 
-    return Response.json(data);
+    return createOkResponse(data);
   } catch (error) {
     console.error('GET /api/words/categories error:', error);
-    return createErrorResponse('Server error.', 500);
+    return createErrorResponse(getWordsErrorMessage('categories', 500), 500);
   }
 }

@@ -1,11 +1,13 @@
 import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
+import { getWordsErrorMessage } from '@/lib/words/words-error';
 
-//===============================================================
-
-function createErrorResponse(message: string, status: number) {
-  return Response.json({ message }, { status });
-}
+import {
+  createErrorResponse,
+  createOkResponse,
+  isStatisticsResponse,
+  parseJsonSafe,
+} from '@/lib/words/words-response';
 
 //===============================================================
 
@@ -14,7 +16,7 @@ export async function GET() {
     const token = await getSessionCookie();
 
     if (!token) {
-      return createErrorResponse('Unauthorized.', 401);
+      return createErrorResponse(getWordsErrorMessage('statistics', 401), 401);
     }
 
     const response = await fetch(`${API_BASE_URL}/words/statistics`, {
@@ -25,34 +27,26 @@ export async function GET() {
       cache: 'no-store',
     });
 
-    const data = await response.json().catch(() => null);
+    const data = await parseJsonSafe<unknown>(response);
 
     if (!response.ok) {
-      if (response.status === 401) {
-        return createErrorResponse('Unauthorized.', 401);
-      }
-
-      if (response.status === 404) {
-        return createErrorResponse('Service not found.', 404);
-      }
-
       return createErrorResponse(
-        'Failed to fetch statistics.',
+        getWordsErrorMessage(
+          'statistics',
+          response.status,
+          'Failed to fetch statistics.'
+        ),
         response.status
       );
     }
 
-    if (
-      !data ||
-      typeof data !== 'object' ||
-      typeof (data as { totalCount?: unknown }).totalCount !== 'number'
-    ) {
+    if (!isStatisticsResponse(data)) {
       return createErrorResponse('Invalid server response.', 500);
     }
 
-    return Response.json(data);
+    return createOkResponse(data);
   } catch (error) {
     console.error('GET /api/words/statistics error:', error);
-    return createErrorResponse('Server error.', 500);
+    return createErrorResponse(getWordsErrorMessage('statistics', 500), 500);
   }
 }

@@ -1,11 +1,12 @@
 import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
+import { getWordsErrorMessage } from '@/lib/words/words-error';
 
-//===============================================================
-
-function createErrorResponse(message: string, status: number) {
-  return Response.json({ message }, { status });
-}
+import {
+  createErrorResponse,
+  createOkResponse,
+  parseJsonSafe,
+} from '@/lib/words/words-response';
 
 //===============================================================
 
@@ -22,7 +23,7 @@ export async function DELETE(_: Request, context: RouteContext) {
     const token = await getSessionCookie();
 
     if (!token) {
-      return createErrorResponse('Unauthorized.', 401);
+      return createErrorResponse(getWordsErrorMessage('delete', 401), 401);
     }
 
     const { id } = await context.params;
@@ -39,27 +40,18 @@ export async function DELETE(_: Request, context: RouteContext) {
       cache: 'no-store',
     });
 
-    const data = await response.json().catch(() => null);
+    const data = await parseJsonSafe<unknown>(response);
 
     if (!response.ok) {
-      if (response.status === 400) {
-        return createErrorResponse('Bad request (invalid request body).', 400);
-      }
-
-      if (response.status === 401) {
-        return createErrorResponse('This word not found.', 401);
-      }
-
-      if (response.status === 404) {
-        return createErrorResponse('Service not found.', 404);
-      }
-
-      return createErrorResponse('Server error.', 500);
+      return createErrorResponse(
+        getWordsErrorMessage('delete', response.status, 'Server error.'),
+        response.status
+      );
     }
 
-    return Response.json(data);
+    return createOkResponse(data);
   } catch (error) {
     console.error('DELETE /api/words/delete/[id] error:', error);
-    return createErrorResponse('Server error.', 500);
+    return createErrorResponse(getWordsErrorMessage('delete', 500), 500);
   }
 }

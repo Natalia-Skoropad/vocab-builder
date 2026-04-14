@@ -3,10 +3,16 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import type { WordItem } from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
+
+import {
+  buildDictionaryPath,
+  formatDictionaryCategoryLabel,
+  parseDictionarySegments,
+} from '@/lib/utils/dictionary.query';
 
 import Dashboard from '@/components/dashboard/Dashboard/Dashboard';
 import WordsTable from '@/components/words/WordsTable/WordsTable';
@@ -15,6 +21,7 @@ import InlineLoader from '@/components/common/InlineLoader/InlineLoader';
 import EmptyState from '@/components/common/EmptyState/EmptyState';
 import AddWordModal from '@/components/modals/AddWordModal/AddWordModal';
 import EditWordModal from '@/components/modals/EditWordModal/EditWordModal';
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 
 //===============================================================
 
@@ -24,35 +31,84 @@ const WORDS_PER_PAGE = 7;
 
 function DictionaryPage() {
   const router = useRouter();
-  const pathname = usePathname();
+  const params = useParams<{ filters?: string[] | string }>();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingWord, setEditingWord] = useState<WordItem | null>(null);
 
-  const page = Number(searchParams.get('page') ?? '1') || 1;
-  const keyword = searchParams.get('keyword')?.trim() ?? '';
-  const category = searchParams.get('category')?.trim() ?? '';
-  const isIrregularParam = searchParams.get('isIrregular');
+  const rawFiltersParam = params.filters;
 
-  const isIrregular =
-    isIrregularParam === 'true'
-      ? true
-      : isIrregularParam === 'false'
-      ? false
-      : undefined;
+  const routeSegments = useMemo<string[]>(() => {
+    if (Array.isArray(rawFiltersParam)) {
+      return rawFiltersParam;
+    }
+
+    if (typeof rawFiltersParam === 'string' && rawFiltersParam.trim()) {
+      return [rawFiltersParam];
+    }
+
+    return [];
+  }, [rawFiltersParam]);
+
+  const { filters: routeFilters } = useMemo(
+    () => parseDictionarySegments(routeSegments),
+    [routeSegments]
+  );
+
+  const keyword = searchParams.get('keyword')?.trim() ?? '';
 
   const queryParams = useMemo(
     () => ({
-      page,
+      page: routeFilters.page,
       limit: WORDS_PER_PAGE,
       keyword: keyword || undefined,
-      category: category || undefined,
-      isIrregular,
+      category:
+        routeFilters.category !== 'categories'
+          ? routeFilters.category
+          : undefined,
+      isIrregular:
+        routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined,
     }),
-    [page, keyword, category, isIrregular]
+    [keyword, routeFilters]
   );
+
+  const breadcrumbItems = useMemo(() => {
+    const items: { label: string; href?: string }[] = [
+      { label: 'Home', href: '/' },
+      { label: 'Dictionary', href: '/dictionary' },
+    ];
+
+    if (routeFilters.category !== 'categories') {
+      const categoryLabel = formatDictionaryCategoryLabel(
+        routeFilters.category
+      );
+
+      if (
+        routeFilters.category === 'verb' &&
+        typeof routeFilters.isIrregular === 'boolean'
+      ) {
+        items.push({
+          label: categoryLabel,
+          href: buildDictionaryPath({
+            category: routeFilters.category,
+            page: 1,
+          }),
+        });
+
+        items.push({
+          label: routeFilters.isIrregular ? 'Irregular' : 'Regular',
+        });
+      } else {
+        items.push({
+          label: categoryLabel,
+        });
+      }
+    }
+
+    return items;
+  }, [routeFilters]);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['dictionary-words', queryParams],
@@ -90,9 +146,22 @@ function DictionaryPage() {
   };
 
   const handlePageChange = (nextPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', String(nextPage));
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    const nextPath = buildDictionaryPath({
+      category: routeFilters.category,
+      isIrregular: routeFilters.isIrregular,
+      page: nextPage,
+    });
+
+    const nextParams = new URLSearchParams();
+
+    if (keyword) {
+      nextParams.set('keyword', keyword);
+    }
+
+    const nextQuery = nextParams.toString();
+    const nextUrl = nextQuery ? `${nextPath}?${nextQuery}` : nextPath;
+
+    router.replace(nextUrl, { scroll: false });
   };
 
   const handleAddWord = () => {
@@ -115,6 +184,8 @@ function DictionaryPage() {
             <h1 id="dictionary-title" className="visually-hidden">
               Dictionary
             </h1>
+
+            <Breadcrumbs items={breadcrumbItems} />
 
             <Dashboard
               variant="dictionary"

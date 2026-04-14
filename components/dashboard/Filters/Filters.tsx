@@ -3,10 +3,19 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCategoriesStore } from '@/store/categories/categoriesStore';
+import {
+  buildDictionaryPath,
+  parseDictionarySegments,
+} from '@/lib/utils/dictionary.query';
 
 import css from './Filters.module.css';
 
@@ -24,20 +33,38 @@ function Filters({ variant }: Props) {
 
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams<{ filters?: string[] | string }>();
   const searchParams = useSearchParams();
 
   const categories = useCategoriesStore((state) => state.categories);
   const isLoaded = useCategoriesStore((state) => state.isLoaded);
   const fetchCategories = useCategoriesStore((state) => state.fetchCategories);
 
+  const rawFiltersParam = params.filters;
+
+  const routeSegments = useMemo<string[]>(() => {
+    if (Array.isArray(rawFiltersParam)) {
+      return rawFiltersParam;
+    }
+
+    if (typeof rawFiltersParam === 'string' && rawFiltersParam.trim()) {
+      return [rawFiltersParam];
+    }
+
+    return [];
+  }, [rawFiltersParam]);
+
+  const { filters: routeFilters } = useMemo(
+    () => parseDictionarySegments(routeSegments),
+    [routeSegments]
+  );
+
   const initialKeyword = searchParams.get('keyword') ?? '';
-  const initialCategory = searchParams.get('category') ?? 'categories';
-  const initialIsIrregular = searchParams.get('isIrregular');
 
   const [keyword, setKeyword] = useState(initialKeyword);
-  const [category, setCategory] = useState(initialCategory);
+  const [category, setCategory] = useState(routeFilters.category);
   const [verbType, setVerbType] = useState<'regular' | 'irregular'>(
-    initialIsIrregular === 'true' ? 'irregular' : 'regular'
+    routeFilters.isIrregular === true ? 'irregular' : 'regular'
   );
 
   const debouncedKeyword = useDebounce(keyword, 300);
@@ -58,47 +85,50 @@ function Filters({ variant }: Props) {
     [debouncedKeyword]
   );
 
-  const isVerb = category === 'verb';
-  const effectiveVerbType = isVerb ? verbType : 'regular';
+  const derivedCategory = routeFilters.category;
+
+  const effectiveCategory =
+    category !== derivedCategory ? category : derivedCategory;
+  const effectiveVerbType = effectiveCategory === 'verb' ? verbType : 'regular';
+  const isVerb = effectiveCategory === 'verb';
+  const effectiveIsIrregular = isVerb
+    ? effectiveVerbType === 'irregular'
+    : undefined;
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
+    const nextPath = buildDictionaryPath({
+      category: effectiveCategory,
+      isIrregular: effectiveIsIrregular,
+      page: 1,
+    });
+
+    const nextParams = new URLSearchParams();
 
     if (normalizedKeyword) {
-      params.set('keyword', normalizedKeyword);
-    } else {
-      params.delete('keyword');
+      nextParams.set('keyword', normalizedKeyword);
     }
 
-    if (category && category !== 'categories') {
-      params.set('category', category);
-    } else {
-      params.delete('category');
-    }
+    const nextQuery = nextParams.toString();
+    const nextUrl = nextQuery ? `${nextPath}?${nextQuery}` : nextPath;
+    const currentUrl = searchParams.toString()
+      ? `${pathname}?${searchParams.toString()}`
+      : pathname;
 
-    if (category === 'verb') {
-      params.set('isIrregular', String(effectiveVerbType === 'irregular'));
-    } else {
-      params.delete('isIrregular');
-    }
-
-    params.set('page', '1');
-
-    const nextQuery = params.toString();
-    const currentQuery = searchParams.toString();
-
-    if (nextQuery !== currentQuery) {
-      const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    if (nextUrl !== currentUrl) {
       router.replace(nextUrl, { scroll: false });
     }
   }, [
+    effectiveCategory,
+    effectiveIsIrregular,
     normalizedKeyword,
-    category,
-    effectiveVerbType,
     pathname,
     router,
     searchParams,
   ]);
+
+  useEffect(() => {
+    setKeyword(initialKeyword);
+  }, [initialKeyword]);
 
   return (
     <div className={css.filters}>
@@ -127,15 +157,20 @@ function Filters({ variant }: Props) {
 
           <select
             id={categoryId}
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
+            value={effectiveCategory}
+            onChange={(event) =>
+              setCategory(event.target.value as typeof effectiveCategory)
+            }
             className={css.select}
           >
             <option value="categories">Categories</option>
 
             {categories.map((item) => (
               <option key={item} value={item}>
-                {item.charAt(0).toUpperCase() + item.slice(1)}
+                {item
+                  .split(' ')
+                  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+                  .join(' ')}
               </option>
             ))}
           </select>
@@ -151,7 +186,7 @@ function Filters({ variant }: Props) {
               type="radio"
               name={`verb-type-${variant}`}
               value="regular"
-              checked={verbType === 'regular'}
+              checked={effectiveVerbType === 'regular'}
               onChange={() => setVerbType('regular')}
               className={css.radioInput}
             />
@@ -163,7 +198,7 @@ function Filters({ variant }: Props) {
               type="radio"
               name={`verb-type-${variant}`}
               value="irregular"
-              checked={verbType === 'irregular'}
+              checked={effectiveVerbType === 'irregular'}
               onChange={() => setVerbType('irregular')}
               className={css.radioInput}
             />

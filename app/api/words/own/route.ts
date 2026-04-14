@@ -1,20 +1,13 @@
 import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
-
-//===============================================================
-
-function createErrorResponse(message: string, status: number) {
-  return Response.json({ message }, { status });
-}
-
-//===============================================================
-
-type BackendOwnWordsResponse = {
-  results?: unknown;
-  totalPages?: unknown;
-  page?: unknown;
-  perPage?: unknown;
-};
+import { getWordsErrorMessage } from '@/lib/words/words-error';
+import {
+  createErrorResponse,
+  createOkResponse,
+  isOwnWordsResponse,
+  normalizeOwnWordsResponse,
+  parseJsonSafe,
+} from '@/lib/words/words-response';
 
 //===============================================================
 
@@ -23,7 +16,7 @@ export async function GET(request: Request) {
     const token = await getSessionCookie();
 
     if (!token) {
-      return createErrorResponse('Unauthorized.', 401);
+      return createErrorResponse(getWordsErrorMessage('own', 401), 401);
     }
 
     const { searchParams } = new URL(request.url);
@@ -56,48 +49,32 @@ export async function GET(request: Request) {
       cache: 'no-store',
     });
 
-    const data = (await response
-      .json()
-      .catch(() => null)) as BackendOwnWordsResponse | null;
-
-    console.log('WORDS OWN RAW DATA:', data);
+    const data = await parseJsonSafe<unknown>(response);
 
     if (!response.ok) {
-      if (response.status === 401) {
-        return createErrorResponse('Unauthorized.', 401);
-      }
-
-      if (response.status === 404) {
-        return createErrorResponse('Service not found.', 404);
-      }
-
       return createErrorResponse(
-        'Failed to fetch user words.',
+        getWordsErrorMessage(
+          'own',
+          response.status,
+          'Failed to fetch user words.'
+        ),
         response.status
       );
     }
 
-    if (!data || !Array.isArray(data.results)) {
+    if (!isOwnWordsResponse(data)) {
       return createErrorResponse('Invalid server response.', 500);
     }
 
-    const normalizedPage =
-      typeof data.page === 'number' ? data.page : Number(page) || 1;
+    const normalized = normalizeOwnWordsResponse(
+      data,
+      Number(page) || 1,
+      Number(limit) || 7
+    );
 
-    const normalizedPerPage =
-      typeof data.perPage === 'number' ? data.perPage : Number(limit) || 7;
-
-    const normalizedTotalPages =
-      typeof data.totalPages === 'number' ? data.totalPages : 1;
-
-    return Response.json({
-      results: data.results,
-      totalPages: normalizedTotalPages,
-      page: normalizedPage,
-      perPage: normalizedPerPage,
-    });
+    return createOkResponse(normalized);
   } catch (error) {
     console.error('GET /api/words/own error:', error);
-    return createErrorResponse('Server error.', 500);
+    return createErrorResponse(getWordsErrorMessage('own', 500), 500);
   }
 }

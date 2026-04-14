@@ -4,7 +4,7 @@ import { Home } from 'lucide-react';
 
 import css from './Breadcrumbs.module.css';
 
-//===========================================================================
+//===============================================================
 
 type Crumb = {
   label: string;
@@ -16,7 +16,7 @@ type Props = {
   className?: string;
 };
 
-//===========================================================================
+//===============================================================
 
 function Breadcrumbs({ items, className }: Props) {
   if (!items?.length) return null;
@@ -45,11 +45,11 @@ function Breadcrumbs({ items, className }: Props) {
                 </span>
               )}
 
-              {!isLast && (
+              {!isLast ? (
                 <span className={css.sep} aria-hidden="true">
                   /
                 </span>
-              )}
+              ) : null}
             </li>
           );
         })}
