@@ -1,0 +1,59 @@
+.nav {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.button,
+.dots {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(18, 20, 23, 0.1);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text-main);
+  background-color: var(--background-1);
+}
+
+.button {
+  transition: background-color 200ms ease, color 200ms ease, opacity 200ms ease;
+}
+
+.button:hover,
+.button:focus-visible {
+  background-color: rgba(133, 170, 159, 0.14);
+}
+
+.button:focus-visible {
+  outline: none;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.active {
+  background-color: var(--green-main);
+  border-color: var(--green-main);
+  color: var(--background-1);
+}
+
+.dots {
+  border-color: transparent;
+  background-color: transparent;
+}

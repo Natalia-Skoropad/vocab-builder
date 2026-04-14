@@ -1,11 +1,13 @@
 'use client';
 
 import clsx from 'clsx';
-import { SearchX } from 'lucide-react';
+import Image from 'next/image';
+
+import Button from '@/components/common/Button/Button';
 
 import css from './EmptyState.module.css';
 
-//===========================================================================
+//===============================================================
 
 type Props = {
   title: string;
@@ -13,9 +15,17 @@ type Props = {
   className?: string;
   titleClassName?: string;
   textClassName?: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  primaryActionLabel?: string;
+  secondaryActionLabel?: string;
+  onPrimaryAction?: () => void;
+  onSecondaryAction?: () => void;
 };
 
-//===========================================================================
+//===============================================================
 
 function EmptyState({
   title,
@@ -23,16 +33,59 @@ function EmptyState({
   className,
   titleClassName,
   textClassName,
+  imageSrc,
+  imageAlt = '',
+  imageWidth = 190,
+  imageHeight = 190,
+  primaryActionLabel,
+  secondaryActionLabel,
+  onPrimaryAction,
+  onSecondaryAction,
 }: Props) {
   return (
     <div className={clsx(css.wrapper, className)}>
       <div className={css.content}>
-        <div className={css.iconWrap} aria-hidden="true">
-          <SearchX className={css.icon} />
+        <div className={css.textSide}>
+          <h2 className={clsx(css.title, titleClassName)}>{title}</h2>
+          <p className={clsx(css.text, textClassName)}>{text}</p>
+
+          {primaryActionLabel || secondaryActionLabel ? (
+            <div className={css.actions}>
+              {primaryActionLabel ? (
+                <Button
+                  type="button"
+                  className={css.primaryButton}
+                  onClick={onPrimaryAction}
+                >
+                  {primaryActionLabel}
+                </Button>
+              ) : null}
+
+              {secondaryActionLabel ? (
+                <Button
+                  type="button"
+                  variant="registration"
+                  className={css.secondaryButton}
+                  onClick={onSecondaryAction}
+                >
+                  {secondaryActionLabel}
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
-        <h2 className={clsx(css.title, titleClassName)}>{title}</h2>
-        <p className={clsx(css.text, textClassName)}>{text}</p>
+        {imageSrc ? (
+          <div className={css.imageWrap} aria-hidden="true">
+            <Image
+              src={imageSrc}
+              alt={imageAlt}
+              width={imageWidth}
+              height={imageHeight}
+              className={css.image}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -1,0 +1,38 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: rgba(18, 20, 23, 0.38);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 628px;
+  padding: 48px 20px 32px;
+  border-radius: 30px;
+  background-color: var(--green-main);
+  color: var(--background-1);
+}
+
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: var(--background-1);
+}
+
+@media only screen and (min-width: 768px) {
+  .modal {
+    padding: 48px 64px 48px;
+  }
+
+  .closeButton {
+    top: 20px;
+    right: 20px;
+  }
+}

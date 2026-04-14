@@ -1,0 +1,29 @@
+.statistics {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+}
+
+.label {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.value {
+  font-size: 20px;
+  line-height: 1;
+  font-weight: var(--fw-semiBold);
+  color: var(--text-main);
+}
+
+@media only screen and (min-width: 768px) {
+  .label {
+    font-size: 16px;
+  }
+
+  .value {
+    font-size: 22px;
+  }
+}

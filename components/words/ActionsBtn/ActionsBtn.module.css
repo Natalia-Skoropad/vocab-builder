@@ -1,0 +1,82 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--text-main);
+  transition: background-color 200ms ease, opacity 200ms ease;
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  background-color: rgba(133, 170, 159, 0.12);
+}
+
+.trigger:focus-visible {
+  outline: none;
+}
+
+.triggerIcon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.25;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 10;
+
+  min-width: 118px;
+  padding: 12px;
+  border-radius: 15px;
+  border: 1px solid var(--border-light);
+  background-color: var(--background-1);
+  box-shadow: 0 8px 24px rgba(18, 20, 23, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menuItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+
+  background: transparent;
+  border: none;
+
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-main);
+  transition: opacity 200ms ease;
+}
+
+.menuItem:hover,
+.menuItem:focus-visible {
+  opacity: 0.72;
+}
+
+.menuItem:focus-visible {
+  outline: none;
+}
+
+.menuIcon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.9;
+  color: var(--green-main);
+}

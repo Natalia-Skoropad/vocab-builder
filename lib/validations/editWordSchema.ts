@@ -1,0 +1,25 @@
+import * as yup from 'yup';
+
+import type { EditWordFormValues } from '@/types/forms';
+
+//===============================================================
+
+const EN_REGEX = /\b[A-Za-z'-]+(?:\s+[A-Za-z'-]+)*\b/;
+const UA_REGEX = /^(?![A-Za-z])[А-ЯІЄЇҐґа-яієїʼ\s]+$/u;
+
+//===============================================================
+
+export const editWordSchema: yup.ObjectSchema<EditWordFormValues> = yup
+  .object({
+    ua: yup
+      .string()
+      .trim()
+      .matches(UA_REGEX, 'Enter a valid Ukrainian word')
+      .required('Translation is required'),
+    en: yup
+      .string()
+      .trim()
+      .matches(EN_REGEX, 'Enter a valid English word')
+      .required('Word is required'),
+  })
+  .required();

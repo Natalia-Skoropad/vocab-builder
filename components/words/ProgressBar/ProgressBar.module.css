@@ -1,0 +1,45 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.value {
+  font-size: 18px;
+  line-height: 1.1;
+  font-weight: var(--fw-medium);
+  color: var(--text-main);
+}
+
+.circle {
+  --progress: 0%;
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(
+      closest-side,
+      var(--background-1) 72%,
+      transparent 73% 100%
+    ),
+    conic-gradient(var(--green-main) var(--progress), #dfeee8 0);
+}
+
+.md {
+  width: 26px;
+  height: 26px;
+}
+
+.sm {
+  width: 20px;
+  height: 20px;
+}
+
+@media only screen and (min-width: 768px) {
+  .value {
+    font-size: 20px;
+  }
+
+  .md {
+    width: 28px;
+    height: 28px;
+  }
+}

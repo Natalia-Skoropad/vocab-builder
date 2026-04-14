@@ -9,7 +9,15 @@ function createErrorResponse(message: string, status: number) {
 
 //===============================================================
 
-export async function GET() {
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+//===============================================================
+
+export async function DELETE(_: Request, context: RouteContext) {
   try {
     const token = await getSessionCookie();
 
@@ -17,8 +25,14 @@ export async function GET() {
       return createErrorResponse('Unauthorized.', 401);
     }
 
-    const response = await fetch(`${API_BASE_URL}/words/statistics`, {
-      method: 'GET',
+    const { id } = await context.params;
+
+    if (!id) {
+      return createErrorResponse('Word id is required.', 400);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/words/delete/${id}`, {
+      method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -28,31 +42,24 @@ export async function GET() {
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
+      if (response.status === 400) {
+        return createErrorResponse('Bad request (invalid request body).', 400);
+      }
+
       if (response.status === 401) {
-        return createErrorResponse('Unauthorized.', 401);
+        return createErrorResponse('This word not found.', 401);
       }
 
       if (response.status === 404) {
         return createErrorResponse('Service not found.', 404);
       }
 
-      return createErrorResponse(
-        'Failed to fetch statistics.',
-        response.status
-      );
-    }
-
-    if (
-      !data ||
-      typeof data !== 'object' ||
-      typeof (data as { totalCount?: unknown }).totalCount !== 'number'
-    ) {
-      return createErrorResponse('Invalid server response.', 500);
+      return createErrorResponse('Server error.', 500);
     }
 
     return Response.json(data);
   } catch (error) {
-    console.error('GET /api/words/statistics error:', error);
+    console.error('DELETE /api/words/delete/[id] error:', error);
     return createErrorResponse('Server error.', 500);
   }
 }
