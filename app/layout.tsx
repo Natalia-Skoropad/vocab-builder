@@ -2,14 +2,57 @@ import type { Metadata } from 'next';
 
 import AuthProvider from '@/providers/AuthProvider';
 import ToastProvider from '@/providers/ToastProvider';
+import TanStackProvider from '@/providers/TanStackProvider';
+
+import {
+  OG_IMAGE,
+  OG_IMAGE_ALT,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from '@/lib/constants/metadata';
 
 import './globals.css';
 
 //===============================================================
 
 export const metadata: Metadata = {
-  title: 'VocabBuilder',
-  description: 'VocabBuilder app',
+  metadataBase: new URL(SITE_URL),
+
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
+  },
+
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+
+  openGraph: {
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: '/',
+    siteName: SITE_NAME,
+    images: [
+      {
+        url: OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: OG_IMAGE_ALT,
+      },
+    ],
+    type: 'website',
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+
+  alternates: {
+    canonical: '/',
+  },
 };
 
 //===============================================================
@@ -24,10 +67,12 @@ function RootLayout({ children }: Props) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          {children}
-          <ToastProvider />
-        </AuthProvider>
+        <TanStackProvider>
+          <AuthProvider>
+            {children}
+            <ToastProvider />
+          </AuthProvider>
+        </TanStackProvider>
       </body>
     </html>
   );

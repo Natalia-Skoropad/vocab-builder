@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 
-//===============================================================
-
 import type {
   AppUser,
   BackendAuthResponse,
   BackendCurrentUserResponse,
 } from '@/types/auth';
+
+//===============================================================
 
 type RouteAuthResponse = {
   user?: AppUser;
