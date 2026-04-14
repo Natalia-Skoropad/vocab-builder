@@ -1,39 +1,47 @@
 .outer {
   margin-top: 32px;
-  padding: 10px;
+  padding: 12px;
   border-radius: 16px;
   background-color: rgba(255, 255, 255, 0.45);
+  overflow: visible;
 }
 
 .scroll {
   width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
   border-radius: 14px;
 }
 
 .table {
   width: 100%;
   min-width: 720px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   background-color: var(--background-1);
   border-radius: 14px;
-  overflow: hidden;
 }
 
 .head {
-  background-color: #f0f4f3;
+  background-color: #f7f9f9;
 }
 
-.row:not(:last-child) {
-  border-bottom: 1px solid rgba(18, 20, 23, 0.1);
+.row:last-child .td:first-child {
+  border-bottom-left-radius: 14px;
+}
+
+.row:last-child .td:last-child {
+  border-bottom-right-radius: 14px;
 }
 
 .th,
 .td {
-  padding: 16px 14px;
+  padding: 18px 14px;
   text-align: left;
   vertical-align: top;
   border-right: 1px solid rgba(18, 20, 23, 0.08);
+  border-bottom: 1px solid rgba(18, 20, 23, 0.08);
+  background-color: var(--background-1);
 }
 
 .th:last-child,
@@ -46,27 +54,115 @@
   line-height: 1.2;
   font-weight: var(--fw-medium);
   color: var(--text-main);
+  background-color: #f7f9f9;
 }
 
 .td {
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.56;
   color: var(--text-main);
 }
 
-@media only screen and (min-width: 768px) {
+.headCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flagIcon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.wordCell,
+.translationCell,
+.categoryCell {
+  display: inline-block;
+}
+
+.td[data-column='progress'] {
+  white-space: nowrap;
+}
+
+.td[data-column='actions'],
+.th[data-column='actions'] {
+  width: 56px;
+  text-align: center;
+}
+
+@media only screen and (max-width: 767.98px) {
   .outer {
-    padding: 18px;
-    border-radius: 24px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .scroll {
+    overflow-x: auto;
+  }
+
+  .table {
+    min-width: 360px;
   }
 
   .th,
   .td {
-    padding: 18px 16px;
+    padding: 16px 14px;
+    font-size: 14px;
+    line-height: 1.43;
+  }
+
+  .flagIcon,
+  .th[data-column='category'],
+  .td[data-column='category'] {
+    display: none;
+  }
+
+  .th[data-column='progress'],
+  .td[data-column='progress'] {
+    width: 86px;
+  }
+
+  .th[data-column='actions'],
+  .td[data-column='actions'] {
+    width: 44px;
+    min-width: 44px;
+    text-align: center;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .outer {
+    padding: 16px;
+    border-radius: 24px;
+  }
+
+  .table {
+    min-width: 640px;
+  }
+
+  .th,
+  .td {
+    padding: 20px 16px;
+  }
+
+  .th[data-column='actions'],
+  .td[data-column='actions'] {
+    width: 52px;
+    min-width: 52px;
   }
 }
 
 @media only screen and (min-width: 1440px) {
+  .outer {
+    padding: 18px;
+    border-radius: 30px;
+  }
+
+  .scroll {
+    overflow: visible;
+  }
+
   .table {
     min-width: 100%;
   }
@@ -74,5 +170,23 @@
   .th,
   .td {
     padding: 22px 18px;
+    font-size: 20px;
+    line-height: 1.4;
+  }
+
+  .th {
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .flagIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .th[data-column='actions'],
+  .td[data-column='actions'] {
+    width: 72px;
+    min-width: 72px;
   }
 }

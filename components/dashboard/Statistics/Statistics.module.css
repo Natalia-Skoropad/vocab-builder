@@ -6,8 +6,8 @@
 }
 
 .label {
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1.2;
   color: var(--text-muted);
 }
 
@@ -16,14 +16,4 @@
   line-height: 1;
   font-weight: var(--fw-semiBold);
   color: var(--text-main);
-}
-
-@media only screen and (min-width: 768px) {
-  .label {
-    font-size: 16px;
-  }
-
-  .value {
-    font-size: 22px;
-  }
 }

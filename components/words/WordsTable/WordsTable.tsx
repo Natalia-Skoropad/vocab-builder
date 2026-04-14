@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import {
   createColumnHelper,
   flexRender,
@@ -11,6 +12,7 @@ import type { WordItem } from '@/types/word';
 
 import ProgressBar from '@/components/words/ProgressBar/ProgressBar';
 import ActionsBtn from '@/components/words/ActionsBtn/ActionsBtn';
+import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 
 import css from './WordsTable.module.css';
 
@@ -30,40 +32,87 @@ const columnHelper = createColumnHelper<WordItem>();
 //===============================================================
 
 function WordsTable({ variant, rows, onEdit, onDelete }: Props) {
-  const columns = [
-    columnHelper.accessor('en', {
-      header: 'Word',
-      cell: (info) => info.getValue(),
-    }),
+  const dictionaryColumns = useMemo(
+    () => [
+      columnHelper.accessor('en', {
+        header: () => (
+          <div className={css.headCell}>
+            <span>Word</span>
+            <SvgIcon name="icon-united-kingdom-flag" className={css.flagIcon} />
+          </div>
+        ),
+        cell: (info) => <span className={css.wordCell}>{info.getValue()}</span>,
+      }),
 
-    columnHelper.accessor('ua', {
-      header: 'Translation',
-      cell: (info) => info.getValue(),
-    }),
+      columnHelper.accessor('ua', {
+        header: () => (
+          <div className={css.headCell}>
+            <span>Translation</span>
+            <SvgIcon name="icon-ukraine-flag" className={css.flagIcon} />
+          </div>
+        ),
+        cell: (info) => (
+          <span className={css.translationCell}>{info.getValue()}</span>
+        ),
+      }),
 
-    columnHelper.accessor('category', {
-      header: 'Category',
-      cell: (info) => info.getValue(),
-    }),
+      columnHelper.accessor('category', {
+        header: 'Category',
+        cell: (info) => (
+          <span className={css.categoryCell}>
+            {info
+              .getValue()
+              .split(' ')
+              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+              .join(' ')}
+          </span>
+        ),
+      }),
 
-    columnHelper.accessor('progress', {
-      header: 'Progress',
-      cell: (info) => <ProgressBar value={info.getValue()} />,
-    }),
+      columnHelper.accessor('progress', {
+        header: 'Progress',
+        cell: (info) => <ProgressBar value={info.getValue()} />,
+      }),
 
-    columnHelper.display({
-      id: 'actions',
-      header: '',
-      cell: (info) =>
-        variant === 'dictionary' ? (
+      columnHelper.display({
+        id: 'actions',
+        header: '',
+        cell: (info) => (
           <ActionsBtn
             word={info.row.original}
             onEdit={onEdit}
             onDelete={onDelete}
           />
-        ) : null,
-    }),
-  ];
+        ),
+      }),
+    ],
+    [onEdit, onDelete]
+  );
+
+  const recommendColumns = useMemo(
+    () => [
+      columnHelper.accessor('en', {
+        header: 'Word',
+        cell: (info) => <span className={css.wordCell}>{info.getValue()}</span>,
+      }),
+
+      columnHelper.accessor('ua', {
+        header: 'Translation',
+        cell: (info) => (
+          <span className={css.translationCell}>{info.getValue()}</span>
+        ),
+      }),
+
+      columnHelper.accessor('progress', {
+        header: 'Progress',
+        cell: (info) => <ProgressBar value={info.getValue()} />,
+      }),
+    ],
+    []
+  );
+
+  const columns =
+    variant === 'dictionary' ? dictionaryColumns : recommendColumns;
 
   const table = useReactTable({
     data: rows,
@@ -79,7 +128,11 @@ function WordsTable({ variant, rows, onEdit, onDelete }: Props) {
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className={css.row}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className={css.th}>
+                  <th
+                    key={header.id}
+                    className={css.th}
+                    data-column={header.column.id}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -96,7 +149,11 @@ function WordsTable({ variant, rows, onEdit, onDelete }: Props) {
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className={css.row}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className={css.td}>
+                  <td
+                    key={cell.id}
+                    className={css.td}
+                    data-column={cell.column.id}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

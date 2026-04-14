@@ -5,8 +5,8 @@
 }
 
 .value {
-  font-size: 18px;
-  line-height: 1.1;
+  font-size: 20px;
+  line-height: 1.2;
   font-weight: var(--fw-medium);
   color: var(--text-main);
 }
@@ -17,10 +17,10 @@
   border-radius: 50%;
   background: radial-gradient(
       closest-side,
-      var(--background-1) 72%,
-      transparent 73% 100%
+      var(--background-1) 70%,
+      transparent 71% 100%
     ),
-    conic-gradient(var(--green-main) var(--progress), #dfeee8 0);
+    conic-gradient(var(--green-main) var(--progress), #d7eadf 0);
 }
 
 .md {
@@ -33,7 +33,19 @@
   height: 20px;
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (max-width: 767.98px) {
+  .value {
+    font-size: 18px;
+    line-height: 1.1;
+  }
+
+  .md {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
   .value {
     font-size: 20px;
   }

@@ -7,9 +7,6 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-
-  background-color: var(--background-1);
-  border: 1px solid var(--border);
 }
 
 .spinner {

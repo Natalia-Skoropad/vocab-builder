@@ -3,6 +3,7 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+
 import {
   useParams,
   usePathname,
@@ -12,10 +13,13 @@ import {
 
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCategoriesStore } from '@/store/categories/categoriesStore';
+
 import {
   buildDictionaryPath,
   parseDictionarySegments,
 } from '@/lib/utils/dictionary.query';
+
+import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
 
 import css from './Filters.module.css';
 
@@ -130,6 +134,20 @@ function Filters({ variant }: Props) {
     setKeyword(initialKeyword);
   }, [initialKeyword]);
 
+  const categoryOptions = useMemo(
+    () => [
+      { value: 'categories', label: 'Categories' },
+      ...categories.map((item) => ({
+        value: item,
+        label: item
+          .split(' ')
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(' '),
+      })),
+    ],
+    [categories]
+  );
+
   return (
     <div className={css.filters}>
       <div className={css.topRow}>
@@ -155,25 +173,16 @@ function Filters({ variant }: Props) {
             Select category
           </label>
 
-          <select
-            id={categoryId}
-            value={effectiveCategory}
-            onChange={(event) =>
-              setCategory(event.target.value as typeof effectiveCategory)
-            }
-            className={css.select}
-          >
-            <option value="categories">Categories</option>
-
-            {categories.map((item) => (
-              <option key={item} value={item}>
-                {item
-                  .split(' ')
-                  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-                  .join(' ')}
-              </option>
-            ))}
-          </select>
+          <div id={categoryId}>
+            <CustomSelect
+              value={effectiveCategory}
+              options={categoryOptions}
+              onChange={(nextValue) =>
+                setCategory(nextValue as typeof effectiveCategory)
+              }
+              placeholder="Categories"
+            />
+          </div>
         </div>
       </div>
 
