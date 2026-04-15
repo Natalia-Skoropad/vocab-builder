@@ -77,7 +77,13 @@
   }
 
   .actionsWrap {
+    flex-wrap: nowrap;
+    align-items: center;
     gap: 16px 28px;
+  }
+
+  .actionsWrap > :first-child {
+    flex: 0 0 auto;
   }
 
   .actionIcon {
