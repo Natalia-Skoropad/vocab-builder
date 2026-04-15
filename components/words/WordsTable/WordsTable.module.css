@@ -8,14 +8,14 @@
 
 .scroll {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: visible;
   border-radius: 14px;
 }
 
 .table {
   width: 100%;
-  min-width: 720px;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   background-color: var(--background-1);
@@ -24,6 +24,10 @@
 
 .head {
   background-color: #f7f9f9;
+}
+
+.row {
+  position: relative;
 }
 
 .row:last-child .td:first-child {
@@ -42,6 +46,11 @@
   border-right: 1px solid rgba(18, 20, 23, 0.08);
   border-bottom: 1px solid rgba(18, 20, 23, 0.08);
   background-color: var(--background-1);
+}
+
+.td {
+  position: relative;
+  overflow: visible;
 }
 
 .th:last-child,
@@ -64,9 +73,11 @@
 }
 
 .headCell {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
+  width: 100%;
 }
 
 .flagIcon {
@@ -78,16 +89,42 @@
 .wordCell,
 .translationCell,
 .categoryCell {
-  display: inline-block;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .td[data-column='progress'] {
   white-space: nowrap;
 }
 
+.th[data-column='en'],
+.td[data-column='en'] {
+  width: 22%;
+}
+
+.th[data-column='ua'],
+.td[data-column='ua'] {
+  width: 30%;
+}
+
+.th[data-column='category'],
+.td[data-column='category'] {
+  width: 22%;
+}
+
+.th[data-column='progress'],
+.td[data-column='progress'] {
+  width: 18%;
+}
+
 .td[data-column='actions'],
 .th[data-column='actions'] {
   width: 56px;
+  min-width: 56px;
   text-align: center;
 }
 
@@ -95,19 +132,17 @@
   .outer {
     padding: 12px;
     border-radius: 16px;
+    overflow: visible;
   }
 
   .scroll {
-    overflow-x: auto;
-  }
-
-  .table {
-    min-width: 360px;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 
   .th,
   .td {
-    padding: 16px 14px;
+    padding: 16px 12px;
     font-size: 14px;
     line-height: 1.43;
   }
@@ -118,27 +153,45 @@
     display: none;
   }
 
+  .th[data-column='en'],
+  .td[data-column='en'] {
+    width: 38%;
+  }
+
+  .th[data-column='ua'],
+  .td[data-column='ua'] {
+    width: 38%;
+  }
+
   .th[data-column='progress'],
   .td[data-column='progress'] {
-    width: 86px;
+    width: 72px;
+    min-width: 72px;
+    padding-left: 6px;
+    padding-right: 6px;
+    text-align: center;
   }
 
   .th[data-column='actions'],
   .td[data-column='actions'] {
     width: 44px;
     min-width: 44px;
+    padding-left: 6px;
+    padding-right: 8px;
     text-align: center;
   }
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 768px) and (max-width: 1439.98px) {
   .outer {
     padding: 16px;
     border-radius: 24px;
+    overflow: visible;
   }
 
-  .table {
-    min-width: 640px;
+  .scroll {
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 
   .th,
@@ -161,10 +214,6 @@
 
   .scroll {
     overflow: visible;
-  }
-
-  .table {
-    min-width: 100%;
   }
 
   .th,

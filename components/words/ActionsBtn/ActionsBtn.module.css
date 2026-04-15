@@ -79,3 +79,11 @@
   stroke-width: 1.9;
   color: var(--green-main);
 }
+
+@media only screen and (max-width: 1439.98px) {
+  .menu {
+    top: auto;
+    bottom: calc(100% + 8px);
+    right: 0;
+  }
+}
