@@ -35,35 +35,14 @@
   text-decoration: none;
 }
 
+.link:focus-visible {
+  outline: none;
+}
+
 .linkText {
   position: relative;
   white-space: nowrap;
   font-weight: var(--fw-medium);
-}
-
-.linkText::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-
-  width: 100%;
-  height: 1px;
-
-  background-color: var(--green-main);
-
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s ease;
-}
-
-.link:hover .linkText::after,
-.link:focus-visible .linkText::after {
-  transform: scaleX(1);
-}
-
-.link:focus-visible {
-  outline: none;
 }
 
 .homeIcon {

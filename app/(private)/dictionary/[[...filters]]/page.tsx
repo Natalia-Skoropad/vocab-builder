@@ -1,13 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import type { WordItem } from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
-
 import {
   buildDictionaryPath,
   formatDictionaryCategoryLabel,
@@ -21,7 +20,10 @@ import InlineLoader from '@/components/common/InlineLoader/InlineLoader';
 import EmptyState from '@/components/common/EmptyState/EmptyState';
 import AddWordModal from '@/components/modals/AddWordModal/AddWordModal';
 import EditWordModal from '@/components/modals/EditWordModal/EditWordModal';
+import ConfirmDeleteModal from '@/components/modals/ConfirmDeleteModal/ConfirmDeleteModal';
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+
+import css from './page.module.css';
 
 //===============================================================
 
@@ -37,6 +39,7 @@ function DictionaryPage() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingWord, setEditingWord] = useState<WordItem | null>(null);
+  const [deletingWord, setDeletingWord] = useState<WordItem | null>(null);
 
   const rawFiltersParam = params.filters;
 
@@ -93,6 +96,7 @@ function DictionaryPage() {
           label: categoryLabel,
           href: buildDictionaryPath({
             category: routeFilters.category,
+            isIrregular: undefined,
             page: 1,
           }),
         });
@@ -115,10 +119,17 @@ function DictionaryPage() {
     queryFn: () => wordsService.getOwnWords(queryParams),
   });
 
+  const { data: statistics } = useQuery({
+    queryKey: ['words-statistics'],
+    queryFn: () => wordsService.getStatistics(),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => wordsService.deleteWord(id),
     onSuccess: (result) => {
       toast.success(result.message || 'Word deleted successfully.');
+
+      setDeletingWord(null);
 
       void queryClient.invalidateQueries({
         queryKey: ['dictionary-words'],
@@ -137,119 +148,110 @@ function DictionaryPage() {
     },
   });
 
-  const handleEdit = (word: WordItem) => {
-    setEditingWord(word);
-  };
-
-  const handleDelete = (word: WordItem) => {
-    void deleteMutation.mutateAsync(word._id);
-  };
+  const rows = data?.results ?? [];
+  const totalPages = data?.totalPages ?? 1;
+  const currentPage = data?.page ?? routeFilters.page;
+  const totalCount = statistics?.totalCount ?? 0;
 
   const handlePageChange = (nextPage: number) => {
     const nextPath = buildDictionaryPath({
       category: routeFilters.category,
-      isIrregular: routeFilters.isIrregular,
+      isIrregular:
+        routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined,
       page: nextPage,
     });
 
-    const nextParams = new URLSearchParams();
+    const nextParams = new URLSearchParams(searchParams.toString());
+    const query = nextParams.toString();
 
-    if (keyword) {
-      nextParams.set('keyword', keyword);
-    }
-
-    const nextQuery = nextParams.toString();
-    const nextUrl = nextQuery ? `${nextPath}?${nextQuery}` : nextPath;
-
-    router.replace(nextUrl, { scroll: false });
+    router.push(query ? `${nextPath}?${query}` : nextPath, {
+      scroll: false,
+    });
   };
 
-  const handleAddWord = () => {
-    setIsAddModalOpen(true);
-  };
+  const handleConfirmDelete = async () => {
+    if (!deletingWord || deleteMutation.isPending) return;
 
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-  };
-
-  const closeEditModal = () => {
-    setEditingWord(null);
+    await deleteMutation.mutateAsync(deletingWord._id);
   };
 
   return (
-    <>
-      <main>
-        <section aria-labelledby="dictionary-title">
-          <div className="container">
-            <h1 id="dictionary-title" className="visually-hidden">
-              Dictionary
-            </h1>
+    <section className={css.section}>
+      <div className="container">
+        <Breadcrumbs items={breadcrumbItems} />
 
-            <Breadcrumbs items={breadcrumbItems} />
+        <Dashboard
+          variant="dictionary"
+          totalCount={totalCount}
+          showAddWord
+          showTrainLink
+          onAddWord={() => setIsAddModalOpen(true)}
+        />
 
-            <Dashboard
+        {isLoading ? (
+          <div className={css.loaderWrap}>
+            <InlineLoader />
+          </div>
+        ) : isError ? (
+          <EmptyState
+            title="Something went wrong"
+            text={
+              error instanceof Error ? error.message : 'Failed to load words.'
+            }
+            className={css.emptyState}
+          />
+        ) : rows.length === 0 ? (
+          <EmptyState
+            title="No words yet"
+            text="Add your first word to start building your personal dictionary."
+            imageSrc="/training-empty.png"
+            imageAlt="Empty training state illustration"
+            imageWidth={498}
+            imageHeight={435}
+            primaryActionLabel="Add word"
+            onPrimaryAction={() => setIsAddModalOpen(true)}
+            className={css.emptyState}
+          />
+        ) : (
+          <>
+            <WordsTable
               variant="dictionary"
-              showAddWord
-              showTrainLink
-              onAddWord={handleAddWord}
+              rows={rows}
+              onEdit={(word) => setEditingWord(word)}
+              onDelete={(word) => setDeletingWord(word)}
             />
 
-            {isLoading ? <InlineLoader text="Loading words…" /> : null}
+            <WordsPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </>
+        )}
 
-            {!isLoading && isError ? (
-              <EmptyState
-                title="Failed to load dictionary"
-                text={
-                  error instanceof Error
-                    ? error.message
-                    : 'Please try again a little later.'
-                }
-                imageSrc="/training-empty.png"
-                imageWidth={180}
-                imageHeight={180}
-              />
-            ) : null}
+        <AddWordModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+        />
 
-            {!isLoading && !isError && data?.results.length === 0 ? (
-              <EmptyState
-                title="Your dictionary is empty"
-                text="Add your first word to start building your personal vocabulary collection and begin learning new words."
-                imageSrc="/training-empty.png"
-                imageWidth={190}
-                imageHeight={190}
-                primaryActionLabel="Add word"
-                onPrimaryAction={handleAddWord}
-              />
-            ) : null}
+        <EditWordModal
+          isOpen={Boolean(editingWord)}
+          word={editingWord}
+          onClose={() => setEditingWord(null)}
+        />
 
-            {!isLoading && !isError && data && data.results.length > 0 ? (
-              <>
-                <WordsTable
-                  variant="dictionary"
-                  rows={data.results}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-
-                <WordsPagination
-                  currentPage={data.page}
-                  totalPages={data.totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </>
-            ) : null}
-          </div>
-        </section>
-      </main>
-
-      <AddWordModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-
-      <EditWordModal
-        isOpen={Boolean(editingWord)}
-        onClose={closeEditModal}
-        word={editingWord}
-      />
-    </>
+        <ConfirmDeleteModal
+          isOpen={Boolean(deletingWord)}
+          onClose={() => {
+            if (deleteMutation.isPending) return;
+            setDeletingWord(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          isSubmitting={deleteMutation.isPending}
+          wordLabel={deletingWord?.en}
+        />
+      </div>
+    </section>
   );
 }
 

@@ -1,0 +1,61 @@
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  margin-bottom: 16px;
+  font-size: 32px;
+  line-height: 1.12;
+  font-weight: var(--fw-bold);
+  color: var(--background-1);
+}
+
+.text {
+  max-width: 420px;
+  font-family: var(--second-family);
+  font-size: 18px;
+  line-height: 1.67;
+  color: rgba(252, 252, 252, 0.9);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.confirmButton,
+.cancelButton {
+  min-width: 100%;
+}
+
+.cancelButton {
+  color: var(--background-1);
+  border-color: rgba(252, 252, 252, 0.35);
+}
+
+.cancelButton:hover,
+.cancelButton:focus-visible {
+  background-color: rgba(252, 252, 252, 0.08);
+}
+
+@media only screen and (min-width: 768px) {
+  .title {
+    margin-bottom: 18px;
+    font-size: 40px;
+    line-height: 1.2;
+  }
+
+  .actions {
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .confirmButton,
+  .cancelButton {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
 
@@ -8,19 +8,18 @@ import css from './CustomSelect.module.css';
 
 //===============================================================
 
-export type CustomSelectOption = {
+type Option = {
   value: string;
   label: string;
 };
 
 type Props = {
   value: string;
-  options: CustomSelectOption[];
+  options: Option[];
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
-  buttonClassName?: string;
-  dropdownClassName?: string;
+  variant?: 'page' | 'modal';
 };
 
 //===============================================================
@@ -29,19 +28,16 @@ function CustomSelect({
   value,
   options,
   onChange,
-  placeholder = 'Select option',
+  placeholder = 'Select',
   className,
-  buttonClassName,
-  dropdownClassName,
+  variant = 'page',
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!isOpen) return;
-
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (!wrapRef.current?.contains(event.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -52,28 +48,32 @@ function CustomSelect({
       }
     };
 
-    window.addEventListener('mousedown', handleOutsideClick);
-    window.addEventListener('keydown', handleEscape);
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
 
     return () => {
-      window.removeEventListener('mousedown', handleOutsideClick);
-      window.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
     };
-  }, [isOpen]);
+  }, []);
 
-  const selectedOption = useMemo(
-    () => options.find((option) => option.value === value) ?? null,
-    [options, value]
-  );
+  const selectedOption = options.find((option) => option.value === value);
 
   return (
-    <div className={clsx(css.wrap, className)} ref={wrapRef}>
+    <div
+      ref={rootRef}
+      className={clsx(
+        css.root,
+        variant === 'modal' && css.modalRoot,
+        className
+      )}
+    >
       <button
         type="button"
         className={clsx(
           css.trigger,
-          buttonClassName,
-          isOpen && css.triggerOpen
+          variant === 'modal' && css.modalTrigger,
+          isOpen && css.open
         )}
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
@@ -90,33 +90,35 @@ function CustomSelect({
       </button>
 
       {isOpen ? (
-        <div className={clsx(css.dropdown, dropdownClassName)} role="listbox">
-          <ul className={css.list}>
-            {options.map((option) => {
-              const isSelected = option.value === value;
+        <ul
+          className={clsx(css.menu, variant === 'modal' && css.modalMenu)}
+          role="listbox"
+        >
+          {options.map((option) => {
+            const isSelected = option.value === value;
 
-              return (
-                <li key={option.value}>
-                  <button
-                    type="button"
-                    className={clsx(
-                      css.option,
-                      isSelected && css.optionSelected
-                    )}
-                    onClick={() => {
-                      onChange(option.value);
-                      setIsOpen(false);
-                    }}
-                    role="option"
-                    aria-selected={isSelected}
-                  >
-                    {option.label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+            return (
+              <li key={option.value}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  className={clsx(
+                    css.option,
+                    variant === 'modal' && css.modalOption,
+                    isSelected && css.selected
+                  )}
+                  onClick={() => {
+                    onChange(option.value);
+                    setIsOpen(false);
+                  }}
+                >
+                  {option.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       ) : null}
     </div>
   );

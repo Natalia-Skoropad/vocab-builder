@@ -3,21 +3,21 @@
 import type { WordItem } from '@/types/word';
 
 import ModalBase from '@/components/modals/ModalBase/ModalBase';
-
 import EditWordForm from './EditWordForm';
-import css from './EditWordModal.module.css';
+
+import css from '@/components/modals/shared/WordModal.module.css';
 
 //===============================================================
 
 type Props = {
   isOpen: boolean;
-  onClose: () => void;
   word: WordItem | null;
+  onClose: () => void;
 };
 
 //===============================================================
 
-function EditWordModal({ isOpen, onClose, word }: Props) {
+function EditWordModal({ isOpen, word, onClose }: Props) {
   if (!word) return null;
 
   return (

@@ -25,13 +25,22 @@ function LogoutButton({
       type="button"
       className={clsx(
         css.button,
+        'interactive-underline-trigger',
         variant === 'offcanvas' && css.offcanvas,
         className
       )}
       aria-label={label}
       {...props}
     >
-      <span className={css.text}>{label}</span>
+      <span
+        className={clsx(
+          css.text,
+          'interactive-underline',
+          variant === 'offcanvas' && 'interactive-underline--light'
+        )}
+      >
+        {label}
+      </span>
 
       <span className={css.arrow} aria-hidden="true">
         →

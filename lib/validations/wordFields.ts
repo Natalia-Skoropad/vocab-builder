@@ -2,32 +2,31 @@ import * as yup from 'yup';
 
 //===============================================================
 
-const EN_REGEX = /\b[A-Za-z'-]+(?:\s+[A-Za-z'-]+)*\b/;
-const UA_REGEX = /^(?![A-Za-z])[А-ЯІЄЇҐґа-яієїʼ\s]+$/u;
+const WORD_MIN = 1;
+const WORD_MAX = 60;
+
+const EN_REGEX = /^[A-Za-z'-]+(?:\s+[A-Za-z'-]+)*$/;
+const UA_REGEX = /^(?![A-Za-z])[А-ЯІЄЇҐґа-яієїʼ'`\-\s]+$/u;
 
 //===============================================================
 
-export const wordValidationFields = {
-  category: yup.string().trim().required('Category is required'),
-
-  isIrregular: yup.boolean().required(),
-
-  ua: yup
-    .string()
-    .trim()
-    .matches(UA_REGEX, 'Enter a valid Ukrainian word')
-    .required('Translation is required'),
-
-  en: yup
-    .string()
-    .trim()
-    .matches(EN_REGEX, 'Enter a valid English word')
-    .required('Word is required'),
+export const WORD_LIMITS = {
+  MIN: WORD_MIN,
+  MAX: WORD_MAX,
 };
 
-//===============================================================
+export const uaWordField = yup
+  .string()
+  .trim()
+  .min(WORD_MIN, 'Enter at least 1 character')
+  .max(WORD_MAX, `Maximum ${WORD_MAX} characters`)
+  .matches(UA_REGEX, 'Enter a valid Ukrainian word')
+  .required('Enter a valid Ukrainian word');
 
-export const baseWordPairShape = {
-  ua: wordValidationFields.ua,
-  en: wordValidationFields.en,
-};
+export const enWordField = yup
+  .string()
+  .trim()
+  .min(WORD_MIN, 'Enter at least 1 character')
+  .max(WORD_MAX, `Maximum ${WORD_MAX} characters`)
+  .matches(EN_REGEX, 'Enter a valid English word')
+  .required('Enter a valid English word');

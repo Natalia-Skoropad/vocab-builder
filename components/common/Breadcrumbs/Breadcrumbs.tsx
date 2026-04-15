@@ -31,13 +31,35 @@ function Breadcrumbs({ items, className }: Props) {
           return (
             <li key={`${item.label}-${idx}`} className={css.item}>
               {idx === 0 && item.href && !isLast ? (
-                <Link href={item.href} className={css.link}>
+                <Link
+                  href={item.href}
+                  className={clsx(css.link, 'interactive-underline-trigger')}
+                >
                   <Home size={16} className={css.homeIcon} aria-hidden="true" />
-                  <span className={css.linkText}>{item.label}</span>
+                  <span
+                    className={clsx(
+                      css.linkText,
+                      'interactive-underline',
+                      'interactive-underline--thin'
+                    )}
+                  >
+                    {item.label}
+                  </span>
                 </Link>
               ) : isLink ? (
-                <Link href={item.href!} className={css.link}>
-                  <span className={css.linkText}>{item.label}</span>
+                <Link
+                  href={item.href!}
+                  className={clsx(css.link, 'interactive-underline-trigger')}
+                >
+                  <span
+                    className={clsx(
+                      css.linkText,
+                      'interactive-underline',
+                      'interactive-underline--thin'
+                    )}
+                  >
+                    {item.label}
+                  </span>
                 </Link>
               ) : (
                 <span className={css.current} aria-current="page">

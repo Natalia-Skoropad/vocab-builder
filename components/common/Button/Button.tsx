@@ -8,17 +8,19 @@ import css from './Button.module.css';
 //===============================================================
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'common' | 'registration' | 'disabled';
+  variant?: 'primary' | 'secondary' | 'dark' | 'light' | 'disabled';
+  fullWidth?: boolean;
 };
 
 //===============================================================
 
 function Button({
-  variant = 'common',
+  variant = 'primary',
   className,
   type = 'button',
   children,
   disabled,
+  fullWidth = true,
   ...props
 }: Props) {
   const isDisabled = disabled || variant === 'disabled';
@@ -30,9 +32,12 @@ function Button({
       className={clsx(
         css.button,
         {
-          [css.common]: variant === 'common',
-          [css.registration]: variant === 'registration',
+          [css.primary]: variant === 'primary',
+          [css.secondary]: variant === 'secondary',
+          [css.dark]: variant === 'dark',
+          [css.light]: variant === 'light',
           [css.disabled]: variant === 'disabled',
+          [css.fullWidth]: fullWidth,
         },
         className
       )}

@@ -1,0 +1,44 @@
+.section {
+  padding-bottom: 32px;
+}
+
+.loaderWrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 48px;
+  padding-bottom: 32px;
+}
+
+.emptyState {
+  margin-top: 32px;
+}
+
+@media only screen and (min-width: 768px) {
+  .section {
+    padding-bottom: 40px;
+  }
+
+  .loaderWrap {
+    padding-top: 64px;
+    padding-bottom: 40px;
+  }
+
+  .emptyState {
+    margin-top: 40px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .section {
+    padding-bottom: 48px;
+  }
+
+  .loaderWrap {
+    padding-top: 72px;
+    padding-bottom: 48px;
+  }
+
+  .emptyState {
+    margin-top: 48px;
+  }
+}

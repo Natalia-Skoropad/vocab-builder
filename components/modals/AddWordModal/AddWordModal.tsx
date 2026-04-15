@@ -1,9 +1,9 @@
 'use client';
 
 import ModalBase from '@/components/modals/ModalBase/ModalBase';
-
 import AddWordForm from './AddWordForm';
-import css from './AddWordModal.module.css';
+
+import css from '@/components/modals/shared/WordModal.module.css';
 
 //===============================================================
 

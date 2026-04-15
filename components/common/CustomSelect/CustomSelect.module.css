@@ -1,28 +1,32 @@
-.wrap {
+.root {
   position: relative;
   width: 100%;
 }
 
 .trigger {
-  width: 100%;
-  min-height: 48px;
-  padding: 12px 18px;
-  border-radius: 15px;
-  border: 1px solid rgba(18, 20, 23, 0.1);
-  background-color: var(--background-1);
-
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 18px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(18, 20, 23, 0.1);
+  background-color: var(--background-1);
   color: var(--text-main);
-  transition: border-color 200ms ease, box-shadow 200ms ease;
+
+  transition: border-color var(--motion-duration-fast)
+      var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .trigger:hover,
 .trigger:focus-visible,
-.triggerOpen {
+.open {
   border-color: var(--green-main);
   box-shadow: 0 0 0 2px rgba(133, 170, 159, 0.12);
 }
@@ -32,75 +36,132 @@
 }
 
 .triggerText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 16px;
-  line-height: 1.5;
-  text-align: left;
+  line-height: 1.2;
 }
 
 .icon {
+  flex-shrink: 0;
   width: 18px;
   height: 18px;
-  flex-shrink: 0;
-  transition: transform 200ms ease;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .iconOpen {
   transform: rotate(180deg);
 }
 
-.dropdown {
+.menu {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  z-index: 20;
-  font-family: var(--font-family);
+  z-index: 40;
 
   width: 100%;
-  max-height: 284px;
+  max-height: min(320px, 45vh);
   overflow-y: auto;
-  padding: 12px 10px;
+  overflow-x: hidden;
+  padding: 8px;
 
   border-radius: 16px;
+  border: 1px solid rgba(18, 20, 23, 0.08);
   background-color: var(--background-1);
   box-shadow: 0 10px 30px rgba(18, 20, 23, 0.08);
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--green-main) transparent;
 }
 
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.menu::-webkit-scrollbar {
+  width: 6px;
+}
 
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.menu::-webkit-scrollbar-thumb {
+  background-color: var(--green-main);
+  border-radius: 999px;
+}
+
+.menu::-webkit-scrollbar-track {
+  background-color: transparent;
 }
 
 .option {
   width: 100%;
-  padding: 4px 10px;
-  background-color: transparent;
-  border: none;
-
-  font-size: 18px;
-  line-height: 1.33;
+  padding: 10px 12px;
+  border-radius: 12px;
   text-align: left;
-  color: rgba(18, 20, 23, 0.5);
-  transition: color 200ms ease;
+  color: var(--text-main);
+  transition: background-color var(--motion-duration-fast)
+      var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .option:hover,
 .option:focus-visible,
-.optionSelected {
-  color: var(--green-main);
+.selected {
+  background-color: rgba(133, 170, 159, 0.12);
 }
 
 .option:focus-visible {
   outline: none;
 }
 
-@media only screen and (max-width: 767.98px) {
-  .dropdown {
-    max-height: 240px;
-    padding: 10px 8px;
+/* modal variant */
+
+.modalTrigger {
+  min-height: 56px;
+  padding: 16px 18px;
+  border-radius: 15px;
+  border: 1px solid rgba(252, 252, 252, 0.25);
+  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--background-1);
+}
+
+.modalTrigger:hover,
+.modalTrigger:focus-visible,
+.modalTrigger.open {
+  border-color: rgba(252, 252, 252, 0.45);
+  box-shadow: 0 0 0 2px rgba(252, 252, 252, 0.08);
+}
+
+.modalMenu {
+  max-height: min(280px, 36vh);
+  border: 1px solid rgba(252, 252, 252, 0.16);
+  background-color: #9ab8ae;
+  box-shadow: 0 12px 30px rgba(18, 20, 23, 0.14);
+}
+
+.modalOption {
+  color: var(--background-1);
+}
+
+.modalOption:hover,
+.modalOption:focus-visible,
+.modalOption.selected {
+  background-color: rgba(252, 252, 252, 0.1);
+}
+
+@media only screen and (min-width: 768px) {
+  .modalTrigger {
+    max-width: 356px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .trigger {
+    min-height: 48px;
+  }
+
+  .modalTrigger {
+    max-width: 204px;
+    min-height: 48px;
+    padding: 12px 18px;
+  }
+
+  .modalMenu {
+    max-width: 204px;
   }
 }

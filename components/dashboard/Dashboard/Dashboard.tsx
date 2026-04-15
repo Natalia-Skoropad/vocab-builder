@@ -42,18 +42,25 @@ function Dashboard({
         {showAddWord ? (
           <button
             type="button"
-            className={css.actionButton}
+            className={clsx(css.actionButton, 'interactive-underline-trigger')}
             onClick={onAddWord}
             aria-label="Add word"
           >
-            <span>Add word</span>
+            <span className={clsx(css.actionText, 'interactive-underline')}>
+              Add word
+            </span>
             <Plus className={css.actionIcon} aria-hidden="true" />
           </button>
         ) : null}
 
         {showTrainLink ? (
-          <Link href={ROUTES.TRAINING} className={css.actionLink}>
-            <span>Train oneself</span>
+          <Link
+            href={ROUTES.TRAINING}
+            className={clsx(css.actionLink, 'interactive-underline-trigger')}
+          >
+            <span className={clsx(css.actionText, 'interactive-underline')}>
+              Train oneself
+            </span>
             <ArrowRight className={css.actionIcon} aria-hidden="true" />
           </Link>
         ) : null}

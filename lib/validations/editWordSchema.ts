@@ -1,12 +1,7 @@
 import * as yup from 'yup';
+import { enWordField, uaWordField } from './wordFields';
 
-import type { EditWordFormValues } from '@/types/forms';
-import { baseWordPairShape } from '@/lib/validations/wordFields';
-
-//===============================================================
-
-export const editWordSchema: yup.ObjectSchema<EditWordFormValues> = yup
-  .object({
-    ...baseWordPairShape,
-  })
-  .required();
+export const editWordSchema = yup.object({
+  ua: uaWordField,
+  en: enWordField,
+});

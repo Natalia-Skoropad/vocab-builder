@@ -11,9 +11,28 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement>;
 
 //===========================================================================
 
-function TextActionButton({ className, type = 'button', ...props }: Props) {
+function TextActionButton({
+  className,
+  type = 'button',
+  children,
+  ...props
+}: Props) {
   return (
-    <button type={type} className={clsx(css.button, className)} {...props} />
+    <button
+      type={type}
+      className={clsx(css.button, 'interactive-underline-trigger', className)}
+      {...props}
+    >
+      <span
+        className={clsx(
+          css.text,
+          'interactive-underline',
+          'interactive-underline--thin'
+        )}
+      >
+        {children}
+      </span>
+    </button>
   );
 }
 

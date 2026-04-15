@@ -1,5 +1,4 @@
 .button {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -13,18 +12,7 @@
   color: var(--text-main);
 
   cursor: pointer;
-  transition: opacity 200ms ease;
-}
-
-.button::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 1px;
-  height: 1px;
-  background-color: currentColor;
-  opacity: 0.75;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .button:hover,
@@ -34,4 +22,9 @@
 
 .button:focus-visible {
   outline: none;
+}
+
+.text {
+  position: relative;
+  display: inline-block;
 }

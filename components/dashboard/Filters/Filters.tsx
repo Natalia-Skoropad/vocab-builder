@@ -4,12 +4,7 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCategoriesStore } from '@/store/categories/categoriesStore';
@@ -20,6 +15,9 @@ import {
 } from '@/lib/utils/dictionary.query';
 
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
+import RadioGroup, {
+  type RadioOption,
+} from '@/components/common/RadioGroup/RadioGroup';
 
 import css from './Filters.module.css';
 
@@ -31,12 +29,18 @@ type Props = {
 
 //===============================================================
 
+const verbOptions: RadioOption[] = [
+  { value: 'regular', label: 'Regular' },
+  { value: 'irregular', label: 'Irregular' },
+];
+
+//===============================================================
+
 function Filters({ variant }: Props) {
   const searchId = useId();
   const categoryId = useId();
 
   const router = useRouter();
-  const pathname = usePathname();
   const params = useParams<{ filters?: string[] | string }>();
   const searchParams = useSearchParams();
 
@@ -100,6 +104,19 @@ function Filters({ variant }: Props) {
     : undefined;
 
   useEffect(() => {
+    const currentKeyword = searchParams.get('keyword')?.trim() ?? '';
+    const currentCategory = routeFilters.category;
+    const currentIsIrregular =
+      routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined;
+
+    const isKeywordChanged = normalizedKeyword !== currentKeyword;
+    const isCategoryChanged = effectiveCategory !== currentCategory;
+    const isIrregularChanged = effectiveIsIrregular !== currentIsIrregular;
+
+    if (!isKeywordChanged && !isCategoryChanged && !isIrregularChanged) {
+      return;
+    }
+
     const nextPath = buildDictionaryPath({
       category: effectiveCategory,
       isIrregular: effectiveIsIrregular,
@@ -114,18 +131,14 @@ function Filters({ variant }: Props) {
 
     const nextQuery = nextParams.toString();
     const nextUrl = nextQuery ? `${nextPath}?${nextQuery}` : nextPath;
-    const currentUrl = searchParams.toString()
-      ? `${pathname}?${searchParams.toString()}`
-      : pathname;
 
-    if (nextUrl !== currentUrl) {
-      router.replace(nextUrl, { scroll: false });
-    }
+    router.replace(nextUrl, { scroll: false });
   }, [
     effectiveCategory,
     effectiveIsIrregular,
     normalizedKeyword,
-    pathname,
+    routeFilters.category,
+    routeFilters.isIrregular,
     router,
     searchParams,
   ]);
@@ -187,33 +200,16 @@ function Filters({ variant }: Props) {
       </div>
 
       {isVerb ? (
-        <fieldset className={css.radioGroup}>
-          <legend className="visually-hidden">Verb type</legend>
-
-          <label className={css.radioLabel}>
-            <input
-              type="radio"
-              name={`verb-type-${variant}`}
-              value="regular"
-              checked={effectiveVerbType === 'regular'}
-              onChange={() => setVerbType('regular')}
-              className={css.radioInput}
-            />
-            <span>Regular</span>
-          </label>
-
-          <label className={css.radioLabel}>
-            <input
-              type="radio"
-              name={`verb-type-${variant}`}
-              value="irregular"
-              checked={effectiveVerbType === 'irregular'}
-              onChange={() => setVerbType('irregular')}
-              className={css.radioInput}
-            />
-            <span>Irregular</span>
-          </label>
-        </fieldset>
+        <RadioGroup
+          name={`verb-type-${variant}`}
+          value={effectiveVerbType}
+          options={verbOptions}
+          onChange={(nextValue) =>
+            setVerbType(nextValue as 'regular' | 'irregular')
+          }
+          className={css.radioGroup}
+          ariaLabel="Verb type"
+        />
       ) : null}
     </div>
   );

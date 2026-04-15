@@ -10,20 +10,29 @@ type Props = {
   href: string;
   children: ReactNode;
   className?: string;
-  variant?: 'common' | 'registration';
+  variant?: 'primary' | 'secondary' | 'dark';
+  fullWidth?: boolean;
 };
 
 //===============================================================
 
-function ButtonLink({ href, children, className, variant = 'common' }: Props) {
+function ButtonLink({
+  href,
+  children,
+  className,
+  variant = 'primary',
+  fullWidth = true,
+}: Props) {
   return (
     <Link
       href={href}
       className={clsx(
         css.button,
         {
-          [css.common]: variant === 'common',
-          [css.registration]: variant === 'registration',
+          [css.primary]: variant === 'primary',
+          [css.secondary]: variant === 'secondary',
+          [css.dark]: variant === 'dark',
+          [css.fullWidth]: fullWidth,
         },
         className
       )}

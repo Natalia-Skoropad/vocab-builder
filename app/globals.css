@@ -204,6 +204,80 @@ svg {
   --background: var(--background-1);
   --link: var(--green-main);
   --green: var(--success);
+
+  /* motion */
+  --motion-duration-fast: 250ms;
+  --motion-duration-base: 300ms;
+  --motion-ease-standard: ease;
+  --motion-ease-emphasized: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* buttons */
+  --btn-height: 56px;
+  --btn-radius: 30px;
+  --btn-padding-x: 20px;
+  --btn-font-size: 18px;
+  --btn-line-height: 1.56;
+  --btn-font-weight: var(--fw-bold);
+
+  --btn-primary-bg: var(--green-main);
+  --btn-primary-bg-hover: var(--green-inactive);
+  --btn-primary-text: var(--background-1);
+
+  --btn-secondary-bg: transparent;
+  --btn-secondary-bg-hover: rgba(133, 170, 159, 0.08);
+  --btn-secondary-text: var(--green-main);
+  --btn-secondary-border: 1px solid var(--green-main);
+
+  --btn-dark-bg: var(--text-main);
+  --btn-dark-bg-hover: rgba(18, 20, 23, 0.9);
+  --btn-dark-text: var(--background-1);
+
+  --btn-disabled-bg: rgba(133, 170, 159, 0.45);
+  --btn-disabled-text: var(--background-1);
+  --btn-focus-ring: 0 0 0 3px rgba(133, 170, 159, 0.16);
+}
+
+/* ===============================================================
+   Shared interactive underline
+   =============================================================== */
+
+.interactive-underline-trigger {
+  outline: none;
+}
+
+.interactive-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.interactive-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: var(--underline-offset, -6px);
+  width: 100%;
+  height: var(--underline-height, 2px);
+  border-radius: 999px;
+  background-color: var(--underline-color, var(--green-main));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.interactive-underline-trigger:hover .interactive-underline::after,
+.interactive-underline-trigger:focus-visible .interactive-underline::after,
+.interactive-underline:hover::after,
+.interactive-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.interactive-underline--light {
+  --underline-color: var(--background-1);
+}
+
+.interactive-underline--thin {
+  --underline-height: 1px;
+  --underline-offset: -2px;
 }
 
 html {

@@ -54,6 +54,7 @@ function EmptyState({
               {primaryActionLabel ? (
                 <Button
                   type="button"
+                  variant="primary"
                   className={css.primaryButton}
                   onClick={onPrimaryAction}
                 >
@@ -64,7 +65,7 @@ function EmptyState({
               {secondaryActionLabel ? (
                 <Button
                   type="button"
-                  variant="registration"
+                  variant="secondary"
                   className={css.secondaryButton}
                   onClick={onSecondaryAction}
                 >

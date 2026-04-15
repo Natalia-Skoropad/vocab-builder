@@ -54,11 +54,20 @@ function MenuNav({ variant = 'header', onNavigate }: Props) {
                 onClick={onNavigate}
                 className={clsx(
                   css.link,
+                  'interactive-underline-trigger',
                   variant === 'offcanvas' && css.linkOffcanvas,
                   active && css.active
                 )}
               >
-                <span className={css.label}>{label}</span>
+                <span
+                  className={clsx(
+                    css.label,
+                    'interactive-underline',
+                    variant === 'offcanvas' && 'interactive-underline--light'
+                  )}
+                >
+                  {label}
+                </span>
               </Link>
             </li>
           );
