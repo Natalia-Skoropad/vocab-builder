@@ -13,8 +13,10 @@ export const SITE_DESCRIPTION =
 export const AUTH_DESCRIPTION =
   'Sign in or create a VocabBuilder account to access your personal vocabulary learning space.';
 
+export const PRIVATE_DESCRIPTION =
+  'Private user area of VocabBuilder for learning, practicing, and tracking vocabulary.';
+
 //===============================================================
 
 export const OG_IMAGE = '/og/craftwork-og-cover.jpg';
-
 export const OG_IMAGE_ALT = 'VocabBuilder preview image';

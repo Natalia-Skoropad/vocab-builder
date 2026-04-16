@@ -1,7 +1,26 @@
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+
+import { PRIVATE_DESCRIPTION, SITE_NAME } from '@/lib/constants/metadata';
 
 import PrivateRoute from '@/components/auth/PrivateRoute/PrivateRoute';
 import Header from '@/components/header/Header/Header';
+
+//===========================================================================
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Dashboard',
+    template: `%s | ${SITE_NAME}`,
+  },
+
+  description: PRIVATE_DESCRIPTION,
+
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 //===========================================================================
 

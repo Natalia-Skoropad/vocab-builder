@@ -1,3 +1,13 @@
+import type { Metadata } from 'next';
+
+//===============================================================
+
+export const metadata: Metadata = {
+  title: 'Training',
+};
+
+//===============================================================
+
 function TrainingPage() {
   return (
     <main>
