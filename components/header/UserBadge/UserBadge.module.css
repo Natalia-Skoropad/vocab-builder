@@ -1,17 +1,24 @@
 .userBadge {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
   min-width: 0;
+  max-width: 100%;
 }
 
 .name {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
   font-family: var(--font-family);
   font-size: 18px;
   line-height: 1;
   font-weight: var(--fw-medium);
   color: var(--text-main);
-  white-space: nowrap;
 }
 
 .avatar {

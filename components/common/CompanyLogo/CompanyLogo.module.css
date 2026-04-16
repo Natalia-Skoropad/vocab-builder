@@ -2,12 +2,13 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  min-width: 0;
+  flex-shrink: 0;
 }
 
 .icon {
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .text {

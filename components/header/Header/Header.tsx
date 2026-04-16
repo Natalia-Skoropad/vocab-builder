@@ -85,7 +85,11 @@ function Header() {
         ) : (
           <>
             <div className={css.mobileRight}>
-              <UserBadge name={userName} variant="header" />
+              <UserBadge
+                name={userName}
+                variant="header"
+                className={css.mobileBadge}
+              />
               <BurgerButton onClick={openMenu} className={css.burger} />
             </div>
 
@@ -94,7 +98,11 @@ function Header() {
             </div>
 
             <div className={css.desktopActions}>
-              <UserBadge name={userName} variant="header" />
+              <UserBadge
+                name={userName}
+                variant="header"
+                className={css.desktopBadge}
+              />
               <LogoutButton onClick={handleLogout} variant="header" />
             </div>
           </>
