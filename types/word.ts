@@ -36,6 +36,7 @@ export type WordsQueryParams = {
   page?: number;
   limit?: number;
   sort?: WordSort;
+  newWordId?: string;
 };
 
 export type TrainingTaskItem = {

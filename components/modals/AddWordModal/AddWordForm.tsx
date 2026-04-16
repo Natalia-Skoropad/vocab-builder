@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
+import { ROUTES } from '@/lib/constants/routes';
 
 import type { AddWordFormValues } from '@/types/forms';
 import { addWordSchema } from '@/lib/validations/addWordSchema';
@@ -14,11 +16,12 @@ import { useCategoriesStore } from '@/store/categories/categoriesStore';
 import Button from '@/components/common/Button/Button';
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
 import LanguageBadge from '@/components/common/LanguageBadge/LanguageBadge';
+
 import RadioGroup, {
   type RadioOption,
 } from '@/components/common/RadioGroup/RadioGroup';
-import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 
+import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 import css from '@/components/modals/shared/WordForm.module.css';
 
 //===============================================================
@@ -36,6 +39,7 @@ const verbOptions: RadioOption[] = [
 
 function AddWordForm({ onClose }: Props) {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const categories = useCategoriesStore((state) => state.categories);
   const isLoaded = useCategoriesStore((state) => state.isLoaded);
@@ -97,7 +101,12 @@ function AddWordForm({ onClose }: Props) {
       ]);
 
       onClose();
+
+      router.push(ROUTES.DICTIONARY, {
+        scroll: false,
+      });
     },
+
     onError: (error) => {
       toast.error(
         error instanceof Error ? error.message : 'Failed to create word.'

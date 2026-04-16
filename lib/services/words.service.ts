@@ -71,6 +71,10 @@ function buildWordsQuery(params: WordsQueryParams = {}) {
     searchParams.set('sort', params.sort);
   }
 
+  if (params.newWordId?.trim()) {
+    searchParams.set('newWordId', params.newWordId.trim());
+  }
+
   return searchParams.toString();
 }
 

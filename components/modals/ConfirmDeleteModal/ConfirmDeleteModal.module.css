@@ -17,6 +17,15 @@
   font-size: 18px;
   line-height: 1.67;
   color: rgba(252, 252, 252, 0.9);
+
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.wordLabel {
+  font-weight: var(--fw-bold);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .actions {

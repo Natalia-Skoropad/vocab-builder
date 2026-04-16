@@ -2,15 +2,14 @@ import { NextRequest } from 'next/server';
 
 import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
-
 import {
   createErrorResponse,
   createOkResponse,
   normalizeOwnWordsResponse,
   parseJsonSafe,
 } from '@/lib/words/words-response';
-
 import { getWordsErrorMessage } from '@/lib/words/words-error';
+
 import type { WordItem, WordSort } from '@/types/word';
 
 //===============================================================
@@ -22,9 +21,9 @@ const DEFAULT_LIMIT = 7;
 
 type BackendWordsResponse = {
   results: WordItem[];
-  totalPages: number;
-  page: number;
-  perPage: number;
+  totalPages?: number;
+  page?: number;
+  perPage?: number;
 };
 
 type BackendRequestError = {
@@ -34,26 +33,11 @@ type BackendRequestError = {
 
 //===============================================================
 
-function isWordItem(value: unknown): value is WordItem {
-  return (
-    !!value &&
-    typeof value === 'object' &&
-    typeof (value as { _id?: unknown })._id === 'string' &&
-    typeof (value as { en?: unknown }).en === 'string' &&
-    typeof (value as { ua?: unknown }).ua === 'string' &&
-    typeof (value as { category?: unknown }).category === 'string'
-  );
-}
-
 function isBackendWordsResponse(value: unknown): value is BackendWordsResponse {
   return (
     !!value &&
     typeof value === 'object' &&
-    Array.isArray((value as { results?: unknown }).results) &&
-    (value as { results: unknown[] }).results.every(isWordItem) &&
-    typeof (value as { totalPages?: unknown }).totalPages === 'number' &&
-    typeof (value as { page?: unknown }).page === 'number' &&
-    typeof (value as { perPage?: unknown }).perPage === 'number'
+    Array.isArray((value as { results?: unknown }).results)
   );
 }
 
@@ -70,21 +54,47 @@ function getBackendMessage(data: unknown): string | undefined {
   return undefined;
 }
 
+function getObjectIdTimestamp(id: string): number {
+  if (id.length < 8) return 0;
+
+  const hex = id.slice(0, 8);
+  const parsed = Number.parseInt(hex, 16);
+
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
 function sortWords(words: WordItem[], sort?: WordSort): WordItem[] {
-  if (!sort) return words;
+  if (sort === 'a-z') {
+    return [...words].sort((a, b) =>
+      a.en.localeCompare(b.en, 'en', { sensitivity: 'base' })
+    );
+  }
 
-  const sorted = [...words].sort((a, b) =>
-    a.en.localeCompare(b.en, 'en', { sensitivity: 'base' })
-  );
+  if (sort === 'z-a') {
+    return [...words].sort((a, b) =>
+      b.en.localeCompare(a.en, 'en', { sensitivity: 'base' })
+    );
+  }
 
-  return sort === 'z-a' ? sorted.reverse() : sorted;
+  return [...words].sort((a, b) => {
+    const timeDiff = getObjectIdTimestamp(b._id) - getObjectIdTimestamp(a._id);
+
+    if (timeDiff !== 0) return timeDiff;
+
+    return b._id.localeCompare(a._id);
+  });
 }
 
 function repaginateWords(
   words: WordItem[],
   page: number,
   limit: number
-): BackendWordsResponse {
+): {
+  results: WordItem[];
+  totalPages: number;
+  page: number;
+  perPage: number;
+} {
   const safePage = Number.isInteger(page) && page > 0 ? page : DEFAULT_PAGE;
   const safeLimit =
     Number.isInteger(limit) && limit > 0 ? limit : DEFAULT_LIMIT;
@@ -149,11 +159,20 @@ async function fetchAllOwnWords(args: {
     }
 
     if (!isBackendWordsResponse(data)) {
+      console.error('Unexpected /words/own payload:', data);
       throw new Error('Invalid own words response.');
     }
 
     aggregated.push(...data.results);
-    totalPages = data.totalPages;
+
+    const nextTotalPages =
+      typeof data.totalPages === 'number'
+        ? data.totalPages
+        : data.results.length > 0
+        ? currentPage
+        : 1;
+
+    totalPages = nextTotalPages;
     currentPage += 1;
   } while (currentPage <= totalPages);
 

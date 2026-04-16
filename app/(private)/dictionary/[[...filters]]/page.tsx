@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
@@ -62,6 +62,7 @@ function DictionaryPage() {
   );
 
   const keyword = searchParams.get('keyword')?.trim() ?? '';
+  const newWordId = searchParams.get('newWordId')?.trim() ?? '';
 
   const queryParams = useMemo(
     () => ({
@@ -75,8 +76,9 @@ function DictionaryPage() {
       isIrregular:
         routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined,
       sort: routeFilters.sort,
+      newWordId: newWordId || undefined,
     }),
-    [keyword, routeFilters]
+    [keyword, newWordId, routeFilters]
   );
 
   const breadcrumbItems = useMemo(() => {
@@ -183,13 +185,17 @@ function DictionaryPage() {
     await deleteMutation.mutateAsync(deletingWord._id);
   };
 
-  if (isError) {
+  useEffect(() => {
+    if (!isError) return;
+
     toast.error(
       error instanceof Error
         ? error.message
         : 'Failed to load dictionary words.'
     );
+  }, [error, isError]);
 
+  if (isError) {
     return (
       <main className={css.page}>
         <section className="container">

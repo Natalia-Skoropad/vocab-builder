@@ -24,10 +24,6 @@ function ConfirmDeleteModal({
   isSubmitting = false,
   wordLabel,
 }: Props) {
-  const description = wordLabel
-    ? `Do you really want to delete the word "${wordLabel}"?`
-    : 'Do you really want to delete this word?';
-
   return (
     <ModalBase
       isOpen={isOpen}
@@ -37,7 +33,16 @@ function ConfirmDeleteModal({
       <div className={css.content}>
         <h2 className={css.title}>Delete word</h2>
 
-        <p className={css.text}>{description}</p>
+        <p className={css.text}>
+          {wordLabel ? (
+            <>
+              Do you really want to delete the word{' '}
+              <span className={css.wordLabel}>&quot;{wordLabel}&quot;</span>?
+            </>
+          ) : (
+            'Do you really want to delete this word?'
+          )}
+        </p>
 
         <div className={css.actions}>
           <Button
