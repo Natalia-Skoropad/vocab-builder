@@ -10,6 +10,11 @@ import { ROUTES } from '@/lib/constants/routes';
 import { loginSchema } from '@/lib/validations/loginSchema';
 import { useAuth } from '@/hooks/useAuth';
 
+import {
+  AUTH_EMAIL_MAX_LENGTH,
+  AUTH_PASSWORD_MAX_LENGTH,
+} from '@/lib/validations/commonFields';
+
 import Button from '@/components/common/Button/Button';
 import TextActionButton from '@/components/common/TextActionButton/TextActionButton';
 import FormField from '@/components/forms/FormField/FormField';
@@ -79,6 +84,7 @@ function LoginForm() {
           type="email"
           placeholder="Email"
           autoComplete="email"
+          maxLength={AUTH_EMAIL_MAX_LENGTH}
           error={errors.email?.message}
           success={
             touchedFields.email && emailValue && !errors.email
@@ -92,6 +98,7 @@ function LoginForm() {
           type="password"
           placeholder="Password"
           autoComplete="current-password"
+          maxLength={AUTH_PASSWORD_MAX_LENGTH}
           error={errors.password?.message}
           success={
             touchedFields.password && passwordValue && !errors.password

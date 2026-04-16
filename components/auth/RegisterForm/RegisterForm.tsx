@@ -10,6 +10,12 @@ import { ROUTES } from '@/lib/constants/routes';
 import { registerSchema } from '@/lib/validations/registerSchema';
 import { useAuth } from '@/hooks/useAuth';
 
+import {
+  AUTH_EMAIL_MAX_LENGTH,
+  AUTH_NAME_MAX_LENGTH,
+  AUTH_PASSWORD_MAX_LENGTH,
+} from '@/lib/validations/commonFields';
+
 import Button from '@/components/common/Button/Button';
 import TextActionButton from '@/components/common/TextActionButton/TextActionButton';
 import FormField from '@/components/forms/FormField/FormField';
@@ -90,6 +96,7 @@ function RegisterForm() {
           type="text"
           placeholder="Name"
           autoComplete="name"
+          maxLength={AUTH_NAME_MAX_LENGTH}
           error={errors.name?.message}
           success={
             touchedFields.name && nameValue && !errors.name
@@ -103,6 +110,7 @@ function RegisterForm() {
           type="email"
           placeholder="Email"
           autoComplete="email"
+          maxLength={AUTH_EMAIL_MAX_LENGTH}
           error={errors.email?.message}
           success={
             touchedFields.email && emailValue && !errors.email
@@ -116,6 +124,7 @@ function RegisterForm() {
           type="password"
           placeholder="Password"
           autoComplete="new-password"
+          maxLength={AUTH_PASSWORD_MAX_LENGTH}
           error={errors.password?.message}
           success={
             touchedFields.password && passwordValue && !errors.password
