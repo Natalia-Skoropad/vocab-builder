@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
 import type { WordItem } from '@/types/word';
@@ -33,6 +33,39 @@ function RecommendPage() {
   const searchParams = useSearchParams();
 
   const rawFiltersParam = params.filters;
+
+  const queryClient = useQueryClient();
+  const [addingWordId, setAddingWordId] = useState<string | null>(null);
+
+  const addToDictionaryMutation = useMutation({
+    mutationFn: async (word: WordItem) => {
+      setAddingWordId(word._id);
+      return wordsService.addWordFromRecommend(word._id);
+    },
+    onSuccess: async () => {
+      toast.success('Word added to dictionary.');
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['recommend-words'] }),
+        queryClient.invalidateQueries({ queryKey: ['dictionary-words'] }),
+        queryClient.invalidateQueries({ queryKey: ['words-statistics'] }),
+      ]);
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Failed to add word to dictionary.'
+      );
+    },
+    onSettled: () => {
+      setAddingWordId(null);
+    },
+  });
+
+  const handleAddToDictionary = async (word: WordItem) => {
+    await addToDictionaryMutation.mutateAsync(word);
+  };
 
   const routeSegments = useMemo<string[]>(() => {
     if (Array.isArray(rawFiltersParam)) return rawFiltersParam;
@@ -143,7 +176,13 @@ function RecommendPage() {
           />
         ) : (
           <>
-            <WordsTable variant="recommend" rows={rows} />
+            <WordsTable
+              variant="recommend"
+              rows={rows}
+              onAddToDictionary={handleAddToDictionary}
+              addingWordId={addingWordId}
+            />
+
             <WordsPagination
               currentPage={currentPage}
               totalPages={totalPages}

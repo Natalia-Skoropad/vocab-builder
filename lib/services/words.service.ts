@@ -268,6 +268,34 @@ async function editWord(params: EditWordParams): Promise<WordItem> {
 
 //===============================================================
 
+async function addWordFromRecommend(id: string): Promise<WordItem> {
+  const response = await fetch(`/api/words/add/${id}`, {
+    method: 'POST',
+    cache: 'no-store',
+  });
+
+  const data = (await response.json().catch(() => null)) as
+    | WordItem
+    | ErrorResponse
+    | null;
+
+  if (!response.ok) {
+    throw new Error(
+      data && 'message' in data && data.message
+        ? data.message
+        : 'Failed to add word to dictionary.'
+    );
+  }
+
+  if (!isWordItem(data)) {
+    throw new Error('Invalid add-to-dictionary response.');
+  }
+
+  return data;
+}
+
+//===============================================================
+
 export const wordsService = {
   getOwnWords,
   getAllWords,
@@ -275,4 +303,5 @@ export const wordsService = {
   deleteWord,
   createWord,
   editWord,
+  addWordFromRecommend,
 };

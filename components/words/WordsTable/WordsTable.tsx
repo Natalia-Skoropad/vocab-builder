@@ -23,6 +23,8 @@ type Props = {
   rows: WordItem[];
   onEdit?: (word: WordItem) => void;
   onDelete?: (word: WordItem) => void;
+  onAddToDictionary?: (word: WordItem) => void | Promise<void>;
+  addingWordId?: string | null;
 };
 
 //===============================================================
@@ -31,7 +33,14 @@ const columnHelper = createColumnHelper<WordItem>();
 
 //===============================================================
 
-function WordsTable({ variant, rows, onEdit, onDelete }: Props) {
+function WordsTable({
+  variant,
+  rows,
+  onEdit,
+  onDelete,
+  onAddToDictionary,
+  addingWordId,
+}: Props) {
   const dictionaryColumns = useMemo(
     () => [
       columnHelper.accessor('en', {
@@ -92,14 +101,37 @@ function WordsTable({ variant, rows, onEdit, onDelete }: Props) {
   const recommendColumns = useMemo(
     () => [
       columnHelper.accessor('en', {
-        header: 'Word',
+        header: () => (
+          <div className={css.headCell}>
+            <span>Word</span>
+            <SvgIcon name="icon-united-kingdom-flag" className={css.flagIcon} />
+          </div>
+        ),
         cell: (info) => <span className={css.wordCell}>{info.getValue()}</span>,
       }),
 
       columnHelper.accessor('ua', {
-        header: 'Translation',
+        header: () => (
+          <div className={css.headCell}>
+            <span>Translation</span>
+            <SvgIcon name="icon-ukraine-flag" className={css.flagIcon} />
+          </div>
+        ),
         cell: (info) => (
           <span className={css.translationCell}>{info.getValue()}</span>
+        ),
+      }),
+
+      columnHelper.accessor('category', {
+        header: 'Category',
+        cell: (info) => (
+          <span className={css.categoryCell}>
+            {info
+              .getValue()
+              .split(' ')
+              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+              .join(' ')}
+          </span>
         ),
       }),
 
@@ -107,8 +139,28 @@ function WordsTable({ variant, rows, onEdit, onDelete }: Props) {
         header: 'Progress',
         cell: (info) => <ProgressBar value={info.getValue()} />,
       }),
+
+      columnHelper.display({
+        id: 'add',
+        header: '',
+        cell: (info) => {
+          const word = info.row.original;
+          const isAdding = addingWordId === word._id;
+
+          return (
+            <button
+              type="button"
+              className={css.addButton}
+              onClick={() => void onAddToDictionary?.(word)}
+              disabled={isAdding}
+            >
+              {isAdding ? 'Adding…' : 'Add to dictionary'}
+            </button>
+          );
+        },
+      }),
     ],
-    []
+    [addingWordId, onAddToDictionary]
   );
 
   const columns =
