@@ -26,3 +26,22 @@ export type WordItem = {
 };
 
 export type WordsResponse = PaginatedResponse<WordItem>;
+
+export type WordsQueryParams = {
+  keyword?: string;
+  category?: string;
+  isIrregular?: boolean;
+  page?: number;
+  limit?: number;
+};
+
+export type TrainingTaskItem = {
+  _id: string;
+  en?: string;
+  ua?: string;
+  task: 'en' | 'ua';
+};
+
+export type TrainingTasksResponse = {
+  words: TrainingTaskItem[];
+};

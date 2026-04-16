@@ -1,5 +1,5 @@
 import type { AddWordFormValues } from '@/types/forms';
-import type { WordsResponse, WordItem } from '@/types/word';
+import type { WordsResponse, WordItem, WordsQueryParams } from '@/types/word';
 import type { WordsStatisticsResponse } from '@/types/statistics';
 
 //===============================================================
@@ -19,14 +19,6 @@ type EditWordParams = {
   ua: string;
   category: string;
   isIrregular?: boolean;
-};
-
-type GetOwnWordsParams = {
-  keyword?: string;
-  category?: string;
-  isIrregular?: boolean;
-  page?: number;
-  limit?: number;
 };
 
 //===============================================================
@@ -52,11 +44,7 @@ function isWordItem(data: unknown): data is WordItem {
   );
 }
 
-//===============================================================
-
-async function getOwnWords(
-  params: GetOwnWordsParams = {}
-): Promise<WordsResponse> {
+function buildWordsQuery(params: WordsQueryParams = {}) {
   const searchParams = new URLSearchParams();
 
   if (params.keyword?.trim()) {
@@ -79,14 +67,13 @@ async function getOwnWords(
     searchParams.set('limit', String(params.limit));
   }
 
-  const query = searchParams.toString();
-  const url = `/api/words/own${query ? `?${query}` : ''}`;
+  return searchParams.toString();
+}
 
-  const response = await fetch(url, {
-    method: 'GET',
-    cache: 'no-store',
-  });
-
+async function parseWordsResponse(
+  response: Response,
+  fallbackMessage: string
+): Promise<WordsResponse> {
   const data = (await response.json().catch(() => null)) as
     | WordsResponse
     | ErrorResponse
@@ -96,7 +83,7 @@ async function getOwnWords(
     throw new Error(
       data && !('results' in data) && data.message
         ? data.message
-        : 'Failed to fetch words.'
+        : fallbackMessage
     );
   }
 
@@ -112,6 +99,36 @@ async function getOwnWords(
   }
 
   return data;
+}
+
+//===============================================================
+
+async function getOwnWords(
+  params: WordsQueryParams = {}
+): Promise<WordsResponse> {
+  const query = buildWordsQuery(params);
+  const url = `/api/words/own${query ? `?${query}` : ''}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+  });
+
+  return parseWordsResponse(response, 'Failed to fetch words.');
+}
+
+async function getAllWords(
+  params: WordsQueryParams = {}
+): Promise<WordsResponse> {
+  const query = buildWordsQuery(params);
+  const url = `/api/words/recommend${query ? `?${query}` : ''}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+  });
+
+  return parseWordsResponse(response, 'Failed to fetch recommended words.');
 }
 
 //===============================================================
@@ -253,6 +270,7 @@ async function editWord(params: EditWordParams): Promise<WordItem> {
 
 export const wordsService = {
   getOwnWords,
+  getAllWords,
   getStatistics,
   deleteWord,
   createWord,
