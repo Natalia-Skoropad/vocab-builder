@@ -128,7 +128,67 @@
   text-align: center;
 }
 
+.th[data-column='add'],
+.td[data-column='add'] {
+  width: 56px;
+  min-width: 56px;
+  text-align: center;
+}
+
+/* recommend add button */
 .addButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0;
+  border: none;
+  background-color: transparent;
+
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.addButton:focus-visible {
+  outline: none;
+}
+
+.addButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.addButtonText {
+  position: relative;
+  display: none;
+}
+
+.addButtonIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--green-main);
+  stroke-width: 2;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard),
+    opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.addButton:hover .addButtonIcon,
+.addButton:focus-visible .addButtonIcon {
+  transform: translateX(2px);
+  opacity: 0.9;
+}
+
+/* old add button styles for dictionary-like action if needed elsewhere */
+.addButtonLegacy {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -146,26 +206,19 @@
     border-color 200ms ease, opacity 200ms ease;
 }
 
-.addButton:hover,
-.addButton:focus-visible {
+.addButtonLegacy:hover,
+.addButtonLegacy:focus-visible {
   background-color: var(--green-main);
   color: var(--background-1);
 }
 
-.addButton:focus-visible {
+.addButtonLegacy:focus-visible {
   outline: none;
 }
 
-.addButton:disabled {
+.addButtonLegacy:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.th[data-column='add'],
-.td[data-column='add'] {
-  width: 170px;
-  min-width: 170px;
-  text-align: right;
 }
 
 @media only screen and (max-width: 767.98px) {
@@ -223,16 +276,39 @@
 
   .th[data-column='add'],
   .td[data-column='add'] {
-    width: 132px;
-    min-width: 132px;
-    padding-left: 8px;
+    width: 44px;
+    min-width: 44px;
+    padding-left: 6px;
     padding-right: 8px;
+    text-align: center;
   }
 
   .addButton {
+    min-height: auto;
+  }
+
+  .addButtonIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .addButtonLegacy {
     min-height: 34px;
     padding: 7px 10px;
     font-size: 12px;
+  }
+}
+
+/* скрол тільки якщо екран вужчий за 375px */
+@media only screen and (max-width: 374.98px) {
+  .scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    min-width: 375px;
   }
 }
 
@@ -257,6 +333,18 @@
   .td[data-column='actions'] {
     width: 52px;
     min-width: 52px;
+  }
+
+  .th[data-column='add'],
+  .td[data-column='add'] {
+    width: 52px;
+    min-width: 52px;
+    text-align: center;
+  }
+
+  .addButtonIcon {
+    width: 22px;
+    height: 22px;
   }
 }
 
@@ -297,9 +385,19 @@
   .td[data-column='add'] {
     width: 196px;
     min-width: 196px;
+    text-align: left;
   }
 
-  .addButton {
+  .addButtonText {
+    display: inline-block;
+  }
+
+  .addButtonIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .addButtonLegacy {
     min-height: 42px;
     padding: 10px 16px;
     font-size: 16px;

@@ -7,6 +7,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { ArrowRight } from 'lucide-react';
 
 import type { WordItem } from '@/types/word';
 
@@ -30,6 +31,30 @@ type Props = {
 //===============================================================
 
 const columnHelper = createColumnHelper<WordItem>();
+
+//===============================================================
+
+function getSafeProgress(value: unknown): number {
+  const parsed =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+      ? Number(value)
+      : 0;
+
+  if (!Number.isFinite(parsed)) return 0;
+
+  return Math.max(0, Math.min(parsed, 100));
+}
+
+//===============================================================
+
+function formatCategory(value: string): string {
+  return value
+    .split(' ')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
 
 //===============================================================
 
@@ -69,18 +94,16 @@ function WordsTable({
         header: 'Category',
         cell: (info) => (
           <span className={css.categoryCell}>
-            {info
-              .getValue()
-              .split(' ')
-              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-              .join(' ')}
+            {formatCategory(info.getValue())}
           </span>
         ),
       }),
 
       columnHelper.accessor('progress', {
         header: 'Progress',
-        cell: (info) => <ProgressBar value={info.getValue()} />,
+        cell: (info) => (
+          <ProgressBar value={getSafeProgress(info.getValue())} />
+        ),
       }),
 
       columnHelper.display({
@@ -126,18 +149,16 @@ function WordsTable({
         header: 'Category',
         cell: (info) => (
           <span className={css.categoryCell}>
-            {info
-              .getValue()
-              .split(' ')
-              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-              .join(' ')}
+            {formatCategory(info.getValue())}
           </span>
         ),
       }),
 
       columnHelper.accessor('progress', {
         header: 'Progress',
-        cell: (info) => <ProgressBar value={info.getValue()} />,
+        cell: (info) => (
+          <ProgressBar value={getSafeProgress(info.getValue())} />
+        ),
       }),
 
       columnHelper.display({
@@ -150,11 +171,18 @@ function WordsTable({
           return (
             <button
               type="button"
-              className={css.addButton}
+              className={`${css.addButton} interactive-underline-trigger`}
               onClick={() => void onAddToDictionary?.(word)}
               disabled={isAdding}
+              aria-label={
+                isAdding ? 'Adding word to dictionary' : 'Add to dictionary'
+              }
             >
-              {isAdding ? 'Adding…' : 'Add to dictionary'}
+              <span className={`${css.addButtonText} interactive-underline`}>
+                {isAdding ? 'Adding…' : 'Add to dictionary'}
+              </span>
+
+              <ArrowRight className={css.addButtonIcon} aria-hidden="true" />
             </button>
           );
         },
