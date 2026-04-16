@@ -37,7 +37,7 @@
   min-height: 56px;
   padding: 16px 18px;
   border-radius: 15px;
-  border: 1px solid rgba(252, 252, 252, 0.3);
+  border: 1px solid var(--border-3);
   background-color: transparent;
   color: var(--background-1);
   transition: border-color var(--motion-duration-fast)
@@ -65,7 +65,7 @@
 }
 
 .input[data-state='success'] {
-  border-color: #b9f2c3;
+  border-color: var(--success-2);
 }
 
 .radioGroup {
@@ -85,7 +85,7 @@
   margin: 0;
   font-size: 14px;
   line-height: 1.33;
-  color: rgba(252, 252, 252, 0.82);
+  color: var(--text-white);
 }
 
 .feedbackError,
@@ -104,7 +104,7 @@
 }
 
 .feedbackSuccess {
-  color: #d8ffe0;
+  color: var(--success-2);
 }
 
 .feedbackIcon {
@@ -120,7 +120,7 @@
 }
 
 .feedbackSuccess .feedbackIcon {
-  color: #b9f2c3;
+  color: var(--success-2);
   fill: currentColor;
 }
 

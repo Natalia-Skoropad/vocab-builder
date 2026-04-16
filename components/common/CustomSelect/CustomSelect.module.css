@@ -67,9 +67,9 @@
   padding: 8px;
 
   border-radius: 16px;
-  border: 1px solid rgba(18, 20, 23, 0.08);
+  border: 1px solid var(--border-light);
   background-color: var(--background-1);
-  box-shadow: 0 10px 30px rgba(18, 20, 23, 0.08);
+  box-shadow: 0 10px 30px var(--border-light);
 
   scrollbar-width: thin;
   scrollbar-color: var(--green-main) transparent;

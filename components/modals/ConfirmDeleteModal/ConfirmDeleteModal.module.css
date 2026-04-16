@@ -33,7 +33,7 @@
 
 .cancelButton {
   color: var(--background-1);
-  border-color: rgba(252, 252, 252, 0.35);
+  border-color: var(--border-3);
 }
 
 .cancelButton:hover,

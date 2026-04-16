@@ -188,15 +188,21 @@ svg {
 
   --green-main: #85aa9f;
   --green-inactive: #a5c0b8;
+  --green-hover: #a5c0b8;
 
   --background-1: #fcfcfc;
   --background-2: #f8f8f8;
+  --text-white: rgba(252, 252, 252, 0.8);
+
+  --background-hover: rgba(133, 170, 159, 0.14);
 
   --border: rgba(18, 20, 23, 0.1);
-  --border-light: rgba(18, 20, 23, 0.06);
+  --border-3: rgba(252, 252, 252, 0.3);
+  --border-light: rgba(18, 20, 23, 0.08);
 
   --error: #d80027;
   --success: #3cbf61;
+  --success-2: #d8ffe0;
 
   /* aliases for shared components */
   --main: var(--green-main);
@@ -235,6 +241,8 @@ svg {
   --btn-disabled-bg: rgba(133, 170, 159, 0.45);
   --btn-disabled-text: var(--background-1);
   --btn-focus-ring: 0 0 0 3px rgba(133, 170, 159, 0.16);
+
+  --black-45: rgba(18, 20, 23, 0.45);
 }
 
 /* ===============================================================

@@ -71,12 +71,12 @@
 
 .light:hover,
 .light:focus-visible {
-  background-color: rgba(252, 252, 252, 0.86);
+  background-color: var(--text-white);
 }
 
 .disabled,
 .button:disabled {
-  background-color: rgba(252, 252, 252, 0.38);
+  background-color: var(--border-3);
   color: rgba(18, 20, 23, 0.55);
   border-color: transparent;
   cursor: not-allowed;

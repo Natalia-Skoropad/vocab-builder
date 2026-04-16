@@ -79,11 +79,11 @@
 }
 
 .option:focus-within .control {
-  box-shadow: 0 0 0 3px rgba(133, 170, 159, 0.14), inset 0 0 0 0 transparent;
+  box-shadow: 0 0 0 3px var(--background-hover), inset 0 0 0 0 transparent;
 }
 
 .option:focus-within .controlChecked {
-  box-shadow: 0 0 0 3px rgba(133, 170, 159, 0.14),
+  box-shadow: 0 0 0 3px var(--background-hover),
     inset 0 0 0 3px var(--background-1);
 }
 

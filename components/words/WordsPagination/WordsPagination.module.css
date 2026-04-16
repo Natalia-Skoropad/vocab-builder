@@ -17,7 +17,7 @@
   height: 32px;
   padding: 0 8px;
   border-radius: 8px;
-  border: 1px solid rgba(18, 20, 23, 0.1);
+  border: 1px solid var(--border-light);
 
   display: inline-flex;
   align-items: center;
@@ -35,7 +35,7 @@
 
 .button:hover,
 .button:focus-visible {
-  background-color: rgba(133, 170, 159, 0.14);
+  background-color: var(--background-hover);
 }
 
 .button:focus-visible {
@@ -51,6 +51,11 @@
   background-color: var(--green-main);
   border-color: var(--green-main);
   color: var(--background-1);
+}
+
+.active:hover,
+.active:focus-visible {
+  background-color: var(--green-hover);
 }
 
 .dots {

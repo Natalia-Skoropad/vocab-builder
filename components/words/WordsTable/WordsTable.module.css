@@ -2,7 +2,7 @@
   margin-top: 32px;
   padding: 12px;
   border-radius: 16px;
-  background-color: rgba(255, 255, 255, 0.45);
+  background-color: var(--background-1);
   overflow: visible;
 }
 
@@ -23,7 +23,7 @@
 }
 
 .head {
-  background-color: #f7f9f9;
+  background-color: var(--background-2);
 }
 
 .row {
@@ -43,8 +43,8 @@
   padding: 18px 14px;
   text-align: left;
   vertical-align: top;
-  border-right: 1px solid rgba(18, 20, 23, 0.08);
-  border-bottom: 1px solid rgba(18, 20, 23, 0.08);
+  border-right: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
   background-color: var(--background-1);
 }
 
@@ -63,7 +63,7 @@
   line-height: 1.2;
   font-weight: var(--fw-medium);
   color: var(--text-main);
-  background-color: #f7f9f9;
+  background-color: var(--background-2);
 }
 
 .td {

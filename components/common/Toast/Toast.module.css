@@ -8,10 +8,10 @@
 
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(18, 20, 23, 0.08);
+  border: 1px solid var(--border-light);
   background: #fff;
 
-  box-shadow: 0 10px 26px rgba(18, 20, 23, 0.08);
+  box-shadow: 0 10px 26px var(--border-light);
   animation: pop 160ms ease;
 }
 
