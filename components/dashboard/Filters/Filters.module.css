@@ -59,6 +59,16 @@
   gap: 24px;
 }
 
+.topRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sortWrap {
+  width: 100%;
+}
+
 @media only screen and (min-width: 768px) {
   .filters {
     flex-direction: row;
@@ -86,6 +96,17 @@
   .radioGroup {
     flex: 0 0 auto;
     gap: 22px;
+  }
+
+  .topRow {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .sortWrap {
+    flex: 0 0 144px;
+    max-width: 144px;
   }
 }
 
@@ -121,5 +142,14 @@
 
   .radioGroup {
     gap: 20px;
+  }
+
+  .topRow {
+    gap: 12px;
+  }
+
+  .sortWrap {
+    flex-basis: 160px;
+    max-width: 160px;
   }
 }

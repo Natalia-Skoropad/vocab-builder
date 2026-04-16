@@ -15,6 +15,8 @@ export type WordCategory =
   | 'phrasal verb'
   | 'functional phrase';
 
+export type WordSort = 'a-z' | 'z-a';
+
 export type WordItem = {
   _id: string;
   en: string;
@@ -33,6 +35,7 @@ export type WordsQueryParams = {
   isIrregular?: boolean;
   page?: number;
   limit?: number;
+  sort?: WordSort;
 };
 
 export type TrainingTaskItem = {

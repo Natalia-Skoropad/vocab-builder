@@ -3,14 +3,14 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
+import type { WordSort } from '@/types/word';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCategoriesStore } from '@/store/categories/categoriesStore';
 
 import {
-  buildDictionaryPath,
+  buildWordsPath,
   parseDictionarySegments,
 } from '@/lib/utils/dictionary.query';
 
@@ -27,11 +27,17 @@ type Props = {
   variant: 'dictionary' | 'recommend';
 };
 
-//===============================================================
+type SortValue = 'sort' | WordSort;
 
 const verbOptions: RadioOption[] = [
   { value: 'regular', label: 'Regular' },
   { value: 'irregular', label: 'Irregular' },
+];
+
+const sortOptions = [
+  { value: 'sort', label: 'Sort' },
+  { value: 'a-z', label: 'A to Z' },
+  { value: 'z-a', label: 'Z to A' },
 ];
 
 //===============================================================
@@ -39,6 +45,7 @@ const verbOptions: RadioOption[] = [
 function Filters({ variant }: Props) {
   const searchId = useId();
   const categoryId = useId();
+  const sortId = useId();
 
   const router = useRouter();
   const params = useParams<{ filters?: string[] | string }>();
@@ -49,6 +56,7 @@ function Filters({ variant }: Props) {
   const fetchCategories = useCategoriesStore((state) => state.fetchCategories);
 
   const rawFiltersParam = params.filters;
+  const basePath = variant === 'recommend' ? '/recommend' : '/dictionary';
 
   const routeSegments = useMemo<string[]>(() => {
     if (Array.isArray(rawFiltersParam)) {
@@ -74,6 +82,7 @@ function Filters({ variant }: Props) {
   const [verbType, setVerbType] = useState<'regular' | 'irregular'>(
     routeFilters.isIrregular === true ? 'irregular' : 'regular'
   );
+  const [sort, setSort] = useState<SortValue>(routeFilters.sort ?? 'sort');
 
   const debouncedKeyword = useDebounce(keyword, 300);
 
@@ -88,39 +97,55 @@ function Filters({ variant }: Props) {
     });
   }, [fetchCategories, isLoaded]);
 
+  useEffect(() => {
+    setKeyword(initialKeyword);
+  }, [initialKeyword]);
+
+  useEffect(() => {
+    setCategory(routeFilters.category);
+  }, [routeFilters.category]);
+
+  useEffect(() => {
+    setVerbType(routeFilters.isIrregular === true ? 'irregular' : 'regular');
+  }, [routeFilters.isIrregular]);
+
+  useEffect(() => {
+    setSort(routeFilters.sort ?? 'sort');
+  }, [routeFilters.sort]);
+
   const normalizedKeyword = useMemo(
     () => debouncedKeyword.trim(),
     [debouncedKeyword]
   );
 
-  const derivedCategory = routeFilters.category;
-
-  const effectiveCategory =
-    category !== derivedCategory ? category : derivedCategory;
-  const effectiveVerbType = effectiveCategory === 'verb' ? verbType : 'regular';
-  const isVerb = effectiveCategory === 'verb';
-  const effectiveIsIrregular = isVerb
-    ? effectiveVerbType === 'irregular'
-    : undefined;
+  const isVerb = category === 'verb';
+  const effectiveSort = sort === 'sort' ? undefined : sort;
 
   useEffect(() => {
     const currentKeyword = searchParams.get('keyword')?.trim() ?? '';
+    const currentSort = routeFilters.sort ?? 'sort';
     const currentCategory = routeFilters.category;
     const currentIsIrregular =
       routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined;
 
-    const isKeywordChanged = normalizedKeyword !== currentKeyword;
-    const isCategoryChanged = effectiveCategory !== currentCategory;
-    const isIrregularChanged = effectiveIsIrregular !== currentIsIrregular;
+    const nextIsIrregular =
+      category === 'verb' ? verbType === 'irregular' : undefined;
 
-    if (!isKeywordChanged && !isCategoryChanged && !isIrregularChanged) {
+    const hasChanged =
+      normalizedKeyword !== currentKeyword ||
+      category !== currentCategory ||
+      nextIsIrregular !== currentIsIrregular ||
+      sort !== currentSort;
+
+    if (!hasChanged) {
       return;
     }
 
-    const nextPath = buildDictionaryPath({
-      category: effectiveCategory,
-      isIrregular: effectiveIsIrregular,
+    const nextPath = buildWordsPath(basePath, {
+      category,
+      isIrregular: nextIsIrregular,
       page: 1,
+      sort: effectiveSort,
     });
 
     const nextParams = new URLSearchParams();
@@ -134,18 +159,18 @@ function Filters({ variant }: Props) {
 
     router.replace(nextUrl, { scroll: false });
   }, [
-    effectiveCategory,
-    effectiveIsIrregular,
+    basePath,
+    category,
+    effectiveSort,
     normalizedKeyword,
     routeFilters.category,
     routeFilters.isIrregular,
+    routeFilters.sort,
     router,
     searchParams,
+    sort,
+    verbType,
   ]);
-
-  useEffect(() => {
-    setKeyword(initialKeyword);
-  }, [initialKeyword]);
 
   const categoryOptions = useMemo(
     () => [
@@ -188,12 +213,27 @@ function Filters({ variant }: Props) {
 
           <div id={categoryId}>
             <CustomSelect
-              value={effectiveCategory}
+              value={category}
               options={categoryOptions}
               onChange={(nextValue) =>
-                setCategory(nextValue as typeof effectiveCategory)
+                setCategory(nextValue as typeof category)
               }
               placeholder="Categories"
+            />
+          </div>
+        </div>
+
+        <div className={css.sortWrap}>
+          <label htmlFor={sortId} className="visually-hidden">
+            Sort words
+          </label>
+
+          <div id={sortId}>
+            <CustomSelect
+              value={sort}
+              options={sortOptions}
+              onChange={(nextValue) => setSort(nextValue as SortValue)}
+              placeholder="Sort"
             />
           </div>
         </div>
@@ -202,7 +242,7 @@ function Filters({ variant }: Props) {
       {isVerb ? (
         <RadioGroup
           name={`verb-type-${variant}`}
-          value={effectiveVerbType}
+          value={verbType}
           options={verbOptions}
           onChange={(nextValue) =>
             setVerbType(nextValue as 'regular' | 'irregular')

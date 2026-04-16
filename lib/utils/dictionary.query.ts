@@ -1,24 +1,28 @@
-import type { WordCategory } from '@/types/word';
+import type { WordCategory, WordSort } from '@/types/word';
 
 //===============================================================
 
-export type DictionaryRouteFilters = {
+export type WordsRouteFilters = {
   category: 'categories' | WordCategory;
   isIrregular?: boolean;
   page: number;
+  sort?: WordSort;
 };
 
-type DictionaryRouteState = {
-  filters: DictionaryRouteFilters;
+type WordsRouteState = {
+  filters: WordsRouteFilters;
 };
 
 //===============================================================
 
-export const DEFAULT_DICTIONARY_FILTERS: DictionaryRouteFilters = {
+export const DEFAULT_WORDS_FILTERS: WordsRouteFilters = {
   category: 'categories',
   isIrregular: undefined,
   page: 1,
+  sort: undefined,
 };
+
+export const DEFAULT_DICTIONARY_FILTERS = DEFAULT_WORDS_FILTERS;
 
 //===============================================================
 
@@ -51,11 +55,9 @@ function unslugCategory(slug: string): WordCategory | null {
 
 //===============================================================
 
-export function parseDictionarySegments(
-  segments?: string[]
-): DictionaryRouteState {
-  const filters: DictionaryRouteFilters = {
-    ...DEFAULT_DICTIONARY_FILTERS,
+export function parseDictionarySegments(segments?: string[]): WordsRouteState {
+  const filters: WordsRouteFilters = {
+    ...DEFAULT_WORDS_FILTERS,
   };
 
   if (!segments?.length) {
@@ -86,6 +88,16 @@ export function parseDictionarySegments(
       continue;
     }
 
+    if (segment === 'sort-a-z') {
+      filters.sort = 'a-z';
+      continue;
+    }
+
+    if (segment === 'sort-z-a') {
+      filters.sort = 'z-a';
+      continue;
+    }
+
     if (segment.startsWith('page-')) {
       const page = Number(segment.replace('page-', ''));
 
@@ -104,15 +116,22 @@ export function parseDictionarySegments(
 
 //===============================================================
 
-export function buildDictionaryPath(filters: DictionaryRouteFilters): string {
-  const segments: string[] = ['/dictionary'];
+export function buildWordsPath(
+  basePath: '/dictionary' | '/recommend',
+  filters: WordsRouteFilters
+): string {
+  const segments: string[] = [basePath];
 
-  if (filters.category !== DEFAULT_DICTIONARY_FILTERS.category) {
+  if (filters.category !== DEFAULT_WORDS_FILTERS.category) {
     segments.push(`category-${slugify(filters.category)}`);
   }
 
   if (filters.category === 'verb' && typeof filters.isIrregular === 'boolean') {
     segments.push(filters.isIrregular ? 'irregular' : 'regular');
+  }
+
+  if (filters.sort) {
+    segments.push(filters.sort === 'a-z' ? 'sort-a-z' : 'sort-z-a');
   }
 
   if (filters.page > 1) {
@@ -122,20 +141,29 @@ export function buildDictionaryPath(filters: DictionaryRouteFilters): string {
   return segments.join('/');
 }
 
+export function buildDictionaryPath(filters: WordsRouteFilters): string {
+  return buildWordsPath('/dictionary', filters);
+}
+
 //===============================================================
 
 export function normalizeDictionaryPathname(pathname: string): string {
   const cleanedPath = pathname.replace(/\/+$/, '') || '/';
   const parts = cleanedPath.split('/').filter(Boolean);
 
-  if (!parts.length || parts[0] !== 'dictionary') {
+  if (
+    !parts.length ||
+    (parts[0] !== 'dictionary' && parts[0] !== 'recommend')
+  ) {
     return cleanedPath;
   }
+
+  const basePath = parts[0] === 'recommend' ? '/recommend' : '/dictionary';
 
   const segments = parts.slice(1);
   const { filters } = parseDictionarySegments(segments);
 
-  return buildDictionaryPath(filters);
+  return buildWordsPath(basePath, filters);
 }
 
 //===============================================================

@@ -67,6 +67,10 @@ function buildWordsQuery(params: WordsQueryParams = {}) {
     searchParams.set('limit', String(params.limit));
   }
 
+  if (params.sort) {
+    searchParams.set('sort', params.sort);
+  }
+
   return searchParams.toString();
 }
 

@@ -9,7 +9,7 @@ import type { WordItem } from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
 
 import {
-  buildDictionaryPath,
+  buildWordsPath,
   parseDictionarySegments,
 } from '@/lib/utils/dictionary.query';
 
@@ -18,6 +18,7 @@ import EmptyState from '@/components/common/EmptyState/EmptyState';
 import InlineLoader from '@/components/common/InlineLoader/InlineLoader';
 import WordsPagination from '@/components/words/WordsPagination/WordsPagination';
 import WordsTable from '@/components/words/WordsTable/WordsTable';
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 
 import css from './page.module.css';
 
@@ -31,11 +32,25 @@ function RecommendPage() {
   const router = useRouter();
   const params = useParams<{ filters?: string[] | string }>();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const rawFiltersParam = params.filters;
-
-  const queryClient = useQueryClient();
   const [addingWordId, setAddingWordId] = useState<string | null>(null);
+
+  const routeSegments = useMemo<string[]>(() => {
+    if (Array.isArray(rawFiltersParam)) return rawFiltersParam;
+    if (typeof rawFiltersParam === 'string' && rawFiltersParam.trim()) {
+      return [rawFiltersParam];
+    }
+    return [];
+  }, [rawFiltersParam]);
+
+  const { filters } = useMemo(
+    () => parseDictionarySegments(routeSegments),
+    [routeSegments]
+  );
+
+  const keyword = searchParams.get('keyword')?.trim() ?? '';
 
   const addToDictionaryMutation = useMutation({
     mutationFn: async (word: WordItem) => {
@@ -67,21 +82,6 @@ function RecommendPage() {
     await addToDictionaryMutation.mutateAsync(word);
   };
 
-  const routeSegments = useMemo<string[]>(() => {
-    if (Array.isArray(rawFiltersParam)) return rawFiltersParam;
-    if (typeof rawFiltersParam === 'string' && rawFiltersParam.trim()) {
-      return [rawFiltersParam];
-    }
-    return [];
-  }, [rawFiltersParam]);
-
-  const { filters } = useMemo(
-    () => parseDictionarySegments(routeSegments),
-    [routeSegments]
-  );
-
-  const keyword = searchParams.get('keyword')?.trim() ?? '';
-
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [
       'recommend-words',
@@ -89,6 +89,7 @@ function RecommendPage() {
       filters.category,
       filters.isIrregular,
       filters.page,
+      filters.sort,
     ],
     queryFn: () =>
       wordsService.getAllWords({
@@ -98,6 +99,7 @@ function RecommendPage() {
           filters.category === 'verb' ? filters.isIrregular : undefined,
         page: filters.page,
         limit: WORDS_PER_PAGE,
+        sort: filters.sort,
       }),
   });
 
@@ -106,11 +108,12 @@ function RecommendPage() {
   const currentPage = data?.page ?? filters.page;
 
   const handlePageChange = (nextPage: number) => {
-    const nextPath = buildDictionaryPath({
+    const nextPath = buildWordsPath('/recommend', {
       category: filters.category,
       isIrregular:
         filters.category === 'verb' ? filters.isIrregular : undefined,
       page: nextPage,
+      sort: filters.sort,
     });
 
     const nextParams = new URLSearchParams();
@@ -125,6 +128,11 @@ function RecommendPage() {
     router.push(nextUrl, { scroll: false });
   };
 
+  const breadcrumbItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Recommend' },
+  ];
+
   if (isError) {
     toast.error(
       error instanceof Error
@@ -135,6 +143,8 @@ function RecommendPage() {
     return (
       <main className={css.page}>
         <section className="container">
+          <Breadcrumbs items={breadcrumbItems} />
+
           <Dashboard
             variant="recommend"
             totalCount={0}
@@ -157,6 +167,8 @@ function RecommendPage() {
   return (
     <main className={css.page}>
       <section className="container">
+        <Breadcrumbs items={breadcrumbItems} />
+
         <Dashboard
           variant="recommend"
           totalCount={0}

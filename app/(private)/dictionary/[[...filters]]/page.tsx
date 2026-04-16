@@ -1,14 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 
 import type { WordItem } from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
+
 import {
-  buildDictionaryPath,
+  buildWordsPath,
   formatDictionaryCategoryLabel,
   parseDictionarySegments,
 } from '@/lib/utils/dictionary.query';
@@ -73,6 +74,7 @@ function DictionaryPage() {
           : undefined,
       isIrregular:
         routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined,
+      sort: routeFilters.sort,
     }),
     [keyword, routeFilters]
   );
@@ -94,10 +96,11 @@ function DictionaryPage() {
       ) {
         items.push({
           label: categoryLabel,
-          href: buildDictionaryPath({
+          href: buildWordsPath('/dictionary', {
             category: routeFilters.category,
             isIrregular: undefined,
             page: 1,
+            sort: routeFilters.sort,
           }),
         });
 
@@ -121,7 +124,7 @@ function DictionaryPage() {
 
   const { data: statistics } = useQuery({
     queryKey: ['words-statistics'],
-    queryFn: () => wordsService.getStatistics(),
+    queryFn: wordsService.getStatistics,
   });
 
   const deleteMutation = useMutation({
@@ -154,14 +157,20 @@ function DictionaryPage() {
   const totalCount = statistics?.totalCount ?? 0;
 
   const handlePageChange = (nextPage: number) => {
-    const nextPath = buildDictionaryPath({
+    const nextPath = buildWordsPath('/dictionary', {
       category: routeFilters.category,
       isIrregular:
         routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined,
       page: nextPage,
+      sort: routeFilters.sort,
     });
 
-    const nextParams = new URLSearchParams(searchParams.toString());
+    const nextParams = new URLSearchParams();
+
+    if (keyword) {
+      nextParams.set('keyword', keyword);
+    }
+
     const query = nextParams.toString();
 
     router.push(query ? `${nextPath}?${query}` : nextPath, {
@@ -169,15 +178,46 @@ function DictionaryPage() {
     });
   };
 
-  const handleConfirmDelete = async () => {
-    if (!deletingWord || deleteMutation.isPending) return;
-
+  const handleDeleteConfirm = async () => {
+    if (!deletingWord) return;
     await deleteMutation.mutateAsync(deletingWord._id);
   };
 
+  if (isError) {
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : 'Failed to load dictionary words.'
+    );
+
+    return (
+      <main className={css.page}>
+        <section className="container">
+          <Breadcrumbs items={breadcrumbItems} />
+
+          <Dashboard
+            variant="dictionary"
+            totalCount={totalCount}
+            showAddWord
+            showTrainLink
+            onAddWord={() => setIsAddModalOpen(true)}
+          />
+
+          <EmptyState
+            title="Something went wrong"
+            text="We couldn’t load your words. Please try again."
+            imageSrc="/training-empty.png"
+            imageWidth={190}
+            imageHeight={190}
+          />
+        </section>
+      </main>
+    );
+  }
+
   return (
-    <section className={css.section}>
-      <div className="container">
+    <main className={css.page}>
+      <section className="container">
         <Breadcrumbs items={breadcrumbItems} />
 
         <Dashboard
@@ -189,28 +229,16 @@ function DictionaryPage() {
         />
 
         {isLoading ? (
-          <div className={css.loaderWrap}>
-            <InlineLoader />
-          </div>
-        ) : isError ? (
-          <EmptyState
-            title="Something went wrong"
-            text={
-              error instanceof Error ? error.message : 'Failed to load words.'
-            }
-            className={css.emptyState}
-          />
+          <InlineLoader text="Loading your words…" />
         ) : rows.length === 0 ? (
           <EmptyState
-            title="No words yet"
-            text="Add your first word to start building your personal dictionary."
+            title="Your dictionary is empty"
+            text="Add your first word and start building your vocabulary."
             imageSrc="/training-empty.png"
-            imageAlt="Empty training state illustration"
-            imageWidth={498}
-            imageHeight={435}
+            imageWidth={190}
+            imageHeight={190}
             primaryActionLabel="Add word"
             onPrimaryAction={() => setIsAddModalOpen(true)}
-            className={css.emptyState}
           />
         ) : (
           <>
@@ -242,16 +270,13 @@ function DictionaryPage() {
 
         <ConfirmDeleteModal
           isOpen={Boolean(deletingWord)}
-          onClose={() => {
-            if (deleteMutation.isPending) return;
-            setDeletingWord(null);
-          }}
-          onConfirm={handleConfirmDelete}
-          isSubmitting={deleteMutation.isPending}
           wordLabel={deletingWord?.en}
+          isSubmitting={deleteMutation.isPending}
+          onClose={() => setDeletingWord(null)}
+          onConfirm={handleDeleteConfirm}
         />
-      </div>
-    </section>
+      </section>
+    </main>
   );
 }
 
