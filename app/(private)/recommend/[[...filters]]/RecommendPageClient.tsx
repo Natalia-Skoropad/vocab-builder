@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -103,6 +103,16 @@ function RecommendPageClient() {
       }),
   });
 
+  useEffect(() => {
+    if (!isError) return;
+
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : 'Failed to load recommended words.'
+    );
+  }, [isError, error]);
+
   const rows: WordItem[] = data?.results ?? [];
   const totalPages = data?.totalPages ?? 1;
   const currentPage = data?.page ?? filters.page;
@@ -134,12 +144,6 @@ function RecommendPageClient() {
   ];
 
   if (isError) {
-    toast.error(
-      error instanceof Error
-        ? error.message
-        : 'Failed to load recommended words.'
-    );
-
     return (
       <main className={css.page}>
         <section className="container">
