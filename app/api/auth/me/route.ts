@@ -9,11 +9,11 @@ import { getAuthErrorMessage } from '@/lib/auth/auth-error';
 
 import {
   buildUserFromBackendCurrent,
-  createErrorResponse,
   createUserResponse,
   isBackendCurrentUserResponse,
-  parseJsonSafe,
 } from '@/lib/auth/auth-response';
+
+import { createErrorResponse, parseJsonSafe } from '@/lib/api/http-response';
 
 //===============================================================
 

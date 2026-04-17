@@ -4,11 +4,11 @@ import { getAuthErrorMessage } from '@/lib/auth/auth-error';
 
 import {
   buildUserFromBackendAuth,
-  createErrorResponse,
   createUserResponse,
   isBackendAuthResponse,
-  parseJsonSafe,
 } from '@/lib/auth/auth-response';
+
+import { createErrorResponse, parseJsonSafe } from '@/lib/api/http-response';
 
 //===============================================================
 

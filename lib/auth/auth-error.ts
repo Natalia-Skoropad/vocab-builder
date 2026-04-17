@@ -16,16 +16,19 @@ const AUTH_ERROR_MAP: Record<AuthAction, AuthErrorConfig[]> = {
     { status: 404, message: 'Service not found.' },
     { status: 500, message: 'Unable to register user.' },
   ],
+
   login: [
     { status: 400, message: 'Invalid login data.' },
     { status: 401, message: 'Email or password invalid.' },
     { status: 404, message: 'Service not found.' },
     { status: 500, message: 'Unable to login user.' },
   ],
+
   logout: [
     { status: 401, message: 'Unauthorized.' },
     { status: 500, message: 'Unable to sign out.' },
   ],
+
   me: [
     { status: 401, message: 'Unauthorized.' },
     { status: 500, message: 'Unable to get current user.' },
@@ -42,5 +45,6 @@ export function getAuthErrorMessage(
   const matched = AUTH_ERROR_MAP[action].find((item) => item.status === status);
 
   if (matched) return matched.message;
+
   return fallback || 'Something went wrong.';
 }

@@ -7,7 +7,7 @@ import {
   createErrorResponse,
   createOkResponse,
   parseJsonSafe,
-} from '@/lib/words/words-response';
+} from '@/lib/api/http-response';
 
 //===============================================================
 

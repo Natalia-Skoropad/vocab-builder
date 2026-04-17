@@ -2,13 +2,12 @@ import { NextRequest } from 'next/server';
 
 import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
-
+import { normalizeOwnWordsResponse } from '@/lib/words/words-response';
 import {
   createErrorResponse,
   createOkResponse,
-  normalizeOwnWordsResponse,
   parseJsonSafe,
-} from '@/lib/words/words-response';
+} from '@/lib/api/http-response';
 
 import type { WordItem, WordSort } from '@/types/word';
 

@@ -1,23 +1,3 @@
-import { NextResponse } from 'next/server';
-
-//===============================================================
-
-export async function parseJsonSafe<T>(response: Response): Promise<T | null> {
-  return (await response.json().catch(() => null)) as T | null;
-}
-
-//===============================================================
-
-export function createErrorResponse(message: string, status: number) {
-  return NextResponse.json({ message }, { status });
-}
-
-export function createOkResponse<T>(data: T, status = 200) {
-  return NextResponse.json(data, { status });
-}
-
-//===============================================================
-
 export function isStatisticsResponse(
   data: unknown
 ): data is { totalCount: number } {
@@ -27,6 +7,8 @@ export function isStatisticsResponse(
     typeof (data as { totalCount?: unknown }).totalCount === 'number'
   );
 }
+
+//===============================================================
 
 export function isOwnWordsResponse(data: unknown): data is {
   results: unknown[];
@@ -40,6 +22,8 @@ export function isOwnWordsResponse(data: unknown): data is {
     Array.isArray((data as { results?: unknown }).results)
   );
 }
+
+//===============================================================
 
 export function normalizeOwnWordsResponse(
   data: {

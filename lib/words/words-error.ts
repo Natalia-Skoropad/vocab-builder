@@ -69,5 +69,6 @@ export function getWordsErrorMessage(
   );
 
   if (matched) return matched.message;
+
   return fallback || 'Something went wrong.';
 }

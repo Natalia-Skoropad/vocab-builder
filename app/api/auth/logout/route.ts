@@ -6,11 +6,8 @@ import {
 } from '@/lib/server/auth/session';
 
 import { getAuthErrorMessage } from '@/lib/auth/auth-error';
-
-import {
-  createErrorResponse,
-  createOkResponse,
-} from '@/lib/auth/auth-response';
+import { createAuthOkResponse } from '@/lib/auth/auth-response';
+import { createErrorResponse } from '@/lib/api/http-response';
 
 //===============================================================
 
@@ -30,7 +27,7 @@ export async function POST() {
 
     await clearSessionCookie();
 
-    return createOkResponse();
+    return createAuthOkResponse();
   } catch (error) {
     console.error('POST /api/auth/logout error:', error);
 

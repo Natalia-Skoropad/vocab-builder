@@ -1,13 +1,13 @@
 import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
 import { getWordsErrorMessage } from '@/lib/words/words-error';
+import { isStatisticsResponse } from '@/lib/words/words-response';
 
 import {
   createErrorResponse,
   createOkResponse,
-  isStatisticsResponse,
   parseJsonSafe,
-} from '@/lib/words/words-response';
+} from '@/lib/api/http-response';
 
 //===============================================================
 

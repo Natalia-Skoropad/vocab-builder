@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
-
 import type {
   AppUser,
   BackendAuthResponse,
   BackendCurrentUserResponse,
 } from '@/types/auth';
+
+import { createOkResponse, parseJsonSafe } from '@/lib/api/http-response';
 
 //===============================================================
 
@@ -13,12 +13,6 @@ type RouteAuthResponse = {
   message?: string;
   ok?: boolean;
 };
-
-//===============================================================
-
-export async function parseJsonSafe<T>(response: Response): Promise<T | null> {
-  return (await response.json().catch(() => null)) as T | null;
-}
 
 //===============================================================
 
@@ -75,16 +69,12 @@ export function buildUserFromBackendCurrent(
 
 //===============================================================
 
-export function createErrorResponse(message: string, status: number) {
-  return NextResponse.json({ message }, { status });
-}
-
 export function createUserResponse(user: AppUser, status = 200) {
-  return NextResponse.json({ user }, { status });
+  return createOkResponse({ user }, status);
 }
 
-export function createOkResponse(status = 200) {
-  return NextResponse.json({ ok: true }, { status });
+export function createAuthOkResponse(status = 200) {
+  return createOkResponse({ ok: true }, status);
 }
 
 //===============================================================
