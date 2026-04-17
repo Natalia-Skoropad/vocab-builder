@@ -67,7 +67,7 @@ function WordsTable({
   onAddToDictionary,
   addingWordId,
 }: Props) {
-  const dictionaryColumns = useMemo(
+  const baseColumns = useMemo(
     () => [
       columnHelper.accessor('en', {
         header: () => (
@@ -106,7 +106,12 @@ function WordsTable({
           <ProgressBar value={getSafeProgress(info.getValue())} />
         ),
       }),
+    ],
+    []
+  );
 
+  const actionColumn = useMemo(
+    () =>
       columnHelper.display({
         id: 'actions',
         header: '',
@@ -118,50 +123,11 @@ function WordsTable({
           />
         ),
       }),
-    ],
     [onEdit, onDelete]
   );
 
-  const recommendColumns = useMemo(
-    () => [
-      columnHelper.accessor('en', {
-        header: () => (
-          <div className={css.headCell}>
-            <span>Word</span>
-            <SvgIcon name="icon-united-kingdom-flag" className={css.flagIcon} />
-          </div>
-        ),
-        cell: (info) => <span className={css.wordCell}>{info.getValue()}</span>,
-      }),
-
-      columnHelper.accessor('ua', {
-        header: () => (
-          <div className={css.headCell}>
-            <span>Translation</span>
-            <SvgIcon name="icon-ukraine-flag" className={css.flagIcon} />
-          </div>
-        ),
-        cell: (info) => (
-          <span className={css.translationCell}>{info.getValue()}</span>
-        ),
-      }),
-
-      columnHelper.accessor('category', {
-        header: 'Category',
-        cell: (info) => (
-          <span className={css.categoryCell}>
-            {formatCategory(info.getValue())}
-          </span>
-        ),
-      }),
-
-      columnHelper.accessor('progress', {
-        header: 'Progress',
-        cell: (info) => (
-          <ProgressBar value={getSafeProgress(info.getValue())} />
-        ),
-      }),
-
+  const addColumn = useMemo(
+    () =>
       columnHelper.display({
         id: 'add',
         header: '',
@@ -188,12 +154,16 @@ function WordsTable({
           );
         },
       }),
-    ],
     [addingWordId, onAddToDictionary]
   );
 
-  const columns =
-    variant === 'dictionary' ? dictionaryColumns : recommendColumns;
+  const columns = useMemo(
+    () =>
+      variant === 'dictionary'
+        ? [...baseColumns, actionColumn]
+        : [...baseColumns, addColumn],
+    [variant, baseColumns, actionColumn, addColumn]
+  );
 
   const table = useReactTable({
     data: rows,

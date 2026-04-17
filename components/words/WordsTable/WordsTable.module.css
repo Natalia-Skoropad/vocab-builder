@@ -186,39 +186,6 @@
   opacity: 0.9;
 }
 
-.addButtonLegacy {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 38px;
-  padding: 8px 14px;
-  border-radius: 30px;
-  border: 1px solid var(--green-main);
-  background-color: transparent;
-  color: var(--text-main);
-  font-size: 14px;
-  line-height: 1.2;
-  font-weight: var(--fw-medium);
-  white-space: nowrap;
-  transition: background-color 200ms ease, color 200ms ease,
-    border-color 200ms ease, opacity 200ms ease;
-}
-
-.addButtonLegacy:hover,
-.addButtonLegacy:focus-visible {
-  background-color: var(--green-main);
-  color: var(--background-1);
-}
-
-.addButtonLegacy:focus-visible {
-  outline: none;
-}
-
-.addButtonLegacy:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 @media only screen and (max-width: 767.98px) {
   .outer {
     padding: 12px;
@@ -288,12 +255,6 @@
   .addButtonIcon {
     width: 20px;
     height: 20px;
-  }
-
-  .addButtonLegacy {
-    min-height: 34px;
-    padding: 7px 10px;
-    font-size: 12px;
   }
 }
 
@@ -392,11 +353,5 @@
   .addButtonIcon {
     width: 20px;
     height: 20px;
-  }
-
-  .addButtonLegacy {
-    min-height: 42px;
-    padding: 10px 16px;
-    font-size: 16px;
   }
 }
