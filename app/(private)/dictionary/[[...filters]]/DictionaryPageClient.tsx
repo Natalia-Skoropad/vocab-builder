@@ -1,8 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+
 import { toast } from 'react-hot-toast';
 
 import type { WordItem } from '@/types/word';
@@ -34,8 +40,11 @@ const WORDS_PER_PAGE = 7;
 
 function DictionaryPageClient() {
   const router = useRouter();
+  const pathname = usePathname();
+
   const params = useParams<{ filters?: string[] | string }>();
   const searchParams = useSearchParams();
+  const shouldAutoOpenAddModal = searchParams.get('openModal') === 'add-word';
   const queryClient = useQueryClient();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -43,6 +52,18 @@ function DictionaryPageClient() {
   const [deletingWord, setDeletingWord] = useState<WordItem | null>(null);
 
   const rawFiltersParam = params.filters;
+
+  useEffect(() => {
+    if (!shouldAutoOpenAddModal) return;
+
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete('openModal');
+
+    const nextQuery = nextParams.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+
+    router.replace(nextUrl, { scroll: false });
+  }, [pathname, router, searchParams, shouldAutoOpenAddModal]);
 
   const routeSegments = useMemo<string[]>(() => {
     if (Array.isArray(rawFiltersParam)) {
@@ -264,7 +285,7 @@ function DictionaryPageClient() {
         )}
 
         <AddWordModal
-          isOpen={isAddModalOpen}
+          isOpen={isAddModalOpen || shouldAutoOpenAddModal}
           onClose={() => setIsAddModalOpen(false)}
         />
 

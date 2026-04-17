@@ -1,0 +1,63 @@
+.content {
+  position: relative;
+  padding: 56px 24px 24px;
+  border-radius: 30px;
+  background-color: var(--green-main);
+  color: var(--background-1);
+}
+
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.title {
+  margin: 0 0 24px;
+  font-size: 32px;
+  line-height: 1.1;
+  font-weight: var(--fw-semiBold);
+  color: var(--background-1);
+  text-align: center;
+}
+
+.columns {
+  display: grid;
+  gap: 24px;
+}
+
+.columnTitle {
+  margin: 0 0 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(252, 252, 252, 0.7);
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.item {
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--background-1);
+}
+
+.actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+@media only screen and (min-width: 768px) {
+  .content {
+    padding: 64px 40px 40px;
+    min-width: 640px;
+  }
+
+  .columns {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}

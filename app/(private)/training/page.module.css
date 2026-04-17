@@ -1,0 +1,88 @@
+.page {
+  padding-bottom: 40px;
+}
+
+.loaderWrap,
+.contentWrap {
+  width: 100%;
+}
+
+.progressWrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.loader {
+  min-height: 220px;
+  border-radius: 30px;
+  border: 1px solid var(--border-light);
+  background-color: var(--background-1);
+}
+
+.emptyState {
+  margin-top: 0;
+}
+
+.trainingPlaceholder {
+  min-height: 420px;
+  padding: 32px 20px;
+  border-radius: 30px;
+  border: 1px solid var(--border-light);
+  background-color: var(--background-1);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media only screen and (max-width: 767.98px) {
+  .page {
+    padding-bottom: 32px;
+  }
+
+  .progressWrap {
+    margin-bottom: 12px;
+  }
+
+  .trainingPlaceholder {
+    min-height: 360px;
+    padding: 24px 16px;
+    border-radius: 24px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .page {
+    padding-bottom: 56px;
+  }
+
+  .progressWrap {
+    margin-bottom: 20px;
+  }
+
+  .trainingPlaceholder {
+    min-height: 500px;
+    padding: 40px 32px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .page {
+    padding-bottom: 64px;
+  }
+
+  .progressWrap {
+    margin-bottom: 24px;
+  }
+
+  .trainingPlaceholder {
+    min-height: 520px;
+    padding: 64px;
+  }
+}

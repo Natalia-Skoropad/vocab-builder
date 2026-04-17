@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import TrainingPageClient from './TrainingPageClient';
 
 //===============================================================
 
@@ -9,13 +10,7 @@ export const metadata: Metadata = {
 //===============================================================
 
 function TrainingPage() {
-  return (
-    <main>
-      <section aria-labelledby="home-title">
-        <div className="container">Hello TrainingPage</div>
-      </section>
-    </main>
-  );
+  return <TrainingPageClient />;
 }
 
 export default TrainingPage;
