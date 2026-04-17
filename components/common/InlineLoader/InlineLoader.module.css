@@ -25,3 +25,9 @@
   line-height: 1.4;
   color: var(--text-main);
 }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

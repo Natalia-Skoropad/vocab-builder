@@ -1,6 +1,9 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 import clsx from 'clsx';
-import { Plus, ArrowRight } from 'lucide-react';
+import { Plus, ArrowRight, SlidersHorizontal } from 'lucide-react';
 
 import { ROUTES } from '@/lib/constants/routes';
 
@@ -30,10 +33,19 @@ function Dashboard({
   onAddWord,
   className,
 }: Props) {
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [hasAppliedFilters, setHasAppliedFilters] = useState(false);
+
   return (
     <div className={clsx(css.dashboard, className)}>
       <div className={css.filtersWrap}>
-        <Filters variant={variant} />
+        <Filters
+          variant={variant}
+          isPanelOpen={isFiltersOpen}
+          onOpenPanel={() => setIsFiltersOpen(true)}
+          onClosePanel={() => setIsFiltersOpen(false)}
+          onAppliedStateChange={setHasAppliedFilters}
+        />
       </div>
 
       <div className={css.actionsWrap}>
@@ -64,6 +76,23 @@ function Dashboard({
             <ArrowRight className={css.actionIcon} aria-hidden="true" />
           </Link>
         ) : null}
+
+        <button
+          type="button"
+          className={clsx(
+            css.filterButton,
+            hasAppliedFilters && css.filterButtonActive
+          )}
+          onClick={() => setIsFiltersOpen(true)}
+          aria-label="Open filters"
+          aria-expanded={isFiltersOpen}
+          aria-controls="words-filters-offcanvas"
+        >
+          <SlidersHorizontal
+            className={css.filterButtonIcon}
+            aria-hidden="true"
+          />
+        </button>
       </div>
     </div>
   );

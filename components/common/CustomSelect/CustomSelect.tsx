@@ -20,6 +20,7 @@ type Props = {
   placeholder?: string;
   className?: string;
   variant?: 'page' | 'modal';
+  isActive?: boolean;
 };
 
 //===============================================================
@@ -31,6 +32,7 @@ function CustomSelect({
   placeholder = 'Select',
   className,
   variant = 'page',
+  isActive = false,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -73,7 +75,9 @@ function CustomSelect({
         className={clsx(
           css.trigger,
           variant === 'modal' && css.modalTrigger,
-          isOpen && css.open
+          isOpen && css.open,
+          isActive && variant === 'page' && css.activeTrigger,
+          isActive && variant === 'modal' && css.activeModalTrigger
         )}
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"

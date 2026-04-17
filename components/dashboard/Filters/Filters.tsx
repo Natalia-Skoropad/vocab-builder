@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useId, useMemo, useCallback, useState } from 'react';
 import { Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -18,6 +19,7 @@ import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
 import RadioGroup, {
   type RadioOption,
 } from '@/components/common/RadioGroup/RadioGroup';
+import CloseButton from '@/components/common/CloseButton/CloseButton';
 
 import css from './Filters.module.css';
 
@@ -25,6 +27,10 @@ import css from './Filters.module.css';
 
 type Props = {
   variant: 'dictionary' | 'recommend';
+  isPanelOpen: boolean;
+  onOpenPanel: () => void;
+  onClosePanel: () => void;
+  onAppliedStateChange?: (value: boolean) => void;
 };
 
 type SortValue = 'sort' | WordSort;
@@ -42,7 +48,12 @@ const sortOptions = [
 
 //===============================================================
 
-function Filters({ variant }: Props) {
+function Filters({
+  variant,
+  isPanelOpen,
+  onClosePanel,
+  onAppliedStateChange,
+}: Props) {
   const searchId = useId();
   const categoryId = useId();
   const sortId = useId();
@@ -59,14 +70,10 @@ function Filters({ variant }: Props) {
   const basePath = variant === 'recommend' ? '/recommend' : '/dictionary';
 
   const routeSegments = useMemo<string[]>(() => {
-    if (Array.isArray(rawFiltersParam)) {
-      return rawFiltersParam;
-    }
-
+    if (Array.isArray(rawFiltersParam)) return rawFiltersParam;
     if (typeof rawFiltersParam === 'string' && rawFiltersParam.trim()) {
       return [rawFiltersParam];
     }
-
     return [];
   }, [rawFiltersParam]);
 
@@ -121,6 +128,14 @@ function Filters({ variant }: Props) {
   const isVerb = category === 'verb';
   const effectiveSort = sort === 'sort' ? undefined : sort;
 
+  const hasAppliedSort = sort !== 'sort';
+  const hasAppliedCategory = category !== 'categories';
+  const hasAppliedFilters = hasAppliedSort || hasAppliedCategory;
+
+  useEffect(() => {
+    onAppliedStateChange?.(hasAppliedFilters);
+  }, [hasAppliedFilters, onAppliedStateChange]);
+
   useEffect(() => {
     const currentKeyword = searchParams.get('keyword')?.trim() ?? '';
     const currentSort = routeFilters.sort ?? 'sort';
@@ -137,9 +152,7 @@ function Filters({ variant }: Props) {
       nextIsIrregular !== currentIsIrregular ||
       sort !== currentSort;
 
-    if (!hasChanged) {
-      return;
-    }
+    if (!hasChanged) return;
 
     const nextPath = buildWordsPath(basePath, {
       category,
@@ -186,9 +199,29 @@ function Filters({ variant }: Props) {
     [categories]
   );
 
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (e.target === e.currentTarget) {
+        onClosePanel();
+      }
+    },
+    [onClosePanel]
+  );
+
+  useEffect(() => {
+    if (!isPanelOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClosePanel();
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isPanelOpen, onClosePanel]);
+
   return (
-    <div className={css.filters}>
-      <div className={css.topRow}>
+    <>
+      <div className={css.filters}>
         <div className={css.searchWrap}>
           <label htmlFor={searchId} className="visually-hidden">
             Find the word
@@ -206,12 +239,18 @@ function Filters({ variant }: Props) {
           <Search className={css.searchIcon} aria-hidden="true" />
         </div>
 
-        <div className={css.selectWrap}>
-          <label htmlFor={categoryId} className="visually-hidden">
-            Select category
-          </label>
+        <div className={css.desktopControls}>
+          <div className={css.sortWrap}>
+            <CustomSelect
+              value={sort}
+              options={sortOptions}
+              onChange={(nextValue) => setSort(nextValue as SortValue)}
+              placeholder="Sort"
+              isActive={hasAppliedSort}
+            />
+          </div>
 
-          <div id={categoryId}>
+          <div className={css.selectWrap}>
             <CustomSelect
               value={category}
               options={categoryOptions}
@@ -219,39 +258,103 @@ function Filters({ variant }: Props) {
                 setCategory(nextValue as typeof category)
               }
               placeholder="Categories"
+              isActive={hasAppliedCategory}
             />
           </div>
-        </div>
 
-        <div className={css.sortWrap}>
-          <label htmlFor={sortId} className="visually-hidden">
-            Sort words
-          </label>
-
-          <div id={sortId}>
-            <CustomSelect
-              value={sort}
-              options={sortOptions}
-              onChange={(nextValue) => setSort(nextValue as SortValue)}
-              placeholder="Sort"
+          {isVerb ? (
+            <RadioGroup
+              name={`verb-type-desktop-${variant}`}
+              value={verbType}
+              options={verbOptions}
+              onChange={(nextValue) =>
+                setVerbType(nextValue as 'regular' | 'irregular')
+              }
+              className={css.radioGroup}
+              ariaLabel="Verb type"
             />
-          </div>
+          ) : null}
         </div>
       </div>
 
-      {isVerb ? (
-        <RadioGroup
-          name={`verb-type-${variant}`}
-          value={verbType}
-          options={verbOptions}
-          onChange={(nextValue) =>
-            setVerbType(nextValue as 'regular' | 'irregular')
-          }
-          className={css.radioGroup}
-          ariaLabel="Verb type"
-        />
+      {isPanelOpen ? (
+        <div
+          className={css.backdrop}
+          onClick={handleBackdropClick}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Filters panel"
+        >
+          <div id="words-filters-offcanvas" className={css.panel}>
+            <div className={css.panelTopRow}>
+              <h2 className={css.panelTitle}>Filters</h2>
+              <CloseButton onClick={onClosePanel} />
+            </div>
+
+            <div className={css.panelContent}>
+              <div className={css.panelField}>
+                <label htmlFor={sortId} className={css.panelLabel}>
+                  Sort
+                </label>
+
+                <CustomSelect
+                  value={sort}
+                  options={sortOptions}
+                  onChange={(nextValue) => setSort(nextValue as SortValue)}
+                  placeholder="Sort"
+                  variant="modal"
+                  isActive={hasAppliedSort}
+                />
+              </div>
+
+              <div className={css.panelField}>
+                <label htmlFor={categoryId} className={css.panelLabel}>
+                  Category
+                </label>
+
+                <CustomSelect
+                  value={category}
+                  options={categoryOptions}
+                  onChange={(nextValue) =>
+                    setCategory(nextValue as typeof category)
+                  }
+                  placeholder="Categories"
+                  variant="modal"
+                  isActive={hasAppliedCategory}
+                />
+              </div>
+
+              {isVerb ? (
+                <div className={css.panelField}>
+                  <RadioGroup
+                    name={`verb-type-mobile-${variant}`}
+                    value={verbType}
+                    options={verbOptions}
+                    onChange={(nextValue) =>
+                      setVerbType(nextValue as 'regular' | 'irregular')
+                    }
+                    className={css.modalRadioGroup}
+                    ariaLabel="Verb type"
+                    variant="light"
+                  />
+                </div>
+              ) : null}
+            </div>
+
+            <div className={css.illustrationWrap} aria-hidden="true">
+              <Image
+                src="/a-girl-and-a-boy-are-reading-a-book.png"
+                alt=""
+                fill
+                className={css.illustration}
+                sizes="(max-width: 767px) 180px, 220px"
+                priority={false}
+              />
+            </div>
+          </div>
+        </div>
       ) : null}
-    </div>
+    </>
   );
 }
 

@@ -1,17 +1,12 @@
 .filters {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-}
-
-.topRow {
-  display: flex;
-  flex-direction: column;
   gap: 14px;
 }
 
 .searchWrap,
-.selectWrap {
+.selectWrap,
+.sortWrap {
   position: relative;
   width: 100%;
 }
@@ -55,58 +50,107 @@
   pointer-events: none;
 }
 
-.radioGroup {
-  gap: 24px;
+.desktopControls {
+  display: none;
 }
 
-.topRow {
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background-color: rgba(18, 20, 23, 0.2);
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(88vw, 300px);
+  height: 100dvh;
+  padding: 20px 20px 24px;
+  background-color: var(--green-main);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  animation: slideInFromRight 300ms ease;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.panelTopRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.14;
+  font-weight: var(--fw-bold);
+  color: var(--background-1);
+}
+
+.panelContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panelField {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.sortWrap {
-  width: 100%;
+.panelLabel {
+  font-size: 14px;
+  line-height: 1.29;
+  color: rgba(252, 252, 252, 0.8);
+}
+
+.modalRadioGroup {
+  gap: 18px;
+}
+
+.illustrationWrap {
+  position: relative;
+  width: 180px;
+  height: 280px;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.illustration {
+  object-fit: contain;
+  object-position: bottom center;
 }
 
 @media only screen and (min-width: 768px) {
-  .filters {
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .topRow {
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-    flex: 0 0 auto;
-  }
-
   .searchWrap {
-    flex: 0 0 274px;
-    max-width: 274px;
+    max-width: 370px;
   }
 
-  .selectWrap {
-    flex: 0 0 188px;
-    max-width: 188px;
+  .panel {
+    width: 300px;
+    padding: 24px 24px 28px;
   }
 
-  .radioGroup {
-    flex: 0 0 auto;
-    gap: 22px;
-  }
-
-  .topRow {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .sortWrap {
-    flex: 0 0 144px;
-    max-width: 144px;
+  .illustrationWrap {
+    width: 220px;
+    height: 340px;
   }
 }
 
@@ -117,9 +161,21 @@
     gap: 16px;
   }
 
-  .topRow {
+  .searchWrap {
+    flex: 0 0 274px;
+    max-width: 274px;
+  }
+
+  .desktopControls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     flex: 0 0 auto;
-    gap: 16px;
+  }
+
+  .sortWrap {
+    flex: 0 0 160px;
+    max-width: 160px;
   }
 
   .selectWrap {
@@ -130,7 +186,6 @@
   .searchInput {
     height: 48px;
     padding: 12px 44px 12px 18px;
-    font-size: 16px;
     line-height: 1.5;
   }
 
@@ -138,18 +193,5 @@
     width: 18px;
     height: 18px;
     right: 16px;
-  }
-
-  .radioGroup {
-    gap: 20px;
-  }
-
-  .topRow {
-    gap: 12px;
-  }
-
-  .sortWrap {
-    flex-basis: 160px;
-    max-width: 160px;
   }
 }

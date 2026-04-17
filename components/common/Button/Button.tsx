@@ -8,7 +8,13 @@ import css from './Button.module.css';
 //===============================================================
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'secondary' | 'dark' | 'light' | 'disabled';
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'dark'
+    | 'light'
+    | 'disabled'
+    | 'disabledAuth';
   fullWidth?: boolean;
 };
 
@@ -23,7 +29,8 @@ function Button({
   fullWidth = true,
   ...props
 }: Props) {
-  const isDisabled = disabled || variant === 'disabled';
+  const isDisabled =
+    disabled || variant === 'disabled' || variant === 'disabledAuth';
 
   return (
     <button
@@ -37,6 +44,7 @@ function Button({
           [css.dark]: variant === 'dark',
           [css.light]: variant === 'light',
           [css.disabled]: variant === 'disabled',
+          [css.disabledAuth]: variant === 'disabledAuth',
           [css.fullWidth]: fullWidth,
         },
         className

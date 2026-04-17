@@ -71,6 +71,46 @@
   opacity: 0.9;
 }
 
+.filterButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin-left: auto;
+
+  border-radius: 14px;
+  border: 1px solid rgba(133, 170, 159, 0.6);
+  background-color: transparent;
+  color: var(--green-main);
+
+  transition: border-color var(--motion-duration-fast)
+      var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.filterButton:hover,
+.filterButton:focus-visible {
+  outline: none;
+  border-color: var(--green-main);
+  background-color: rgba(133, 170, 159, 0.08);
+  box-shadow: 0 0 0 2px rgba(133, 170, 159, 0.12);
+}
+
+.filterButtonActive {
+  background-color: rgba(133, 170, 159, 0.14);
+  border-color: var(--green-main);
+}
+
+.filterButtonIcon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
 @media only screen and (min-width: 768px) {
   .dashboard {
     gap: 28px;
@@ -120,5 +160,9 @@
   .actionIcon {
     width: 20px;
     height: 20px;
+  }
+
+  .filterButton {
+    display: none;
   }
 }

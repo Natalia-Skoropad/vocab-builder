@@ -38,7 +38,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   font-size: 20px;
   line-height: 1;
+  color: var(--green-main);
   transform: translateY(-1px);
+
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard),
+    opacity var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.button:hover .arrow,
+.button:focus-visible .arrow {
+  transform: translate(2px, -1px);
+  opacity: 0.9;
+}
+
+.offcanvas .arrow {
+  color: var(--background-1);
 }
