@@ -135,7 +135,6 @@
   text-align: center;
 }
 
-/* recommend add button */
 .addButton {
   display: inline-flex;
   align-items: center;
@@ -187,7 +186,6 @@
   opacity: 0.9;
 }
 
-/* old add button styles for dictionary-like action if needed elsewhere */
 .addButtonLegacy {
   display: inline-flex;
   align-items: center;
@@ -299,7 +297,6 @@
   }
 }
 
-/* скрол тільки якщо екран вужчий за 375px */
 @media only screen and (max-width: 374.98px) {
   .scroll {
     overflow-x: auto;

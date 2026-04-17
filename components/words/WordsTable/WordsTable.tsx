@@ -1,13 +1,14 @@
 'use client';
 
 import { useMemo } from 'react';
+import { ArrowRight } from 'lucide-react';
+
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ArrowRight } from 'lucide-react';
 
 import type { WordItem } from '@/types/word';
 

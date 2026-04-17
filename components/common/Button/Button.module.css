@@ -75,7 +75,6 @@
 }
 
 /* disabled for auth pages */
-
 .disabledAuth {
   background-color: rgba(133, 170, 159, 0.3);
   color: rgba(18, 20, 23, 0.3);
@@ -85,7 +84,6 @@
 }
 
 /* disabled for modal / green surfaces */
-
 .disabled {
   background-color: var(--border-3);
   color: rgba(18, 20, 23, 0.55);

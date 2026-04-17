@@ -6,9 +6,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { ROUTES } from '@/lib/constants/routes';
 
 import type { AddWordFormValues } from '@/types/forms';
+import { ROUTES } from '@/lib/constants/routes';
 import { addWordSchema } from '@/lib/validations/addWordSchema';
 import { wordsService } from '@/lib/services/words.service';
 import { useCategoriesStore } from '@/store/categories/categoriesStore';
@@ -16,12 +16,12 @@ import { useCategoriesStore } from '@/store/categories/categoriesStore';
 import Button from '@/components/common/Button/Button';
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
 import LanguageBadge from '@/components/common/LanguageBadge/LanguageBadge';
+import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 
 import RadioGroup, {
   type RadioOption,
 } from '@/components/common/RadioGroup/RadioGroup';
 
-import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 import css from '@/components/modals/shared/WordForm.module.css';
 
 //===============================================================

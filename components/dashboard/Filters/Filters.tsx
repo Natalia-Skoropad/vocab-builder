@@ -16,10 +16,11 @@ import {
 } from '@/lib/utils/dictionary.query';
 
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
+import CloseButton from '@/components/common/CloseButton/CloseButton';
+
 import RadioGroup, {
   type RadioOption,
 } from '@/components/common/RadioGroup/RadioGroup';
-import CloseButton from '@/components/common/CloseButton/CloseButton';
 
 import css from './Filters.module.css';
 
@@ -34,6 +35,8 @@ type Props = {
 };
 
 type SortValue = 'sort' | WordSort;
+
+//===============================================================
 
 const verbOptions: RadioOption[] = [
   { value: 'regular', label: 'Regular' },

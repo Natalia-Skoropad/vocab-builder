@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+
 import css from './Toast.module.css';
 
 //===============================================================

@@ -27,6 +27,8 @@ export type WordItem = {
   progress: number;
 };
 
+//===============================================================
+
 export type WordsResponse = PaginatedResponse<WordItem>;
 
 export type WordsQueryParams = {
@@ -38,6 +40,8 @@ export type WordsQueryParams = {
   sort?: WordSort;
   newWordId?: string;
 };
+
+//===============================================================
 
 export type TrainingTaskItem = {
   _id: string;
