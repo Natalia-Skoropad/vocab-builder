@@ -2,10 +2,8 @@
 
 import type { WordItem } from '@/types/word';
 
-import ModalBase from '@/components/modals/ModalBase/ModalBase';
-import EditWordForm from './EditWordForm';
-
-import css from '@/components/modals/shared/WordModal.module.css';
+import EditWordForm from '@/components/words/EditWordForm/EditWordForm';
+import WordModalShell from '@/components/modals/shared/WordModalShell';
 
 //===============================================================
 
@@ -21,18 +19,15 @@ function EditWordModal({ isOpen, word, onClose }: Props) {
   if (!word) return null;
 
   return (
-    <ModalBase isOpen={isOpen} onClose={onClose} ariaLabel="Edit word modal">
-      <div className={css.content}>
-        <h2 className={css.title}>Edit word</h2>
-
-        <p className={css.text}>
-          Update the selected word and keep your personal vocabulary accurate
-          and up to date.
-        </p>
-
-        <EditWordForm word={word} onClose={onClose} />
-      </div>
-    </ModalBase>
+    <WordModalShell
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel="Edit word modal"
+      title="Edit word"
+      text="Update the selected word and keep your personal vocabulary accurate and up to date."
+    >
+      <EditWordForm word={word} onClose={onClose} />
+    </WordModalShell>
   );
 }
 

@@ -9,20 +9,22 @@ import { toast } from 'react-hot-toast';
 
 import type { AddWordFormValues } from '@/types/forms';
 import { ROUTES } from '@/lib/constants/routes';
-import { addWordSchema } from '@/lib/validations/addWordSchema';
 import { wordsService } from '@/lib/services/words.service';
+import { setFormValueWithMeta } from '@/lib/forms/setWordFormValue';
+import { addWordSchema } from '@/lib/validations/addWordSchema';
 import { useCategoriesStore } from '@/store/categories/categoriesStore';
-
-import Button from '@/components/common/Button/Button';
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
-import LanguageBadge from '@/components/common/LanguageBadge/LanguageBadge';
-import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
+import WordFormActions from '@/components/words/WordFormActions/WordFormActions';
 
 import RadioGroup, {
   type RadioOption,
 } from '@/components/common/RadioGroup/RadioGroup';
 
-import css from '@/components/modals/shared/WordForm.module.css';
+import WordFormFieldRow, {
+  type FeedbackState,
+} from '@/components/words/WordFormFieldRow/WordFormFieldRow';
+
+import css from '@/components/words/shared/WordForm.module.css';
 
 //===============================================================
 
@@ -106,7 +108,6 @@ function AddWordForm({ onClose }: Props) {
         scroll: false,
       });
     },
-
     onError: (error) => {
       toast.error(
         error instanceof Error ? error.message : 'Failed to create word.'
@@ -140,6 +141,18 @@ function AddWordForm({ onClose }: Props) {
   const enHasSuccess =
     touchedFields.en && enValue.trim().length > 0 && !errors.en?.message;
 
+  const uaState: FeedbackState = errors.ua?.message
+    ? 'error'
+    : uaHasSuccess
+    ? 'success'
+    : 'default';
+
+  const enState: FeedbackState = errors.en?.message
+    ? 'error'
+    : enHasSuccess
+    ? 'success'
+    : 'default';
+
   return (
     <form className={css.form} onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className={css.topGroup}>
@@ -147,7 +160,7 @@ function AddWordForm({ onClose }: Props) {
           value={selectedCategory}
           options={categoryOptions}
           onChange={(nextValue) => {
-            setValue('category', nextValue, { shouldValidate: true });
+            setFormValueWithMeta(setValue, 'category', nextValue);
             void trigger('category');
           }}
           variant="modal"
@@ -183,134 +196,37 @@ function AddWordForm({ onClose }: Props) {
       </div>
 
       <div className={css.wordsGroup}>
-        <div className={css.wordRow}>
-          <label className={css.inputWrap}>
-            <input
-              type="text"
-              value={uaValue}
-              onChange={(event) =>
-                setValue('ua', event.target.value, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true,
-                })
-              }
-              placeholder="Працювати"
-              maxLength={60}
-              className={css.input}
-              data-state={
-                errors.ua?.message
-                  ? 'error'
-                  : uaHasSuccess
-                  ? 'success'
-                  : 'default'
-              }
-            />
-          </label>
+        <WordFormFieldRow
+          name="ua"
+          value={uaValue}
+          placeholder="Працювати"
+          iconName="icon-ukraine-flag"
+          languageLabel="Ukrainian"
+          state={uaState}
+          errorText={errors.ua?.message}
+          successText="Looks good"
+          onChange={(value) => setFormValueWithMeta(setValue, 'ua', value)}
+        />
 
-          <LanguageBadge
-            iconName="icon-ukraine-flag"
-            label="Ukrainian"
-            className={css.langBadge}
-          />
-
-          <div className={css.feedbackSlot}>
-            {errors.ua?.message ? (
-              <p className={css.feedbackError}>
-                <SvgIcon
-                  name="icon-error-warning-fill"
-                  className={css.feedbackIcon}
-                  size={16}
-                />
-                <span>{errors.ua.message}</span>
-              </p>
-            ) : uaHasSuccess ? (
-              <p className={css.feedbackSuccess}>
-                <SvgIcon
-                  name="icon-checkbox-circle-fill"
-                  className={css.feedbackIcon}
-                  size={16}
-                />
-                <span>Looks good</span>
-              </p>
-            ) : null}
-          </div>
-        </div>
-
-        <div className={css.wordRow}>
-          <label className={css.inputWrap}>
-            <input
-              type="text"
-              value={enValue}
-              onChange={(event) =>
-                setValue('en', event.target.value, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true,
-                })
-              }
-              placeholder="Work"
-              maxLength={60}
-              className={css.input}
-              data-state={
-                errors.en?.message
-                  ? 'error'
-                  : enHasSuccess
-                  ? 'success'
-                  : 'default'
-              }
-            />
-          </label>
-
-          <LanguageBadge
-            iconName="icon-united-kingdom-flag"
-            label="English"
-            className={css.langBadge}
-          />
-
-          <div className={css.feedbackSlot}>
-            {errors.en?.message ? (
-              <p className={css.feedbackError}>
-                <SvgIcon
-                  name="icon-error-warning-fill"
-                  className={css.feedbackIcon}
-                  size={16}
-                />
-                <span>{errors.en.message}</span>
-              </p>
-            ) : enHasSuccess ? (
-              <p className={css.feedbackSuccess}>
-                <SvgIcon
-                  name="icon-checkbox-circle-fill"
-                  className={css.feedbackIcon}
-                  size={16}
-                />
-                <span>Looks good</span>
-              </p>
-            ) : null}
-          </div>
-        </div>
+        <WordFormFieldRow
+          name="en"
+          value={enValue}
+          placeholder="Work"
+          iconName="icon-united-kingdom-flag"
+          languageLabel="English"
+          state={enState}
+          errorText={errors.en?.message}
+          successText="Looks good"
+          onChange={(value) => setFormValueWithMeta(setValue, 'en', value)}
+        />
       </div>
 
-      <div className={css.actions}>
-        <Button
-          type="submit"
-          disabled={isAddDisabled}
-          variant={isAddDisabled ? 'disabled' : 'light'}
-          fullWidth={false}
-        >
-          {createMutation.isPending ? 'Adding...' : 'Add'}
-        </Button>
-
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={onClose}
-          fullWidth={false}
-        >
-          Cancel
-        </Button>
-      </div>
+      <WordFormActions
+        submitLabel={createMutation.isPending ? 'Adding...' : 'Add'}
+        onCancel={onClose}
+        isSubmitDisabled={isAddDisabled}
+        isBusy={createMutation.isPending || isSubmitting}
+      />
     </form>
   );
 }

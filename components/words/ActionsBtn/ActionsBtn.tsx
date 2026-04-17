@@ -58,31 +58,35 @@ function ActionsBtn({ word, onEdit, onDelete }: Props) {
       </button>
 
       {isOpen ? (
-        <div className={css.menu} role="menu">
-          <button
-            type="button"
-            className={css.menuItem}
-            onClick={() => {
-              onEdit?.(word);
-              setIsOpen(false);
-            }}
-          >
-            <PencilLine className={css.menuIcon} aria-hidden="true" />
-            <span>Edit</span>
-          </button>
+        <ul className={css.menu} role="menu">
+          <li>
+            <button
+              type="button"
+              className={css.menuItem}
+              onClick={() => {
+                onEdit?.(word);
+                setIsOpen(false);
+              }}
+            >
+              <PencilLine className={css.menuIcon} aria-hidden="true" />
+              <span>Edit</span>
+            </button>
+          </li>
 
-          <button
-            type="button"
-            className={css.menuItem}
-            onClick={() => {
-              onDelete?.(word);
-              setIsOpen(false);
-            }}
-          >
-            <Trash2 className={css.menuIcon} aria-hidden="true" />
-            <span>Delete</span>
-          </button>
-        </div>
+          <li>
+            <button
+              type="button"
+              className={css.menuItem}
+              onClick={() => {
+                onDelete?.(word);
+                setIsOpen(false);
+              }}
+            >
+              <Trash2 className={css.menuIcon} aria-hidden="true" />
+              <span>Delete</span>
+            </button>
+          </li>
+        </ul>
       ) : null}
     </div>
   );

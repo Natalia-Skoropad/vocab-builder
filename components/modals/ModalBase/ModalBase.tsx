@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
 import CloseButton from '@/components/common/CloseButton/CloseButton';
 
@@ -11,7 +11,7 @@ import css from './ModalBase.module.css';
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
   ariaLabel: string;
 };
 
