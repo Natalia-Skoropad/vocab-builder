@@ -4,12 +4,19 @@
   gap: 24px;
 }
 
+.outer {
+  padding: 12px;
+  border-radius: 16px;
+  background-color: #ffff;
+  overflow: visible;
+}
+
 .top {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border-light);
-  border-radius: 30px;
-  background-color: var(--background-1);
+
+  border-radius: 14px;
+  background-color: #fcfcfc;
   overflow: hidden;
 }
 
@@ -27,27 +34,45 @@
   gap: 16px;
 }
 
-.title {
+.title,
+.subtitle {
   margin: 0;
   font-size: 24px;
   line-height: 1.16;
-  font-weight: var(--fw-semiBold);
-  color: var(--text-main);
+  font-weight: var(--fw-medium);
+  color: var(--green-main);
 }
 
 .word {
-  margin: 0;
-  font-size: 24px;
-  line-height: 1.16;
+  margin: 24px 0 0;
+  font-size: 30px;
+  line-height: 1.1;
   font-weight: var(--fw-semiBold);
   color: var(--text-main);
+  word-break: break-word;
+}
+
+.inputWrap {
+  margin-top: 24px;
+  flex: 1 1 auto;
+  min-height: 160px;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  background-color: #ffff;
+  transition: border-color var(--motion-duration-fast)
+      var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.inputWrap:focus-within {
+  border-color: var(--green-main);
+  box-shadow: 0 0 0 4px rgba(133, 170, 159, 0.14);
 }
 
 .textarea {
   width: 100%;
   min-height: 160px;
-  margin-top: 24px;
-  padding: 0;
+  padding: 18px 20px;
   border: none;
   outline: none;
   resize: none;
@@ -63,17 +88,70 @@
   color: var(--text-muted);
 }
 
-.nextButton {
+.nextRow {
   margin-top: auto;
-  align-self: flex-start;
-  border: none;
-  background: transparent;
-  padding: 0;
+  padding-top: 20px;
+  display: flex;
 
-  font-size: 16px;
-  line-height: 1.5;
-  color: var(--green-main);
+  gap: 10px;
+}
+
+.nextButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+
+  padding: 0;
+  border: none;
+  background-color: transparent;
+
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
   cursor: pointer;
+  text-decoration: none;
+
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.nextHint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.nextButton:focus-visible {
+  outline: none;
+}
+
+.nextButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.nextButtonText {
+  position: relative;
+  display: inline-block;
+}
+
+.nextButtonIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--green-main);
+  stroke-width: 2;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard),
+    opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.nextButton:not(:disabled):hover .nextButtonIcon,
+.nextButton:not(:disabled):focus-visible .nextButtonIcon {
+  transform: translateX(2px);
+  opacity: 0.9;
 }
 
 .divider {
@@ -85,35 +163,81 @@
 .actions {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 12px;
 }
 
+.actionButton {
+  width: auto;
+  min-width: 160px;
+  flex: 0 0 auto;
+}
+
 @media only screen and (min-width: 768px) {
+  .outer {
+    padding: 16px;
+    border-radius: 24px;
+  }
+
+  .top {
+    border-radius: 14px;
+  }
+
   .panel {
     min-height: 320px;
     padding: 32px;
   }
 
+  .inputWrap,
+  .textarea {
+    min-height: 180px;
+  }
+
   .actions {
     flex-direction: row;
+    align-items: center;
     gap: 16px;
+  }
+
+  .actionButton {
+    min-width: 204px;
+  }
+
+  .nextButtonIcon {
+    width: 20px;
+    height: 20px;
   }
 }
 
 @media only screen and (min-width: 1440px) {
+  .outer {
+    padding: 18px;
+    border-radius: 30px;
+  }
+
   .top {
     flex-direction: row;
+    border-radius: 14px;
   }
 
   .panel {
     flex: 1 1 50%;
-    min-height: 420px;
-    padding: 32px;
+    min-height: 360px;
+    padding: 36px 40px;
   }
 
   .divider {
     width: 1px;
     height: auto;
     align-self: stretch;
+  }
+
+  .word {
+    margin-top: 32px;
+    font-size: 32px;
+  }
+
+  .actionButton {
+    min-width: 240px;
   }
 }

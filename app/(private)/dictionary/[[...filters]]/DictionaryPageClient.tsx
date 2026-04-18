@@ -47,7 +47,10 @@ function DictionaryPageClient() {
   const shouldAutoOpenAddModal = searchParams.get('openModal') === 'add-word';
   const queryClient = useQueryClient();
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(
+    () => shouldAutoOpenAddModal
+  );
+
   const [editingWord, setEditingWord] = useState<WordItem | null>(null);
   const [deletingWord, setDeletingWord] = useState<WordItem | null>(null);
 
@@ -256,7 +259,9 @@ function DictionaryPageClient() {
         />
 
         {isLoading ? (
-          <InlineLoader text="Loading your words…" />
+          <div className={css.loaderWrap}>
+            <InlineLoader text="Loading your words…" className={css.loader} />
+          </div>
         ) : rows.length === 0 ? (
           <EmptyState
             title="Your dictionary is empty"
@@ -285,7 +290,7 @@ function DictionaryPageClient() {
         )}
 
         <AddWordModal
-          isOpen={isAddModalOpen || shouldAutoOpenAddModal}
+          isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
         />
 

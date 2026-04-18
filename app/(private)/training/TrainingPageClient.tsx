@@ -13,7 +13,8 @@ import { trainingService } from '@/lib/services/training.service';
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import EmptyState from '@/components/common/EmptyState/EmptyState';
 import InlineLoader from '@/components/common/InlineLoader/InlineLoader';
-import ProgressBar from '@/components/words/ProgressBar/ProgressBar';
+import Statistics from '@/components/dashboard/Statistics/Statistics';
+import TrainingProgress from '@/components/training/TrainingProgress/TrainingProgress';
 import TrainingRoom from '@/components/training/TrainingRoom/TrainingRoom';
 import WellDoneModal from '@/components/modals/WellDoneModal/WellDoneModal';
 
@@ -176,8 +177,14 @@ function TrainingPageClient() {
         <section className="container">
           <Breadcrumbs items={breadcrumbItems} />
 
-          <div className={css.progressWrap}>
-            <ProgressBar value={0} max={1} />
+          <div className={css.topBar}>
+            <div className={css.statsWrap}>
+              <Statistics />
+            </div>
+
+            <div className={css.progressWrap}>
+              <TrainingProgress current={0} total={1} />
+            </div>
           </div>
 
           <div className={css.contentWrap}>
@@ -207,8 +214,14 @@ function TrainingPageClient() {
       <section className="container">
         <Breadcrumbs items={breadcrumbItems} />
 
-        <div className={css.progressWrap}>
-          <ProgressBar value={answers.length} max={tasks.length} />
+        <div className={css.topBar}>
+          <div className={css.statsWrap}>
+            <Statistics />
+          </div>
+
+          <div className={css.progressWrap}>
+            <TrainingProgress current={answers.length} total={tasks.length} />
+          </div>
         </div>
 
         {currentTask ? (

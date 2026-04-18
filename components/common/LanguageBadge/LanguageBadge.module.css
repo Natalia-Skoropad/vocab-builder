@@ -3,7 +3,6 @@
   align-items: center;
   gap: 8px;
   min-height: 28px;
-  color: var(--background-1);
 }
 
 .flag {
@@ -16,7 +15,22 @@
   font-size: 16px;
   line-height: 1.5;
   font-weight: var(--fw-medium);
+}
+
+.light {
   color: var(--background-1);
+}
+
+.light .label {
+  color: var(--background-1);
+}
+
+.dark {
+  color: var(--text-main);
+}
+
+.dark .label {
+  color: var(--text-main);
 }
 
 @media only screen and (max-width: 767px) {

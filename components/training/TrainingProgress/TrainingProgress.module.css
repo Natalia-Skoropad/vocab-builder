@@ -1,0 +1,39 @@
+.wrap {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.value {
+  position: absolute;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: var(--fw-medium);
+  color: var(--text-main);
+}
+
+.circle {
+  width: 58px;
+  height: 58px;
+  transform: rotate(-90deg);
+}
+
+.track,
+.progress {
+  fill: none;
+  stroke-width: 4;
+}
+
+.track {
+  stroke: rgba(133, 170, 159, 0.18);
+}
+
+.progress {
+  stroke: var(--green-main);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--motion-duration-fast)
+    var(--motion-ease-standard);
+}

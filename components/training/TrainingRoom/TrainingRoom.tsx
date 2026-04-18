@@ -1,6 +1,7 @@
 'use client';
 
 import type { ChangeEvent } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 import Button from '@/components/common/Button/Button';
 import LanguageBadge from '@/components/common/LanguageBadge/LanguageBadge';
@@ -50,47 +51,70 @@ function TrainingRoom({
     onChange(event.target.value);
   };
 
+  const isNextDisabled = !showNext || isSubmitting;
+
   return (
     <div className={css.card}>
-      <div className={css.top}>
-        <div className={css.panel}>
-          <div className={css.panelHeader}>
-            <h2 className={css.title}>Введіть переклад</h2>
-            <LanguageBadge
-              iconName={answerBadge.iconName}
-              label={answerBadge.label}
-            />
+      <div className={css.outer}>
+        <div className={css.top}>
+          <div className={css.panel}>
+            <div className={css.panelHeader}>
+              <h2 className={css.title}>Enter the word</h2>
+
+              <LanguageBadge
+                iconName={answerBadge.iconName}
+                label={answerBadge.label}
+                variant="dark"
+              />
+            </div>
+
+            <div className={css.inputWrap}>
+              <textarea
+                value={value}
+                onChange={handleChange}
+                className={css.textarea}
+                aria-label={`Translate to ${answerBadge.label}`}
+                placeholder="Type your answer here"
+              />
+            </div>
+
+            <div className={css.nextRow}>
+              <button
+                type="button"
+                className={`${css.nextButton} interactive-underline-trigger`}
+                onClick={onNext}
+                disabled={isNextDisabled}
+                aria-label="Go to next word"
+              >
+                <span className={`${css.nextButtonText} interactive-underline`}>
+                  Next
+                </span>
+
+                <ArrowRight className={css.nextButtonIcon} aria-hidden="true" />
+              </button>
+
+              {!showNext ? (
+                <p className={css.nextHint}>
+                  This is the last task. Press Save.
+                </p>
+              ) : null}
+            </div>
           </div>
 
-          <textarea
-            value={value}
-            onChange={handleChange}
-            className={css.textarea}
-            aria-label={`Translate to ${answerBadge.label}`}
-            placeholder="Enter translation"
-          />
+          <div className={css.divider} />
 
-          {showNext ? (
-            <button
-              type="button"
-              className={css.nextButton}
-              onClick={onNext}
-              disabled={isSubmitting}
-            >
-              Next →
-            </button>
-          ) : null}
-        </div>
+          <div className={css.panel}>
+            <div className={css.panelHeader}>
+              <p className={css.subtitle}>You are learning now</p>
 
-        <div className={css.divider} />
+              <LanguageBadge
+                iconName={wordBadge.iconName}
+                label={wordBadge.label}
+                variant="dark"
+              />
+            </div>
 
-        <div className={css.panel}>
-          <div className={css.panelHeader}>
             <p className={css.word}>{promptText}</p>
-            <LanguageBadge
-              iconName={wordBadge.iconName}
-              label={wordBadge.label}
-            />
           </div>
         </div>
       </div>
@@ -101,6 +125,7 @@ function TrainingRoom({
           variant="primary"
           onClick={onSave}
           disabled={isSubmitting}
+          className={css.actionButton}
         >
           Save
         </Button>
@@ -110,6 +135,7 @@ function TrainingRoom({
           variant="secondary"
           onClick={onCancel}
           disabled={isSubmitting}
+          className={css.actionButton}
         >
           Cancel
         </Button>

@@ -2,11 +2,27 @@
   padding-bottom: 32px;
 }
 
+.loaderWrap,
+.contentWrap {
+  width: 100%;
+}
+
 .loaderWrap {
   display: flex;
   justify-content: center;
   padding-top: 48px;
   padding-bottom: 32px;
+}
+
+.loader {
+  min-height: 220px;
+  border-radius: 30px;
+  border: 1px solid var(--border-light);
+  background-color: var(--background-1);
+}
+
+.emptyState {
+  margin-top: 0;
 }
 
 .emptyState {
@@ -15,16 +31,16 @@
 
 @media only screen and (min-width: 768px) {
   .section {
-    padding-bottom: 40px;
+    padding-bottom: 48px;
   }
 
   .loaderWrap {
-    padding-top: 64px;
+    padding-top: 48px;
     padding-bottom: 40px;
   }
 
   .emptyState {
-    margin-top: 40px;
+    margin-top: 48px;
   }
 }
 
@@ -34,7 +50,7 @@
   }
 
   .loaderWrap {
-    padding-top: 72px;
+    padding-top: 48px;
     padding-bottom: 48px;
   }
 

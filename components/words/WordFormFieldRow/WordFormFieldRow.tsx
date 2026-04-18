@@ -56,6 +56,7 @@ function WordFormFieldRow({
         iconName={iconName}
         label={languageLabel}
         className={css.langBadge}
+        variant="light"
       />
 
       <div className={css.feedbackSlot}>

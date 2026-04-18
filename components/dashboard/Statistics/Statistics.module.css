@@ -1,3 +1,10 @@
+.statisticsWrap {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
 .statistics {
   display: inline-flex;
   align-items: baseline;

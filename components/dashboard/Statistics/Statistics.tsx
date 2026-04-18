@@ -20,13 +20,39 @@ function Statistics({ totalCount = 0 }: Props) {
     queryFn: wordsService.getStatistics,
   });
 
-  const value = data?.totalCount ?? totalCount;
+  const { data: ownWordsData } = useQuery({
+    queryKey: ['words-learned-statistics'],
+    queryFn: () =>
+      wordsService.getOwnWords({
+        page: 1,
+        limit: 1000,
+      }),
+  });
+
+  const toStudyValue = data?.totalCount ?? totalCount;
+
+  const learnedValue =
+    ownWordsData?.results.filter((word) => {
+      const progress =
+        typeof word.progress === 'number'
+          ? word.progress
+          : Number(word.progress) || 0;
+
+      return progress >= 100;
+    }).length ?? 0;
 
   return (
-    <p className={css.statistics}>
-      <span className={css.label}>To study:</span>{' '}
-      <span className={css.value}>{value}</span>
-    </p>
+    <div className={css.statisticsWrap}>
+      <p className={css.statistics}>
+        <span className={css.label}>To study:</span>{' '}
+        <span className={css.value}>{toStudyValue}</span>
+      </p>
+
+      <p className={css.statistics}>
+        <span className={css.label}>Words learned:</span>{' '}
+        <span className={css.value}>{learnedValue}</span>
+      </p>
+    </div>
   );
 }
 
