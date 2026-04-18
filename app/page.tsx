@@ -1,6 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 
 import { ROUTES } from '@/lib/constants/routes';
+import { useAuth } from '@/hooks/useAuth';
 
 import Button from '@/components/common/Button/Button';
 
@@ -9,6 +12,12 @@ import css from './shared-hero.module.css';
 //===========================================================================
 
 function Home() {
+  const { user, isAuthReady } = useAuth();
+
+  const isAuthenticated = Boolean(user);
+  const ctaHref = isAuthenticated ? ROUTES.DICTIONARY : ROUTES.LOGIN;
+  const ctaLabel = isAuthenticated ? 'Go to dictionary' : 'Get started';
+
   return (
     <main className={css.page}>
       <section className={css.section} aria-labelledby="home-title">
@@ -27,15 +36,14 @@ function Home() {
               </p>
 
               <div className={css.actions}>
-                <Link href={ROUTES.REGISTER} className={css.actionLink}>
-                  <Button type="button" variant="primary">
-                    Get started
-                  </Button>
-                </Link>
-
-                <Link href={ROUTES.LOGIN} className={css.actionLink}>
-                  <Button type="button" variant="secondary">
-                    Log in
+                <Link href={ctaHref} className={css.actionLink}>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    fullWidth={false}
+                    disabled={!isAuthReady}
+                  >
+                    {ctaLabel}
                   </Button>
                 </Link>
               </div>

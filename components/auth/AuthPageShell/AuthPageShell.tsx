@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import Image from 'next/image';
 
-import CompanyLogo from '@/components/common/CompanyLogo/CompanyLogo';
-
 import css from './AuthPageShell.module.css';
 
 //===============================================================
@@ -17,10 +15,6 @@ function AuthPageShell({ children }: Props) {
   return (
     <div className={css.page}>
       <div className={css.shell}>
-        <header className={css.header}>
-          <CompanyLogo />
-        </header>
-
         <div className={css.content}>
           <aside className={css.visualSide} aria-hidden="true">
             <div className={css.imageWrap}>

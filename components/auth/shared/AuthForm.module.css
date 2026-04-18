@@ -9,11 +9,11 @@
 }
 
 .submitBtn {
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 .switchText {
-  margin-top: 16px;
+  margin-top: 18px;
   text-align: center;
   font-size: 14px;
   line-height: 1.43;
@@ -30,11 +30,11 @@
 
 @media only screen and (min-width: 768px) {
   .submitBtn {
-    margin-top: 14px;
+    margin-top: 18px;
   }
 
   .switchText {
-    margin-top: 18px;
+    margin-top: 20px;
     font-size: 16px;
     line-height: 1.5;
   }

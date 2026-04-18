@@ -4,6 +4,8 @@ import AuthProvider from '@/providers/AuthProvider';
 import ToastProvider from '@/providers/ToastProvider';
 import TanStackProvider from '@/providers/TanStackProvider';
 
+import Header from '@/components/header/Header/Header';
+
 import {
   OG_IMAGE,
   OG_IMAGE_ALT,
@@ -69,6 +71,7 @@ function RootLayout({ children }: Props) {
       <body>
         <TanStackProvider>
           <AuthProvider>
+            <Header />
             {children}
             <ToastProvider />
           </AuthProvider>

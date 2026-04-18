@@ -11,15 +11,22 @@ import css from './MenuNav.module.css';
 //===============================================================
 
 type Variant = 'header' | 'offcanvas';
+type Mode = 'public' | 'private';
 
 type Props = {
   variant?: Variant;
+  mode?: Mode;
   onNavigate?: () => void;
 };
 
 //===============================================================
 
-const navItems = [
+const publicNavItems = [
+  { href: ROUTES.LOGIN, label: 'Login' },
+  { href: ROUTES.REGISTER, label: 'Register' },
+];
+
+const privateNavItems = [
   { href: ROUTES.DICTIONARY, label: 'Dictionary' },
   { href: ROUTES.RECOMMEND, label: 'Recommend' },
   { href: ROUTES.TRAINING, label: 'Training' },
@@ -33,8 +40,9 @@ function isActive(pathname: string, href: string) {
 
 //===============================================================
 
-function MenuNav({ variant = 'header', onNavigate }: Props) {
+function MenuNav({ variant = 'header', mode = 'private', onNavigate }: Props) {
   const pathname = usePathname();
+  const navItems = mode === 'public' ? publicNavItems : privateNavItems;
 
   return (
     <nav

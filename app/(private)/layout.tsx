@@ -4,7 +4,6 @@ import type { ReactNode } from 'react';
 import { PRIVATE_DESCRIPTION, SITE_NAME } from '@/lib/constants/metadata';
 
 import PrivateRoute from '@/components/auth/PrivateRoute/PrivateRoute';
-import Header from '@/components/header/Header/Header';
 
 //===========================================================================
 
@@ -31,12 +30,7 @@ type Props = {
 //===========================================================================
 
 function PrivateLayout({ children }: Props) {
-  return (
-    <PrivateRoute>
-      <Header />
-      {children}
-    </PrivateRoute>
-  );
+  return <PrivateRoute>{children}</PrivateRoute>;
 }
 
 export default PrivateLayout;

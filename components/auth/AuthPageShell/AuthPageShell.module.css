@@ -1,27 +1,14 @@
 .page {
-  position: relative;
   min-height: 100vh;
   background-color: var(--background-1);
-  overflow: hidden;
-}
-
-.page::after {
-  content: '';
-  display: none;
 }
 
 .shell {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
   max-width: 1440px;
   margin: 0 auto;
-  padding: 16px 12px 20px;
+  padding: 0 12px 20px;
   background-color: var(--background-1);
-}
-
-.header {
-  margin-bottom: 16px;
 }
 
 .content {
@@ -29,11 +16,17 @@
   flex-direction: column;
 }
 
+.formSide {
+  order: 1;
+  width: 100%;
+}
+
 .visualSide {
+  order: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  order: 1;
+  margin-top: 28px;
 }
 
 .imageWrap {
@@ -54,45 +47,17 @@
   color: var(--text-muted);
 }
 
-.formSide {
-  order: 2;
-  width: 100%;
-  margin-top: 20px;
-}
-
 @media only screen and (min-width: 768px) {
-  .page::after {
-    display: block;
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 360px;
-    height: 250px;
-    background: linear-gradient(
-      135deg,
-      rgba(133, 170, 159, 0.02) 0%,
-      rgba(133, 170, 159, 0.06) 45%,
-      rgba(133, 170, 159, 0.16) 100%
-    );
-    clip-path: polygon(42% 0, 100% 8%, 100% 100%, 0 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
   .shell {
-    padding: 24px 20px 28px;
-  }
-
-  .header {
-    margin-bottom: 28px;
+    min-height: calc(100vh - 80px);
+    padding: 0 20px 28px;
   }
 
   .content {
-    min-height: calc(100vh - 120px);
+    min-height: calc(100vh - 112px);
   }
 
   .visualSide {
-    order: 2;
     margin-top: auto;
     padding-top: 24px;
   }
@@ -105,36 +70,16 @@
     margin-top: 0;
     font-size: 16px;
   }
-
-  .formSide {
-    order: 1;
-    margin-top: 0;
-  }
 }
 
 @media only screen and (min-width: 1440px) {
-  .page::after {
-    width: 520px;
-    height: 380px;
-    background: linear-gradient(
-      135deg,
-      rgba(133, 170, 159, 0.02) 0%,
-      rgba(133, 170, 159, 0.07) 46%,
-      rgba(133, 170, 159, 0.18) 100%
-    );
-    clip-path: polygon(40% 0, 100% 9%, 100% 100%, 0 100%);
-  }
-
   .shell {
-    padding: 24px 24px 32px;
-  }
-
-  .header {
-    margin-bottom: 8px;
+    min-height: calc(100vh - 88px);
+    padding: 0 24px 32px;
   }
 
   .content {
-    min-height: calc(100vh - 96px);
+    min-height: calc(100vh - 120px);
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
@@ -146,17 +91,11 @@
     flex: 0 0 calc(50% - 24px);
   }
 
-  .formSide {
-    order: 1;
-    margin-top: 0;
-  }
-
   .visualSide {
-    order: 2;
     justify-content: center;
     min-height: 620px;
-    padding-top: 0;
     margin-top: 0;
+    padding-top: 0;
   }
 
   .imageWrap {

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useCallback, useEffect } from 'react';
 
 import CloseButton from '@/components/common/CloseButton/CloseButton';
+import CompanyLogo from '@/components/common/CompanyLogo/CompanyLogo';
 import MenuNav from '@/components/header/MenuNav/MenuNav';
 import UserBadge from '@/components/header/UserBadge/UserBadge';
 import LogoutButton from '@/components/header/LogoutButton/LogoutButton';
@@ -15,13 +16,20 @@ import css from './MobileOffcanvas.module.css';
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  userName: string;
-  onLogout: () => void | Promise<void>;
+  isAuthenticated: boolean;
+  userName?: string;
+  onLogout?: () => void | Promise<void>;
 };
 
 //===============================================================
 
-function MobileOffcanvas({ isOpen, onClose, userName, onLogout }: Props) {
+function MobileOffcanvas({
+  isOpen,
+  onClose,
+  isAuthenticated,
+  userName = 'User',
+  onLogout,
+}: Props) {
   const handleBackdropClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (e.target === e.currentTarget) {
@@ -54,23 +62,33 @@ function MobileOffcanvas({ isOpen, onClose, userName, onLogout }: Props) {
     >
       <div className={css.panel}>
         <div className={css.topRow}>
-          <UserBadge
-            name={userName}
-            variant="offcanvas"
-            className={css.userBadge}
-          />
+          {isAuthenticated ? (
+            <UserBadge
+              name={userName}
+              variant="offcanvas"
+              className={css.userBadge}
+            />
+          ) : (
+            <CompanyLogo />
+          )}
 
           <CloseButton onClick={onClose} />
         </div>
 
         <div className={css.content}>
-          <MenuNav variant="offcanvas" onNavigate={onClose} />
-
-          <LogoutButton
-            onClick={onLogout}
+          <MenuNav
             variant="offcanvas"
-            className={css.logoutButton}
+            mode={isAuthenticated ? 'private' : 'public'}
+            onNavigate={onClose}
           />
+
+          {isAuthenticated ? (
+            <LogoutButton
+              onClick={onLogout}
+              variant="offcanvas"
+              className={css.logoutButton}
+            />
+          ) : null}
         </div>
 
         <div className={css.illustrationWrap} aria-hidden="true">

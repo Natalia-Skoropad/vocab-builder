@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
@@ -8,8 +9,8 @@ import { toast } from 'react-hot-toast';
 import { ROUTES } from '@/lib/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
 
-import BurgerButton from '@/components/header/BurgerButton/BurgerButton';
 import CompanyLogo from '@/components/common/CompanyLogo/CompanyLogo';
+import BurgerButton from '@/components/header/BurgerButton/BurgerButton';
 import LogoutButton from '@/components/header/LogoutButton/LogoutButton';
 import MenuNav from '@/components/header/MenuNav/MenuNav';
 import UserBadge from '@/components/header/UserBadge/UserBadge';
@@ -34,6 +35,7 @@ function Header() {
 
   const { user, logout, isAuthReady } = useAuth();
 
+  const isAuthenticated = Boolean(user);
   const userName = user?.name?.trim() || 'User';
 
   const openMenu = () => setIsMenuOpen(true);
@@ -43,8 +45,13 @@ function Header() {
     try {
       await logout();
       toast.success('Logged out successfully!');
+      closeMenu();
 
-      if (pathname.startsWith(ROUTES.DICTIONARY)) {
+      if (
+        pathname.startsWith(ROUTES.DICTIONARY) ||
+        pathname.startsWith(ROUTES.RECOMMEND) ||
+        pathname.startsWith(ROUTES.TRAINING)
+      ) {
         router.replace(ROUTES.HOME);
         return;
       }
@@ -85,26 +92,55 @@ function Header() {
         ) : (
           <>
             <div className={css.mobileRight}>
-              <UserBadge
-                name={userName}
-                variant="header"
-                className={css.mobileBadge}
-              />
+              {isAuthenticated ? (
+                <UserBadge
+                  name={userName}
+                  variant="header"
+                  className={css.mobileBadge}
+                />
+              ) : null}
+
               <BurgerButton onClick={openMenu} className={css.burger} />
             </div>
 
-            <div className={css.desktopNav}>
-              <MenuNav variant="header" />
-            </div>
+            {isAuthenticated ? (
+              <>
+                <div className={css.desktopNav}>
+                  <MenuNav variant="header" mode="private" />
+                </div>
 
-            <div className={css.desktopActions}>
-              <UserBadge
-                name={userName}
-                variant="header"
-                className={css.desktopBadge}
-              />
-              <LogoutButton onClick={handleLogout} variant="header" />
-            </div>
+                <div className={css.desktopActions}>
+                  <UserBadge
+                    name={userName}
+                    variant="header"
+                    className={css.desktopBadge}
+                  />
+                  <LogoutButton onClick={handleLogout} variant="header" />
+                </div>
+              </>
+            ) : (
+              <div className={css.desktopGuestActions}>
+                <Link
+                  href={ROUTES.LOGIN}
+                  className={css.guestLink}
+                  aria-label="Go to login"
+                >
+                  Login
+                </Link>
+
+                <span className={css.guestSep} aria-hidden="true">
+                  |
+                </span>
+
+                <Link
+                  href={ROUTES.REGISTER}
+                  className={css.guestLink}
+                  aria-label="Go to register"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -113,8 +149,9 @@ function Header() {
         <MobileOffcanvas
           isOpen={isMenuOpen}
           onClose={closeMenu}
+          isAuthenticated={isAuthenticated}
           userName={userName}
-          onLogout={handleLogout}
+          onLogout={isAuthenticated ? handleLogout : undefined}
         />
       ) : null}
     </header>

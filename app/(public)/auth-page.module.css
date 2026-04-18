@@ -1,3 +1,9 @@
+.breadcrumbsWrap {
+  width: 100%;
+  max-width: 628px;
+  margin: 0 auto 20px;
+}
+
 .card {
   width: 100%;
   max-width: 628px;
@@ -23,6 +29,10 @@
 }
 
 @media only screen and (min-width: 768px) {
+  .breadcrumbsWrap {
+    margin-bottom: 24px;
+  }
+
   .card {
     padding: 48px 64px;
     border-radius: 30px;
