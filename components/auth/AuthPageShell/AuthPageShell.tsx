@@ -1,5 +1,11 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import clsx from 'clsx';
+
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 
 import css from './AuthPageShell.module.css';
 
@@ -12,10 +18,27 @@ type Props = {
 //===============================================================
 
 function AuthPageShell({ children }: Props) {
+  const pathname = usePathname();
+
+  const isRegisterPage = pathname === '/register';
+  const isLoginPage = pathname === '/login';
+
+  const breadcrumbItems = isRegisterPage
+    ? [{ label: 'Home', href: '/' }, { label: 'Register' }]
+    : isLoginPage
+    ? [{ label: 'Home', href: '/' }, { label: 'Login' }]
+    : null;
+
   return (
     <div className={css.page}>
-      <div className={css.shell}>
-        <div className={css.content}>
+      <div className={`container ${css.shell}`}>
+        {breadcrumbItems ? (
+          <div className={css.breadcrumbsWrap}>
+            <Breadcrumbs items={breadcrumbItems} />
+          </div>
+        ) : null}
+
+        <div className={clsx(css.content, isRegisterPage && css.isRegister)}>
           <aside className={css.visualSide} aria-hidden="true">
             <div className={css.imageWrap}>
               <Image
@@ -28,12 +51,18 @@ function AuthPageShell({ children }: Props) {
               />
             </div>
 
-            <p className={css.caption}>
+            <p className={css.visualCaption}>
               Word · Translation · Grammar · Progress
             </p>
           </aside>
 
-          <div className={css.formSide}>{children}</div>
+          <div className={css.formSide}>
+            {children}
+
+            <p className={css.formCaption}>
+              Word · Translation · Grammar · Progress
+            </p>
+          </div>
         </div>
       </div>
     </div>

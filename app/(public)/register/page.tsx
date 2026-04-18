@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 import RegisterForm from '@/components/auth/RegisterForm/RegisterForm';
-import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 
 import { OG_IMAGE, OG_IMAGE_ALT, SITE_NAME } from '@/lib/constants/metadata';
 
@@ -50,24 +49,16 @@ export const metadata: Metadata = {
 
 function RegisterPage() {
   return (
-    <>
-      <div className={css.breadcrumbsWrap}>
-        <Breadcrumbs
-          items={[{ label: 'Home', href: '/' }, { label: 'Register' }]}
-        />
-      </div>
+    <section className={css.card}>
+      <h1 className={css.title}>Register</h1>
 
-      <section className={css.card}>
-        <h1 className={css.title}>Register</h1>
+      <p className={css.text}>
+        To start using our services, please fill out the registration form
+        below. All fields are mandatory:
+      </p>
 
-        <p className={css.text}>
-          To start using our services, please fill out the registration form
-          below. All fields are mandatory:
-        </p>
-
-        <RegisterForm />
-      </section>
-    </>
+      <RegisterForm />
+    </section>
   );
 }
 

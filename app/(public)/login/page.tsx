@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 import LoginForm from '@/components/auth/LoginForm/LoginForm';
-import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 
 import { OG_IMAGE, OG_IMAGE_ALT, SITE_NAME } from '@/lib/constants/metadata';
 
@@ -50,23 +49,15 @@ export const metadata: Metadata = {
 
 function LoginPage() {
   return (
-    <>
-      <div className={css.breadcrumbsWrap}>
-        <Breadcrumbs
-          items={[{ label: 'Home', href: '/' }, { label: 'Login' }]}
-        />
-      </div>
+    <section className={css.card}>
+      <h1 className={css.title}>Login</h1>
 
-      <section className={css.card}>
-        <h1 className={css.title}>Login</h1>
+      <p className={css.text}>
+        Please enter your login details to continue using our service:
+      </p>
 
-        <p className={css.text}>
-          Please enter your login details to continue using our service:
-        </p>
-
-        <LoginForm />
-      </section>
-    </>
+      <LoginForm />
+    </section>
   );
 }
 
