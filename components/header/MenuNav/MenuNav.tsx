@@ -33,6 +33,7 @@ const publicOffcanvasNavItems = [
 ];
 
 const privateNavItems = [
+  { href: ROUTES.HOME, label: 'Home' },
   { href: ROUTES.DICTIONARY, label: 'Dictionary' },
   { href: ROUTES.RECOMMEND, label: 'Recommend' },
   { href: ROUTES.TRAINING, label: 'Training' },
@@ -56,6 +57,9 @@ function MenuNav({ variant = 'header', mode = 'private', onNavigate }: Props) {
       ? publicOffcanvasNavItems
       : publicHeaderNavItems;
 
+  const shouldShowActive =
+    mode === 'private' || (mode === 'public' && variant === 'header');
+
   return (
     <nav
       className={clsx(css.nav, variant === 'offcanvas' && css.navOffcanvas)}
@@ -76,7 +80,7 @@ function MenuNav({ variant = 'header', mode = 'private', onNavigate }: Props) {
                   css.link,
                   'interactive-underline-trigger',
                   variant === 'offcanvas' && css.linkOffcanvas,
-                  active && css.active
+                  shouldShowActive && active && css.active
                 )}
               >
                 <span
