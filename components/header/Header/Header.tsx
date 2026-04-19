@@ -77,7 +77,7 @@ function Header() {
   return (
     <header className={css.header}>
       <div className={`container ${css.inner}`}>
-        <CompanyLogo />
+        <CompanyLogo variant="dark" />
 
         {!isAuthReady ? (
           <>

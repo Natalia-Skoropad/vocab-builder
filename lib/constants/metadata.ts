@@ -10,6 +10,9 @@ export const SITE_URL =
 export const SITE_DESCRIPTION =
   'VocabBuilder helps you learn, practice, and track English vocabulary in one place.';
 
+export const HOME_DESCRIPTION =
+  'Build your personal vocabulary, track progress, and practice English step by step with VocabBuilder.';
+
 export const AUTH_DESCRIPTION =
   'Sign in or create a VocabBuilder account to access your personal vocabulary learning space.';
 

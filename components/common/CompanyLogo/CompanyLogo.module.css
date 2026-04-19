@@ -15,8 +15,15 @@
   font-size: 18px;
   line-height: 1;
   font-weight: var(--fw-semiBold);
-  color: var(--text-main);
   white-space: nowrap;
+}
+
+.dark .text {
+  color: var(--text-main);
+}
+
+.light .text {
+  color: var(--background-1);
 }
 
 @media only screen and (min-width: 768px) {

@@ -9,14 +9,13 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: min(88vw, 240px);
+  width: min(88vw, 330px);
   height: 100dvh;
   padding: 20px 20px 24px;
   background-color: var(--green-main);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-
   transform: translateX(0);
   animation: slideInFromRight 300ms ease;
 }
@@ -75,7 +74,7 @@
 
 @media only screen and (min-width: 768px) {
   .panel {
-    width: 300px;
+    width: 350px;
     padding: 24px 24px 28px;
   }
 

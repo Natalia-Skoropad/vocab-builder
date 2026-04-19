@@ -69,7 +69,7 @@ function MobileOffcanvas({
               className={css.userBadge}
             />
           ) : (
-            <CompanyLogo />
+            <CompanyLogo variant="light" />
           )}
 
           <CloseButton onClick={onClose} />

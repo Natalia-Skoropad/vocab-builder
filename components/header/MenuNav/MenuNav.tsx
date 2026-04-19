@@ -21,7 +21,13 @@ type Props = {
 
 //===============================================================
 
-const publicNavItems = [
+const publicHeaderNavItems = [
+  { href: ROUTES.LOGIN, label: 'Login' },
+  { href: ROUTES.REGISTER, label: 'Register' },
+];
+
+const publicOffcanvasNavItems = [
+  { href: ROUTES.HOME, label: 'Home' },
   { href: ROUTES.LOGIN, label: 'Login' },
   { href: ROUTES.REGISTER, label: 'Register' },
 ];
@@ -42,7 +48,13 @@ function isActive(pathname: string, href: string) {
 
 function MenuNav({ variant = 'header', mode = 'private', onNavigate }: Props) {
   const pathname = usePathname();
-  const navItems = mode === 'public' ? publicNavItems : privateNavItems;
+
+  const navItems =
+    mode === 'private'
+      ? privateNavItems
+      : variant === 'offcanvas'
+      ? publicOffcanvasNavItems
+      : publicHeaderNavItems;
 
   return (
     <nav
