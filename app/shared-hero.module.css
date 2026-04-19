@@ -6,21 +6,27 @@
   padding: 24px 0 32px;
 }
 
+.heroFrame {
+  border: 1px solid var(--border-light);
+  border-radius: 30px;
+  background-color: var(--background-1);
+  overflow: hidden;
+}
+
 .hero {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 28px;
+  padding: 32px 20px;
 }
 
 .content {
   width: 100%;
-  max-width: 420px;
   text-align: center;
 }
 
 .kicker {
-  margin: 0 0 16px;
+  margin: 0 0 14px;
   font-size: 14px;
   line-height: 1.2;
   text-transform: uppercase;
@@ -29,17 +35,22 @@
 }
 
 .title {
-  margin: 0 0 24px;
-  font-size: 44px;
+  margin: 0 0 20px;
+  font-size: 42px;
   line-height: 1.04;
   font-weight: var(--fw-semiBold);
   color: var(--text-main);
 }
 
+.titleAccent {
+  color: var(--green-main);
+}
+
 .text {
-  margin: 0 0 28px;
-  font-size: 18px;
-  line-height: 1.55;
+  max-width: 560px;
+  margin: 0 auto 28px;
+  font-size: 16px;
+  line-height: 1.6;
   color: var(--text-muted);
 }
 
@@ -49,17 +60,50 @@
 }
 
 .actionLink {
-  display: inline-flex;
+  min-width: 0;
 }
 
 .imageWrap {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .image {
   width: min(100%, 420px);
   height: auto;
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.benefitItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  background-color: var(--background-1);
+}
+
+.benefitValue {
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: var(--fw-semiBold);
+  color: var(--text-main);
+}
+
+.benefitLabel {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-muted);
 }
 
 @media only screen and (min-width: 768px) {
@@ -71,8 +115,27 @@
     padding: 32px 0 40px;
   }
 
+  .hero {
+    padding: 40px 32px;
+  }
+
   .title {
-    font-size: 64px;
+    font-size: 58px;
+  }
+
+  .text {
+    font-size: 18px;
+  }
+
+  .benefits {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .benefitItem {
+    min-height: 112px;
+    justify-content: center;
   }
 }
 
@@ -82,20 +145,25 @@
   }
 
   .section {
-    padding: 0;
+    padding: 40px 0 40px;
   }
 
   .hero {
-    min-height: calc(100vh - 88px);
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(420px, 568px);
     align-items: center;
-    justify-content: space-between;
-    gap: 48px;
+    gap: 36px;
+    padding: 40px 70px;
   }
 
   .content {
-    max-width: 560px;
+    max-width: 620px;
     text-align: left;
+  }
+
+  .text {
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .actions {
@@ -103,6 +171,18 @@
   }
 
   .image {
-    width: 568px;
+    width: 500px;
+  }
+
+  .benefits {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .benefitItem {
+    min-height: 116px;
+    padding: 20px 22px;
+    border-radius: 24px;
   }
 }
