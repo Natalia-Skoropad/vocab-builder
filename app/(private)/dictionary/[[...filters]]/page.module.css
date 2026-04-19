@@ -26,7 +26,7 @@
 }
 
 .emptyState {
-  margin-top: 32px;
+  margin-top: 20px;
 }
 
 @media only screen and (min-width: 768px) {
@@ -50,7 +50,7 @@
   }
 
   .loaderWrap {
-    padding-top: 48px;
+    padding-top: 20px;
     padding-bottom: 48px;
   }
 

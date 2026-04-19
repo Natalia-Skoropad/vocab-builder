@@ -1,5 +1,6 @@
 'use client';
 
+import clsx from 'clsx';
 import { useQuery } from '@tanstack/react-query';
 
 import { wordsService } from '@/lib/services/words.service';
@@ -10,11 +11,12 @@ import css from './Statistics.module.css';
 
 type Props = {
   totalCount?: number;
+  className?: string;
 };
 
 //===============================================================
 
-function Statistics({ totalCount = 0 }: Props) {
+function Statistics({ totalCount = 0, className }: Props) {
   const { data } = useQuery({
     queryKey: ['words-statistics'],
     queryFn: wordsService.getStatistics,
@@ -42,14 +44,14 @@ function Statistics({ totalCount = 0 }: Props) {
     }).length ?? 0;
 
   return (
-    <div className={css.statisticsWrap}>
+    <div className={clsx(css.statisticsWrap, className)}>
       <p className={css.statistics}>
-        <span className={css.label}>To study:</span>{' '}
+        <span className={css.label}>To study:</span>
         <span className={css.value}>{toStudyValue}</span>
       </p>
 
       <p className={css.statistics}>
-        <span className={css.label}>Words learned:</span>{' '}
+        <span className={css.label}>Words learned:</span>
         <span className={css.value}>{learnedValue}</span>
       </p>
     </div>

@@ -1,11 +1,28 @@
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 20px;
   padding-top: 0;
 }
 
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .filtersWrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.metaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.statisticsWrap {
   width: 100%;
 }
 
@@ -16,20 +33,14 @@
   gap: 12px 24px;
 }
 
-.actionsWrap > :first-child {
-  flex: 0 0 100%;
-}
-
 .actionButton,
 .actionLink {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   padding: 0;
   border: none;
   background-color: transparent;
-
   font-size: 16px;
   line-height: 1.33;
   font-weight: var(--fw-medium);
@@ -45,7 +56,8 @@
 }
 
 .actionButton:focus-visible,
-.actionLink:focus-visible {
+.actionLink:focus-visible,
+.filterButton:focus-visible {
   outline: none;
 }
 
@@ -73,18 +85,16 @@
 
 .filterButton {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   padding: 0;
-  margin-left: auto;
-
   border-radius: 14px;
   border: 1px solid rgba(133, 170, 159, 0.6);
   background-color: transparent;
   color: var(--green-main);
-
   transition: border-color var(--motion-duration-fast)
       var(--motion-ease-standard),
     background-color var(--motion-duration-fast) var(--motion-ease-standard),
@@ -94,7 +104,6 @@
 
 .filterButton:hover,
 .filterButton:focus-visible {
-  outline: none;
   border-color: var(--green-main);
   background-color: rgba(133, 170, 159, 0.08);
   box-shadow: 0 0 0 2px rgba(133, 170, 159, 0.12);
@@ -113,17 +122,30 @@
 
 @media only screen and (min-width: 768px) {
   .dashboard {
-    gap: 28px;
+    gap: 30px;
+  }
+
+  .topRow {
+    gap: 16px;
+  }
+
+  .metaRow {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 24px 40px;
+  }
+
+  .statisticsWrap {
+    flex: 0 0 auto;
+    width: auto;
   }
 
   .actionsWrap {
-    flex-wrap: nowrap;
-    align-items: center;
     gap: 16px 28px;
-  }
-
-  .actionsWrap > :first-child {
-    flex: 0 0 auto;
+    justify-content: flex-end;
+    margin-left: auto;
   }
 
   .actionIcon {
@@ -134,27 +156,29 @@
 
 @media only screen and (min-width: 1440px) {
   .dashboard {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
+    gap: 40px;
   }
 
-  .filtersWrap {
-    flex: 1 1 auto;
-    min-width: 0;
+  .topRow {
+    display: block;
+  }
+
+  .metaRow {
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 48px;
+  }
+
+  .statisticsWrap {
+    flex: 0 0 auto;
   }
 
   .actionsWrap {
     flex: 0 0 auto;
+    flex-wrap: nowrap;
     justify-content: flex-end;
-    align-items: center;
-    gap: 16px 28px;
-    padding-top: 8px;
-  }
-
-  .actionsWrap > :first-child {
-    flex: 0 0 auto;
+    margin-left: auto;
   }
 
   .actionIcon {

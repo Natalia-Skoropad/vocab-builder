@@ -1,26 +1,55 @@
 .statisticsWrap {
-  display: inline-flex;
-  align-items: baseline;
+  display: flex;
   flex-wrap: wrap;
-  gap: 12px 24px;
+  align-items: center;
+  gap: 8px 20px;
 }
 
 .statistics {
   display: inline-flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
 }
 
 .label {
-  font-size: 16px;
-  line-height: 1.2;
+  font-size: 14px;
+  line-height: 1.29;
   color: var(--text-muted);
 }
 
 .value {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
   font-weight: var(--fw-semiBold);
   color: var(--text-main);
+}
+
+@media only screen and (min-width: 768px) {
+  .statisticsWrap {
+    gap: 10px 24px;
+  }
+
+  .label {
+    font-size: 15px;
+  }
+
+  .value {
+    font-size: 20px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .statisticsWrap {
+    gap: 12px 28px;
+  }
+
+  .label {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  .value {
+    font-size: 20px;
+  }
 }

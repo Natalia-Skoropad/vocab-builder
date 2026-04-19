@@ -38,44 +38,16 @@ function Dashboard({
 
   return (
     <div className={clsx(css.dashboard, className)}>
-      <div className={css.filtersWrap}>
-        <Filters
-          variant={variant}
-          isPanelOpen={isFiltersOpen}
-          onOpenPanel={() => setIsFiltersOpen(true)}
-          onClosePanel={() => setIsFiltersOpen(false)}
-          onAppliedStateChange={setHasAppliedFilters}
-        />
-      </div>
-
-      <div className={css.actionsWrap}>
-        <Statistics totalCount={totalCount} />
-
-        {showAddWord ? (
-          <button
-            type="button"
-            className={clsx(css.actionButton, 'interactive-underline-trigger')}
-            onClick={onAddWord}
-            aria-label="Add word"
-          >
-            <span className={clsx(css.actionText, 'interactive-underline')}>
-              Add word
-            </span>
-            <Plus className={css.actionIcon} aria-hidden="true" />
-          </button>
-        ) : null}
-
-        {showTrainLink ? (
-          <Link
-            href={ROUTES.TRAINING}
-            className={clsx(css.actionLink, 'interactive-underline-trigger')}
-          >
-            <span className={clsx(css.actionText, 'interactive-underline')}>
-              Train oneself
-            </span>
-            <ArrowRight className={css.actionIcon} aria-hidden="true" />
-          </Link>
-        ) : null}
+      <div className={css.topRow}>
+        <div className={css.filtersWrap}>
+          <Filters
+            variant={variant}
+            isPanelOpen={isFiltersOpen}
+            onOpenPanel={() => setIsFiltersOpen(true)}
+            onClosePanel={() => setIsFiltersOpen(false)}
+            onAppliedStateChange={setHasAppliedFilters}
+          />
+        </div>
 
         <button
           type="button"
@@ -93,6 +65,43 @@ function Dashboard({
             aria-hidden="true"
           />
         </button>
+      </div>
+
+      <div className={css.metaRow}>
+        <div className={css.statisticsWrap}>
+          <Statistics totalCount={totalCount} />
+        </div>
+
+        <div className={css.actionsWrap}>
+          {showAddWord ? (
+            <button
+              type="button"
+              className={clsx(
+                css.actionButton,
+                'interactive-underline-trigger'
+              )}
+              onClick={onAddWord}
+              aria-label="Add word"
+            >
+              <span className={clsx(css.actionText, 'interactive-underline')}>
+                Add word
+              </span>
+              <Plus className={css.actionIcon} aria-hidden="true" />
+            </button>
+          ) : null}
+
+          {showTrainLink ? (
+            <Link
+              href={ROUTES.TRAINING}
+              className={clsx(css.actionLink, 'interactive-underline-trigger')}
+            >
+              <span className={clsx(css.actionText, 'interactive-underline')}>
+                Train oneself
+              </span>
+              <ArrowRight className={css.actionIcon} aria-hidden="true" />
+            </Link>
+          ) : null}
+        </div>
       </div>
     </div>
   );
