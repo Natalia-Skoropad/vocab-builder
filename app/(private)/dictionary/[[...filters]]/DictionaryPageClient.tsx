@@ -249,7 +249,7 @@ function DictionaryPageClient() {
     <main className={css.page}>
       <section className="container">
         <Breadcrumbs items={breadcrumbItems} />
-
+        
         <Dashboard
           variant="dictionary"
           totalCount={totalCount}

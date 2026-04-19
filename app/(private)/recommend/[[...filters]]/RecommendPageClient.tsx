@@ -181,7 +181,12 @@ function RecommendPageClient() {
         />
 
         {isLoading ? (
-          <InlineLoader text="Loading recommended words…" />
+          <div className={css.loaderWrap}>
+            <InlineLoader
+              text="Loading recommended words…"
+              className={css.loader}
+            />
+          </div>
         ) : rows.length === 0 ? (
           <EmptyState
             title="No recommended words found"

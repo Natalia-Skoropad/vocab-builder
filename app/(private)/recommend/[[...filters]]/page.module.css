@@ -2,14 +2,41 @@
   padding-bottom: 48px;
 }
 
+.loaderWrap,
+.contentWrap {
+  width: 100%;
+}
+
+.loaderWrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  padding-bottom: 32px;
+}
+
+.loader {
+  min-height: 220px;
+  border-radius: 30px;
+  border: 1px solid var(--border-light);
+  background-color: var(--background-1);
+}
+
 @media only screen and (min-width: 768px) {
   .page {
     padding-bottom: 64px;
+  }
+
+  .loaderWrap {
+    padding-bottom: 40px;
   }
 }
 
 @media only screen and (min-width: 1440px) {
   .page {
     padding-bottom: 80px;
+  }
+
+  .loaderWrap {
+    padding-bottom: 48px;
   }
 }
