@@ -1,5 +1,5 @@
 .page {
-  min-height: 80vh;
+  min-height: calc(100vh - 90px);
   background-color: var(--background-1);
 }
 
@@ -89,6 +89,23 @@
 }
 
 @media only screen and (min-width: 1440px) {
+  .page {
+    background-color: var(--background-1);
+    background-image: radial-gradient(
+        42% 32% at 92% 72%,
+        rgba(133, 170, 159, 0.22) 0%,
+        rgba(133, 170, 159, 0.12) 45%,
+        rgba(133, 170, 159, 0) 100%
+      ),
+      radial-gradient(
+        28% 24% at 100% 100%,
+        rgba(133, 170, 159, 0.18) 0%,
+        rgba(133, 170, 159, 0.08) 50%,
+        rgba(133, 170, 159, 0) 100%
+      );
+    background-repeat: no-repeat;
+  }
+
   .shell {
     padding-bottom: 48px;
   }
