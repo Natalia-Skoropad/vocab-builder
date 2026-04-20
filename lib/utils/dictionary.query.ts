@@ -2,11 +2,14 @@ import type { WordCategory, WordSort } from '@/types/word';
 
 //===============================================================
 
+export type WordProgressFilter = '0' | '50' | '100';
+
 export type WordsRouteFilters = {
   category: 'categories' | WordCategory;
   isIrregular?: boolean;
   page: number;
   sort?: WordSort;
+  progress?: WordProgressFilter;
 };
 
 type WordsRouteState = {
@@ -20,6 +23,7 @@ export const DEFAULT_WORDS_FILTERS: WordsRouteFilters = {
   isIrregular: undefined,
   page: 1,
   sort: undefined,
+  progress: undefined,
 };
 
 export const DEFAULT_DICTIONARY_FILTERS = DEFAULT_WORDS_FILTERS;
@@ -98,6 +102,21 @@ export function parseDictionarySegments(segments?: string[]): WordsRouteState {
       continue;
     }
 
+    if (segment === 'progress-100') {
+      filters.progress = '100';
+      continue;
+    }
+
+    if (segment === 'progress-50') {
+      filters.progress = '50';
+      continue;
+    }
+
+    if (segment === 'progress-0') {
+      filters.progress = '0';
+      continue;
+    }
+
     if (segment.startsWith('page-')) {
       const page = Number(segment.replace('page-', ''));
 
@@ -132,6 +151,10 @@ export function buildWordsPath(
 
   if (filters.sort) {
     segments.push(filters.sort === 'a-z' ? 'sort-a-z' : 'sort-z-a');
+  }
+
+  if (filters.progress) {
+    segments.push(`progress-${filters.progress}`);
   }
 
   if (filters.page > 1) {

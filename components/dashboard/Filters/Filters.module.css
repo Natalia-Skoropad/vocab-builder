@@ -6,7 +6,8 @@
 
 .searchWrap,
 .selectWrap,
-.sortWrap {
+.sortWrap,
+.progressWrap {
   position: relative;
   width: 100%;
 }
@@ -18,12 +19,10 @@
   border-radius: 16px;
   border: 1px solid rgba(18, 20, 23, 0.1);
   background-color: var(--background-1);
-
   font-family: var(--font-family);
   font-size: 16px;
   line-height: 1.2;
   color: var(--text-main);
-
   transition: border-color var(--motion-duration-fast)
       var(--motion-ease-standard),
     box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
@@ -72,7 +71,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-
   animation: slideInFromRight 300ms ease;
 }
 
@@ -176,6 +174,11 @@
   .sortWrap {
     flex: 0 0 160px;
     max-width: 160px;
+  }
+
+  .progressWrap {
+    flex: 0 0 182px;
+    max-width: 182px;
   }
 
   .selectWrap {

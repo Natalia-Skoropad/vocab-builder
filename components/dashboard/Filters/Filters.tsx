@@ -13,6 +13,7 @@ import { useCategoriesStore } from '@/store/categories/categoriesStore';
 import {
   buildWordsPath,
   parseDictionarySegments,
+  type WordProgressFilter,
 } from '@/lib/utils/dictionary.query';
 
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
@@ -35,6 +36,7 @@ type Props = {
 };
 
 type SortValue = 'sort' | WordSort;
+type ProgressValue = 'progress' | WordProgressFilter;
 
 //===============================================================
 
@@ -49,6 +51,13 @@ const sortOptions = [
   { value: 'z-a', label: 'Z to A' },
 ];
 
+const progressOptions = [
+  { value: 'progress', label: 'Progress' },
+  { value: '100', label: '100% learned' },
+  { value: '50', label: '50% learned' },
+  { value: '0', label: '0% learned' },
+];
+
 //===============================================================
 
 function Filters({
@@ -60,6 +69,7 @@ function Filters({
   const searchId = useId();
   const categoryId = useId();
   const sortId = useId();
+  const progressId = useId();
 
   const router = useRouter();
   const params = useParams<{ filters?: string[] | string }>();
@@ -93,6 +103,9 @@ function Filters({
     routeFilters.isIrregular === true ? 'irregular' : 'regular'
   );
   const [sort, setSort] = useState<SortValue>(routeFilters.sort ?? 'sort');
+  const [progress, setProgress] = useState<ProgressValue>(
+    routeFilters.progress ?? 'progress'
+  );
 
   const debouncedKeyword = useDebounce(keyword, 300);
 
@@ -123,6 +136,10 @@ function Filters({
     setSort(routeFilters.sort ?? 'sort');
   }, [routeFilters.sort]);
 
+  useEffect(() => {
+    setProgress(routeFilters.progress ?? 'progress');
+  }, [routeFilters.progress]);
+
   const normalizedKeyword = useMemo(
     () => debouncedKeyword.trim(),
     [debouncedKeyword]
@@ -130,10 +147,14 @@ function Filters({
 
   const isVerb = category === 'verb';
   const effectiveSort = sort === 'sort' ? undefined : sort;
+  const effectiveProgress =
+    progress === 'progress' ? undefined : (progress as WordProgressFilter);
 
   const hasAppliedSort = sort !== 'sort';
   const hasAppliedCategory = category !== 'categories';
-  const hasAppliedFilters = hasAppliedSort || hasAppliedCategory;
+  const hasAppliedProgress = progress !== 'progress';
+  const hasAppliedFilters =
+    hasAppliedSort || hasAppliedCategory || hasAppliedProgress;
 
   useEffect(() => {
     onAppliedStateChange?.(hasAppliedFilters);
@@ -143,6 +164,7 @@ function Filters({
     const currentKeyword = searchParams.get('keyword')?.trim() ?? '';
     const currentSort = routeFilters.sort ?? 'sort';
     const currentCategory = routeFilters.category;
+    const currentProgress = routeFilters.progress ?? 'progress';
     const currentIsIrregular =
       routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined;
 
@@ -153,7 +175,8 @@ function Filters({
       normalizedKeyword !== currentKeyword ||
       category !== currentCategory ||
       nextIsIrregular !== currentIsIrregular ||
-      sort !== currentSort;
+      sort !== currentSort ||
+      progress !== currentProgress;
 
     if (!hasChanged) return;
 
@@ -162,6 +185,7 @@ function Filters({
       isIrregular: nextIsIrregular,
       page: 1,
       sort: effectiveSort,
+      progress: effectiveProgress,
     });
 
     const nextParams = new URLSearchParams();
@@ -177,10 +201,13 @@ function Filters({
   }, [
     basePath,
     category,
+    effectiveProgress,
     effectiveSort,
     normalizedKeyword,
+    progress,
     routeFilters.category,
     routeFilters.isIrregular,
+    routeFilters.progress,
     routeFilters.sort,
     router,
     searchParams,
@@ -253,6 +280,16 @@ function Filters({
             />
           </div>
 
+          <div className={css.progressWrap}>
+            <CustomSelect
+              value={progress}
+              options={progressOptions}
+              onChange={(nextValue) => setProgress(nextValue as ProgressValue)}
+              placeholder="Progress"
+              isActive={hasAppliedProgress}
+            />
+          </div>
+
           <div className={css.selectWrap}>
             <CustomSelect
               value={category}
@@ -311,6 +348,23 @@ function Filters({
               </div>
 
               <div className={css.panelField}>
+                <label htmlFor={progressId} className={css.panelLabel}>
+                  Progress
+                </label>
+
+                <CustomSelect
+                  value={progress}
+                  options={progressOptions}
+                  onChange={(nextValue) =>
+                    setProgress(nextValue as ProgressValue)
+                  }
+                  placeholder="Progress"
+                  variant="modal"
+                  isActive={hasAppliedProgress}
+                />
+              </div>
+
+              <div className={css.panelField}>
                 <label htmlFor={categoryId} className={css.panelLabel}>
                   Category
                 </label>
@@ -337,8 +391,8 @@ function Filters({
                       setVerbType(nextValue as 'regular' | 'irregular')
                     }
                     className={css.modalRadioGroup}
-                    ariaLabel="Verb type"
                     variant="light"
+                    ariaLabel="Verb type"
                   />
                 </div>
               ) : null}
@@ -346,12 +400,10 @@ function Filters({
 
             <div className={css.illustrationWrap} aria-hidden="true">
               <Image
-                src="/a-girl-and-a-boy-are-reading-a-book.png"
+                src="/training-empty.png"
                 alt=""
                 fill
                 className={css.illustration}
-                sizes="(max-width: 767px) 180px, 220px"
-                priority={false}
               />
             </div>
           </div>

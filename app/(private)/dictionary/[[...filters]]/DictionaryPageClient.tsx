@@ -18,6 +18,7 @@ import {
   buildWordsPath,
   formatDictionaryCategoryLabel,
   parseDictionarySegments,
+  type WordProgressFilter,
 } from '@/lib/utils/dictionary.query';
 
 import Dashboard from '@/components/dashboard/Dashboard/Dashboard';
@@ -35,6 +36,18 @@ import css from './page.module.css';
 //===============================================================
 
 const WORDS_PER_PAGE = 7;
+
+//===============================================================
+
+function filterRowsByProgress(
+  rows: WordItem[],
+  progressFilter?: WordProgressFilter
+): WordItem[] {
+  if (!progressFilter) return rows;
+
+  const target = Number(progressFilter);
+  return rows.filter((row) => Math.round(Number(row.progress) || 0) === target);
+}
 
 //===============================================================
 
@@ -111,7 +124,8 @@ function DictionaryPageClient() {
     Boolean(keyword) ||
     routeFilters.category !== 'categories' ||
     Boolean(routeFilters.sort) ||
-    hasIrregularFilter;
+    hasIrregularFilter ||
+    Boolean(routeFilters.progress);
 
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; href?: string }[] = [
@@ -132,6 +146,7 @@ function DictionaryPageClient() {
             isIrregular: undefined,
             page: 1,
             sort: routeFilters.sort,
+            progress: routeFilters.progress,
           }),
         });
 
@@ -149,10 +164,38 @@ function DictionaryPageClient() {
   }, [hasIrregularFilter, routeFilters]);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['dictionary-words', queryParams],
+    queryKey: ['dictionary-words', queryParams, routeFilters.progress],
     queryFn: async () => {
       try {
-        return await wordsService.getOwnWords(queryParams);
+        if (!routeFilters.progress) {
+          return await wordsService.getOwnWords(queryParams);
+        }
+
+        const allData = await wordsService.getOwnWords({
+          ...queryParams,
+          page: 1,
+          limit: 1000,
+          newWordId: undefined,
+        });
+
+        const filtered = filterRowsByProgress(
+          allData.results,
+          routeFilters.progress
+        );
+        const totalPages = Math.max(
+          1,
+          Math.ceil(filtered.length / WORDS_PER_PAGE)
+        );
+        const safePage = Math.min(routeFilters.page, totalPages);
+        const start = (safePage - 1) * WORDS_PER_PAGE;
+        const paged = filtered.slice(start, start + WORDS_PER_PAGE);
+
+        return {
+          results: paged,
+          totalPages,
+          page: safePage,
+          perPage: WORDS_PER_PAGE,
+        };
       } catch (queryError) {
         if (hasActiveSearchOrFilters) {
           return {
@@ -209,6 +252,7 @@ function DictionaryPageClient() {
         routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined,
       page: nextPage,
       sort: routeFilters.sort,
+      progress: routeFilters.progress,
     });
 
     const nextParams = new URLSearchParams();

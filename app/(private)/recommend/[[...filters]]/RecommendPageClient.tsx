@@ -11,6 +11,7 @@ import { wordsService } from '@/lib/services/words.service';
 import {
   buildWordsPath,
   parseDictionarySegments,
+  type WordProgressFilter,
 } from '@/lib/utils/dictionary.query';
 
 import Dashboard from '@/components/dashboard/Dashboard/Dashboard';
@@ -32,6 +33,16 @@ function normalizeWordKey(word: Pick<WordItem, 'en' | 'ua' | 'category'>) {
   return `${word.en.trim().toLowerCase()}__${word.ua
     .trim()
     .toLowerCase()}__${word.category.trim().toLowerCase()}`;
+}
+
+function filterRowsByProgress(
+  rows: WordItem[],
+  progressFilter?: WordProgressFilter
+): WordItem[] {
+  if (!progressFilter) return rows;
+
+  const target = Number(progressFilter);
+  return rows.filter((row) => Math.round(Number(row.progress) || 0) === target);
 }
 
 //===============================================================
@@ -65,7 +76,8 @@ function RecommendPageClient() {
     Boolean(keyword) ||
     filters.category !== 'categories' ||
     Boolean(filters.sort) ||
-    hasIrregularFilter;
+    hasIrregularFilter ||
+    Boolean(filters.progress);
 
   const addToDictionaryMutation = useMutation({
     mutationFn: (word: WordItem) => wordsService.addWordFromRecommend(word._id),
@@ -98,6 +110,25 @@ function RecommendPageClient() {
     await addToDictionaryMutation.mutateAsync(word);
   };
 
+  const { data: ownWordsData } = useQuery({
+    queryKey: ['recommend-own-words'],
+    queryFn: () =>
+      wordsService.getOwnWords({
+        page: 1,
+        limit: 1000,
+      }),
+  });
+
+  const ownWordsMap = useMemo(() => {
+    const map = new Map<string, WordItem>();
+
+    for (const word of ownWordsData?.results ?? []) {
+      map.set(normalizeWordKey(word), word);
+    }
+
+    return map;
+  }, [ownWordsData?.results]);
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [
       'recommend-words',
@@ -106,18 +137,57 @@ function RecommendPageClient() {
       filters.isIrregular,
       filters.page,
       filters.sort,
+      filters.progress,
+      ownWordsData?.results,
     ],
+    enabled: Boolean(ownWordsData),
     queryFn: async () => {
       try {
-        return await wordsService.getAllWords({
+        const baseData = await wordsService.getAllWords({
           keyword,
           category: filters.category,
           isIrregular:
             filters.category === 'verb' ? filters.isIrregular : undefined,
-          page: filters.page,
-          limit: WORDS_PER_PAGE,
+          page: 1,
+          limit: 1000,
           sort: filters.sort,
         });
+
+        const mergedRows: WordItem[] = baseData.results.map((word) => {
+          const ownWord = ownWordsMap.get(normalizeWordKey(word));
+
+          if (!ownWord) {
+            return {
+              ...word,
+              progress:
+                typeof word.progress === 'number'
+                  ? word.progress
+                  : Number(word.progress) || 0,
+            };
+          }
+
+          return {
+            ...word,
+            owner: ownWord.owner,
+            progress: ownWord.progress,
+          };
+        });
+
+        const filteredRows = filterRowsByProgress(mergedRows, filters.progress);
+        const totalPages = Math.max(
+          1,
+          Math.ceil(filteredRows.length / WORDS_PER_PAGE)
+        );
+        const safePage = Math.min(filters.page, totalPages);
+        const start = (safePage - 1) * WORDS_PER_PAGE;
+        const pagedRows = filteredRows.slice(start, start + WORDS_PER_PAGE);
+
+        return {
+          results: pagedRows,
+          totalPages,
+          page: safePage,
+          perPage: WORDS_PER_PAGE,
+        };
       } catch (queryError) {
         if (hasActiveSearchOrFilters) {
           return {
@@ -133,15 +203,6 @@ function RecommendPageClient() {
     },
   });
 
-  const { data: ownWordsData } = useQuery({
-    queryKey: ['recommend-own-words'],
-    queryFn: () =>
-      wordsService.getOwnWords({
-        page: 1,
-        limit: 1000,
-      }),
-  });
-
   useEffect(() => {
     if (!isError) return;
 
@@ -152,38 +213,7 @@ function RecommendPageClient() {
     );
   }, [isError, error]);
 
-  const ownWordsMap = useMemo(() => {
-    const map = new Map<string, WordItem>();
-
-    for (const word of ownWordsData?.results ?? []) {
-      map.set(normalizeWordKey(word), word);
-    }
-
-    return map;
-  }, [ownWordsData?.results]);
-
-  const rows: WordItem[] = useMemo(() => {
-    return (data?.results ?? []).map((word) => {
-      const ownWord = ownWordsMap.get(normalizeWordKey(word));
-
-      if (!ownWord) {
-        return {
-          ...word,
-          progress:
-            typeof word.progress === 'number'
-              ? word.progress
-              : Number(word.progress) || 0,
-        };
-      }
-
-      return {
-        ...word,
-        owner: ownWord.owner,
-        progress: ownWord.progress,
-      };
-    });
-  }, [data?.results, ownWordsMap]);
-
+  const rows = data?.results ?? [];
   const totalPages = data?.totalPages ?? 1;
   const currentPage = data?.page ?? filters.page;
 
@@ -194,6 +224,7 @@ function RecommendPageClient() {
         filters.category === 'verb' ? filters.isIrregular : undefined,
       page: nextPage,
       sort: filters.sort,
+      progress: filters.progress,
     });
 
     const nextParams = new URLSearchParams();
