@@ -57,9 +57,6 @@ function MenuNav({ variant = 'header', mode = 'private', onNavigate }: Props) {
       ? publicOffcanvasNavItems
       : publicHeaderNavItems;
 
-  const shouldShowActive =
-    mode === 'private' || (mode === 'public' && variant === 'header');
-
   return (
     <nav
       className={clsx(css.nav, variant === 'offcanvas' && css.navOffcanvas)}
@@ -80,7 +77,7 @@ function MenuNav({ variant = 'header', mode = 'private', onNavigate }: Props) {
                   css.link,
                   'interactive-underline-trigger',
                   variant === 'offcanvas' && css.linkOffcanvas,
-                  shouldShowActive && active && css.active
+                  active && css.active
                 )}
               >
                 <span

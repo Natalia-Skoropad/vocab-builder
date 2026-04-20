@@ -9,28 +9,93 @@ import {
 
 //===============================================================
 
-type BackendTasksResponse = {
-  tasks: unknown[];
+type BackendTaskItem = {
+  _id: string;
+  en?: string;
+  ua?: string;
+  task: 'en' | 'ua';
 };
 
-function isBackendTasksResponse(data: unknown): data is BackendTasksResponse {
+type BackendTasksResponse =
+  | {
+      words: BackendTaskItem[];
+    }
+  | {
+      tasks: BackendTaskItem[];
+    };
+
+type BackendErrorResponse = {
+  message?: string;
+};
+
+//===============================================================
+
+function isBackendTaskItem(value: unknown): value is BackendTaskItem {
+  if (!value || typeof value !== 'object') return false;
+
+  const item = value as Record<string, unknown>;
+
+  const hasValidPrompt =
+    typeof item.en === 'string' || typeof item.ua === 'string';
+
   return (
-    !!data &&
-    typeof data === 'object' &&
-    Array.isArray((data as BackendTasksResponse).tasks)
+    typeof item._id === 'string' &&
+    hasValidPrompt &&
+    (item.task === 'en' || item.task === 'ua')
   );
+}
+
+function isBackendTasksResponse(value: unknown): value is BackendTasksResponse {
+  if (!value || typeof value !== 'object') return false;
+
+  const data = value as Record<string, unknown>;
+
+  if (Array.isArray(data.words)) {
+    return data.words.every(isBackendTaskItem);
+  }
+
+  if (Array.isArray(data.tasks)) {
+    return data.tasks.every(isBackendTaskItem);
+  }
+
+  return false;
+}
+
+function getBackendMessage(data: unknown): string | undefined {
+  if (
+    data &&
+    typeof data === 'object' &&
+    'message' in data &&
+    typeof (data as BackendErrorResponse).message === 'string'
+  ) {
+    return (data as BackendErrorResponse).message;
+  }
+
+  return undefined;
+}
+
+function normalizeTasksResponse(data: BackendTasksResponse) {
+  if ('words' in data) {
+    return {
+      words: data.words,
+    };
+  }
+
+  return {
+    words: data.tasks,
+  };
 }
 
 //===============================================================
 
 export async function GET() {
-  const token = await getSessionCookie();
-
-  if (!token) {
-    return createErrorResponse('Unauthorized.', 401);
-  }
-
   try {
+    const token = await getSessionCookie();
+
+    if (!token) {
+      return createErrorResponse('Unauthorized.', 401);
+    }
+
     const response = await fetch(`${API_BASE_URL}/words/tasks`, {
       method: 'GET',
       headers: {
@@ -40,7 +105,7 @@ export async function GET() {
     });
 
     const data = await parseJsonSafe<
-      BackendTasksResponse | { message?: string }
+      BackendTasksResponse | BackendErrorResponse
     >(response);
 
     if (!response.ok) {
@@ -53,12 +118,7 @@ export async function GET() {
       }
 
       return createErrorResponse(
-        data &&
-          typeof data === 'object' &&
-          'message' in data &&
-          typeof data.message === 'string'
-          ? data.message
-          : 'Failed to fetch training tasks.',
+        getBackendMessage(data) || 'Failed to fetch training tasks.',
         response.status || 500
       );
     }
@@ -67,8 +127,9 @@ export async function GET() {
       return createErrorResponse('Invalid training tasks response.', 500);
     }
 
-    return createOkResponse(data);
-  } catch {
+    return createOkResponse(normalizeTasksResponse(data));
+  } catch (error) {
+    console.error('GET /api/training/tasks error:', error);
     return createErrorResponse('Server error.', 500);
   }
 }

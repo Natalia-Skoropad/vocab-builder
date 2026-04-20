@@ -11,37 +11,53 @@ import css from './Statistics.module.css';
 
 type Props = {
   totalCount?: number;
+  learnedCount?: number;
   className?: string;
 };
 
 //===============================================================
 
-function Statistics({ totalCount = 0, className }: Props) {
-  const { data } = useQuery({
+function getLearnedWordsCountFromResults(
+  results: Array<{ progress: number | string }>
+): number {
+  return results.filter((word) => {
+    const progress =
+      typeof word.progress === 'number'
+        ? word.progress
+        : Number(word.progress) || 0;
+
+    return progress >= 100;
+  }).length;
+}
+
+//===============================================================
+
+function Statistics({ totalCount = 0, learnedCount, className }: Props) {
+  const { data: statisticsData } = useQuery({
     queryKey: ['words-statistics'],
     queryFn: wordsService.getStatistics,
   });
 
-  const { data: ownWordsData } = useQuery({
-    queryKey: ['words-learned-statistics'],
-    queryFn: () =>
-      wordsService.getOwnWords({
+  const shouldFetchLearnedCount = typeof learnedCount !== 'number';
+
+  const { data: learnedWordsCount = 0 } = useQuery({
+    queryKey: ['words-learned-count'],
+    queryFn: async () => {
+      const response = await wordsService.getOwnWords({
         page: 1,
         limit: 1000,
-      }),
+      });
+
+      return getLearnedWordsCountFromResults(response.results);
+    },
+    enabled: shouldFetchLearnedCount,
+    staleTime: 60_000,
   });
 
-  const toStudyValue = data?.totalCount ?? totalCount;
+  const toStudyValue = statisticsData?.totalCount ?? totalCount;
 
   const learnedValue =
-    ownWordsData?.results.filter((word) => {
-      const progress =
-        typeof word.progress === 'number'
-          ? word.progress
-          : Number(word.progress) || 0;
-
-      return progress >= 100;
-    }).length ?? 0;
+    typeof learnedCount === 'number' ? learnedCount : learnedWordsCount;
 
   return (
     <div className={clsx(css.statisticsWrap, className)}>

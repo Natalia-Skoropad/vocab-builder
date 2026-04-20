@@ -25,6 +25,18 @@ function isErrorResponse(data: unknown): data is ErrorResponse {
   return !!data && typeof data === 'object' && 'message' in data;
 }
 
+function isTrainingTaskItem(data: unknown): data is TrainingTask {
+  return (
+    !!data &&
+    typeof data === 'object' &&
+    typeof (data as TrainingTask)._id === 'string' &&
+    (((data as TrainingTask).task === 'en' &&
+      typeof (data as TrainingTask).ua === 'string') ||
+      ((data as TrainingTask).task === 'ua' &&
+        typeof (data as TrainingTask).en === 'string'))
+  );
+}
+
 function isRawTrainingTasksResponse(
   data: unknown
 ): data is RawTrainingTasksResponse {
@@ -90,7 +102,13 @@ async function getTasks(): Promise<TrainingTasksResponse> {
     throw new Error('Invalid training tasks response.');
   }
 
-  return normalizeTrainingTasksResponse(data);
+  const normalizedData = normalizeTrainingTasksResponse(data);
+
+  if (!normalizedData.words.every(isTrainingTaskItem)) {
+    throw new Error('Invalid training tasks response.');
+  }
+
+  return normalizedData;
 }
 
 async function submitAnswers(

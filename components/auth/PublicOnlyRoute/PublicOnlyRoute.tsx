@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes';
 import { useAuth } from '@/hooks/useAuth';
 
+import AuthReadyGate from '@/components/auth/AuthReadyGate/AuthReadyGate';
+
 //===============================================================
 
 type Props = {
@@ -16,23 +18,15 @@ type Props = {
 
 function PublicOnlyRoute({ children }: Props) {
   const router = useRouter();
-  const { isAuthReady, isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isAuthReady && isAuthenticated) {
+    if (isAuthenticated) {
       router.replace(ROUTES.DICTIONARY);
     }
-  }, [isAuthReady, isAuthenticated, router]);
+  }, [isAuthenticated, router]);
 
-  if (!isAuthReady || isLoading) {
-    return null;
-  }
-
-  if (isAuthenticated) {
-    return null;
-  }
-
-  return <>{children}</>;
+  return <AuthReadyGate>{isAuthenticated ? null : children}</AuthReadyGate>;
 }
 
 export default PublicOnlyRoute;

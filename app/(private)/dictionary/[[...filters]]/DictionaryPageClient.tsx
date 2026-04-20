@@ -46,6 +46,7 @@ function filterRowsByProgress(
   if (!progressFilter) return rows;
 
   const target = Number(progressFilter);
+
   return rows.filter((row) => Math.round(Number(row.progress) || 0) === target);
 }
 
@@ -54,16 +55,15 @@ function filterRowsByProgress(
 function DictionaryPageClient() {
   const router = useRouter();
   const pathname = usePathname();
-
   const params = useParams<{ filters?: string[] | string }>();
   const searchParams = useSearchParams();
-  const shouldAutoOpenAddModal = searchParams.get('openModal') === 'add-word';
   const queryClient = useQueryClient();
+
+  const shouldAutoOpenAddModal = searchParams.get('openModal') === 'add-word';
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(
     () => shouldAutoOpenAddModal
   );
-
   const [editingWord, setEditingWord] = useState<WordItem | null>(null);
   const [deletingWord, setDeletingWord] = useState<WordItem | null>(null);
 
@@ -82,9 +82,7 @@ function DictionaryPageClient() {
   }, [pathname, router, searchParams, shouldAutoOpenAddModal]);
 
   const routeSegments = useMemo<string[]>(() => {
-    if (Array.isArray(rawFiltersParam)) {
-      return rawFiltersParam;
-    }
+    if (Array.isArray(rawFiltersParam)) return rawFiltersParam;
 
     if (typeof rawFiltersParam === 'string' && rawFiltersParam.trim()) {
       return [rawFiltersParam];
@@ -182,10 +180,12 @@ function DictionaryPageClient() {
           allData.results,
           routeFilters.progress
         );
+
         const totalPages = Math.max(
           1,
           Math.ceil(filtered.length / WORDS_PER_PAGE)
         );
+
         const safePage = Math.min(routeFilters.page, totalPages);
         const start = (safePage - 1) * WORDS_PER_PAGE;
         const paged = filtered.slice(start, start + WORDS_PER_PAGE);
@@ -229,6 +229,10 @@ function DictionaryPageClient() {
 
       void queryClient.invalidateQueries({
         queryKey: ['words-statistics'],
+      });
+
+      void queryClient.invalidateQueries({
+        queryKey: ['words-learned-count'],
       });
     },
     onError: (mutationError) => {
@@ -303,6 +307,11 @@ function DictionaryPageClient() {
             imageSrc="/training-empty.png"
             imageWidth={190}
             imageHeight={190}
+          />
+
+          <AddWordModal
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
           />
         </section>
       </main>

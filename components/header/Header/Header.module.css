@@ -39,11 +39,31 @@
 }
 
 .guestLink {
+  position: relative;
   color: var(--text-main);
   font-size: 16px;
   line-height: 1.2;
   font-weight: var(--fw-medium);
+  text-decoration: none;
   transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.guestLink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 1px;
+  background-color: var(--green-main);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.guestLink:hover::after,
+.guestLink:focus-visible::after {
+  transform: scaleX(1);
 }
 
 .guestLink:hover,
@@ -103,59 +123,5 @@
   .desktopBadge {
     min-width: 0;
     max-width: 320px;
-  }
-}
-
-.desktopGuestActions {
-  display: none;
-}
-
-.guestLink {
-  position: relative;
-  color: var(--text-main);
-  font-size: 16px;
-  line-height: 1.2;
-  font-weight: var(--fw-medium);
-  text-decoration: none;
-  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
-}
-
-.guestLink::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 100%;
-  height: 1px;
-  background-color: var(--green-main);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
-}
-
-.guestLink:hover::after,
-.guestLink:focus-visible::after {
-  transform: scaleX(1);
-}
-
-.guestLink:hover,
-.guestLink:focus-visible {
-  opacity: 0.72;
-}
-
-.guestLink:focus-visible {
-  outline: none;
-}
-
-.guestSep {
-  color: rgba(18, 20, 23, 0.25);
-}
-
-@media only screen and (min-width: 1440px) {
-  .desktopGuestActions {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    margin-left: auto;
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -89,6 +89,7 @@ function RecommendPageClient() {
         queryClient.invalidateQueries({ queryKey: ['dictionary-words'] }),
         queryClient.invalidateQueries({ queryKey: ['words-statistics'] }),
         queryClient.invalidateQueries({ queryKey: ['recommend-own-words'] }),
+        queryClient.invalidateQueries({ queryKey: ['words-learned-count'] }),
       ]);
     },
     onError: (mutationError) => {
@@ -103,12 +104,19 @@ function RecommendPageClient() {
     },
   });
 
-  const handleAddToDictionary = async (word: WordItem) => {
-    if (word.owner) return;
-
-    setAddingWordId(word._id);
-    await addToDictionaryMutation.mutateAsync(word);
-  };
+  const queryParams = useMemo(
+    () => ({
+      page: filters.page,
+      limit: WORDS_PER_PAGE,
+      keyword: keyword || undefined,
+      category:
+        filters.category !== 'categories' ? filters.category : undefined,
+      isIrregular:
+        filters.category === 'verb' ? filters.isIrregular : undefined,
+      sort: filters.sort,
+    }),
+    [filters, keyword]
+  );
 
   const { data: ownWordsData } = useQuery({
     queryKey: ['recommend-own-words'],
@@ -117,105 +125,73 @@ function RecommendPageClient() {
         page: 1,
         limit: 1000,
       }),
+    placeholderData: (previousData) => previousData,
   });
 
-  const ownWordsMap = useMemo(() => {
-    const map = new Map<string, WordItem>();
-
-    for (const word of ownWordsData?.results ?? []) {
-      map.set(normalizeWordKey(word), word);
-    }
-
-    return map;
-  }, [ownWordsData?.results]);
-
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: [
-      'recommend-words',
-      keyword,
-      filters.category,
-      filters.isIrregular,
-      filters.page,
-      filters.sort,
-      filters.progress,
-      ownWordsData?.results,
-    ],
-    enabled: Boolean(ownWordsData),
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['recommend-words', queryParams, filters.progress],
     queryFn: async () => {
-      try {
-        const baseData = await wordsService.getAllWords({
-          keyword,
-          category: filters.category,
-          isIrregular:
-            filters.category === 'verb' ? filters.isIrregular : undefined,
-          page: 1,
-          limit: 1000,
-          sort: filters.sort,
-        });
-
-        const mergedRows: WordItem[] = baseData.results.map((word) => {
-          const ownWord = ownWordsMap.get(normalizeWordKey(word));
-
-          if (!ownWord) {
-            return {
-              ...word,
-              progress:
-                typeof word.progress === 'number'
-                  ? word.progress
-                  : Number(word.progress) || 0,
-            };
-          }
-
-          return {
-            ...word,
-            owner: ownWord.owner,
-            progress: ownWord.progress,
-          };
-        });
-
-        const filteredRows = filterRowsByProgress(mergedRows, filters.progress);
-        const totalPages = Math.max(
-          1,
-          Math.ceil(filteredRows.length / WORDS_PER_PAGE)
-        );
-        const safePage = Math.min(filters.page, totalPages);
-        const start = (safePage - 1) * WORDS_PER_PAGE;
-        const pagedRows = filteredRows.slice(start, start + WORDS_PER_PAGE);
-
-        return {
-          results: pagedRows,
-          totalPages,
-          page: safePage,
-          perPage: WORDS_PER_PAGE,
-        };
-      } catch (queryError) {
-        if (hasActiveSearchOrFilters) {
-          return {
-            results: [],
-            totalPages: 1,
-            page: filters.page,
-            perPage: WORDS_PER_PAGE,
-          };
-        }
-
-        throw queryError;
+      if (!filters.progress) {
+        return wordsService.getAllWords(queryParams);
       }
+
+      const allData = await wordsService.getAllWords({
+        ...queryParams,
+        page: 1,
+        limit: 1000,
+      });
+
+      const filtered = filterRowsByProgress(allData.results, filters.progress);
+      const totalPages = Math.max(
+        1,
+        Math.ceil(filtered.length / WORDS_PER_PAGE)
+      );
+      const safePage = Math.min(filters.page, totalPages);
+      const start = (safePage - 1) * WORDS_PER_PAGE;
+      const paged = filtered.slice(start, start + WORDS_PER_PAGE);
+
+      return {
+        results: paged,
+        totalPages,
+        page: safePage,
+        perPage: WORDS_PER_PAGE,
+      };
     },
+    placeholderData: (previousData) => previousData,
   });
 
-  useEffect(() => {
-    if (!isError) return;
+  const rows = useMemo(() => {
+    const recommendRows = data?.results ?? [];
+    const ownWords = ownWordsData?.results ?? [];
 
-    toast.error(
-      error instanceof Error
-        ? error.message
-        : 'Failed to load recommended words.'
+    if (!recommendRows.length || !ownWords.length) return recommendRows;
+
+    const ownWordsMap = new Map(
+      ownWords.map((word) => [normalizeWordKey(word), word])
     );
-  }, [isError, error]);
 
-  const rows = data?.results ?? [];
+    return recommendRows.map((word) => {
+      const matchedOwnWord = ownWordsMap.get(normalizeWordKey(word));
+
+      if (!matchedOwnWord) return word;
+
+      return {
+        ...word,
+        owner: matchedOwnWord.owner,
+        progress: matchedOwnWord.progress,
+      };
+    });
+  }, [data?.results, ownWordsData?.results]);
+
   const totalPages = data?.totalPages ?? 1;
   const currentPage = data?.page ?? filters.page;
+
+  const handleAddToDictionary = async (word: WordItem) => {
+    if (addingWordId || word.owner) return;
+
+    setAddingWordId(word._id);
+    await addToDictionaryMutation.mutateAsync(word);
+  };
 
   const handlePageChange = (nextPage: number) => {
     const nextPath = buildWordsPath('/recommend', {
@@ -281,7 +257,7 @@ function RecommendPageClient() {
           showTrainLink
         />
 
-        {isLoading ? (
+        {isLoading && !data ? (
           <div className={css.loaderWrap}>
             <InlineLoader
               text="Loading recommended words…"
@@ -290,7 +266,11 @@ function RecommendPageClient() {
           </div>
         ) : rows.length === 0 ? (
           <EmptyState
-            title="No recommended words found"
+            title={
+              hasActiveSearchOrFilters
+                ? 'No recommended words found'
+                : 'No recommended words yet'
+            }
             text="There are no words matching your current search or filters."
             imageSrc="/training-empty.png"
             imageWidth={190}
