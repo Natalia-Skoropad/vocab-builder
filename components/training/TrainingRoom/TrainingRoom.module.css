@@ -7,16 +7,15 @@
 .outer {
   padding: 12px;
   border-radius: 16px;
-  background-color: #ffff;
+  background-color: var(--background-1);
   overflow: visible;
 }
 
 .top {
   display: flex;
   flex-direction: column;
-
   border-radius: 14px;
-  background-color: #fcfcfc;
+  background-color: var(--background-2);
   overflow: hidden;
 }
 
@@ -43,6 +42,10 @@
   color: var(--green-main);
 }
 
+.title {
+  max-width: 360px;
+}
+
 .word {
   margin: 24px 0 0;
   font-size: 30px;
@@ -50,6 +53,7 @@
   font-weight: var(--fw-semiBold);
   color: var(--text-main);
   word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .inputWrap {
@@ -58,7 +62,7 @@
   min-height: 160px;
   border: 1px solid var(--border-light);
   border-radius: 14px;
-  background-color: #ffff;
+  background-color: var(--background-1);
   transition: border-color var(--motion-duration-fast)
       var(--motion-ease-standard),
     box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
@@ -77,7 +81,6 @@
   outline: none;
   resize: none;
   background-color: transparent;
-
   font: inherit;
   font-size: 18px;
   line-height: 1.5;
@@ -92,7 +95,7 @@
   margin-top: auto;
   padding-top: 20px;
   display: flex;
-
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -101,11 +104,9 @@
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-
   padding: 0;
   border: none;
   background-color: transparent;
-
   color: var(--text-main);
   font-size: 14px;
   line-height: 1.2;
@@ -113,7 +114,6 @@
   white-space: nowrap;
   cursor: pointer;
   text-decoration: none;
-
   transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
@@ -163,14 +163,23 @@
 .actions {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 12px;
 }
 
 .actionButton {
-  width: auto;
-  min-width: 160px;
-  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.saveButton {
+  background-color: var(--green-main);
+  color: var(--background-1);
+  border-color: transparent;
+}
+
+.saveButton:hover,
+.saveButton:focus-visible {
+  background-color: var(--green-inactive);
 }
 
 @media only screen and (min-width: 768px) {
@@ -197,10 +206,12 @@
     flex-direction: row;
     align-items: center;
     gap: 16px;
+    width: fit-content;
   }
 
   .actionButton {
-    min-width: 204px;
+    width: 204px;
+    flex: 0 0 204px;
   }
 
   .nextButtonIcon {
@@ -229,15 +240,10 @@
   .divider {
     width: 1px;
     height: auto;
-    align-self: stretch;
   }
 
-  .word {
-    margin-top: 32px;
-    font-size: 32px;
-  }
-
-  .actionButton {
-    min-width: 240px;
+  .actions {
+    flex-direction: row;
+    width: fit-content;
   }
 }

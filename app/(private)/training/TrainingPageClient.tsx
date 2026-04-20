@@ -28,7 +28,9 @@ function upsertAnswer(
 ): TrainingAnswer[] {
   if (!nextAnswer) return prev;
 
-  const existingIndex = prev.findIndex((item) => item._id === nextAnswer._id);
+  const existingIndex = prev.findIndex(
+    (item) => item._id === nextAnswer._id && item.task === nextAnswer.task
+  );
 
   if (existingIndex === -1) {
     return [...prev, nextAnswer];
@@ -212,11 +214,9 @@ function TrainingPageClient() {
               title="You don't have a single word to learn right now."
               text="Please create or add a word to start the workout. We want to improve your vocabulary and develop your knowledge, so please share the words you are interested in adding to your study."
               primaryActionLabel="Add word"
-              secondaryActionLabel="Cancel"
               onPrimaryAction={() =>
                 router.push(`${ROUTES.DICTIONARY}?openModal=add-word`)
               }
-              onSecondaryAction={() => router.push(ROUTES.DICTIONARY)}
               imageSrc="/training-empty.png"
               imageAlt=""
               imageWidth={498}

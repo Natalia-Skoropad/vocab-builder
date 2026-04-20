@@ -14,7 +14,8 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
     | 'dark'
     | 'light'
     | 'disabled'
-    | 'disabledAuth';
+    | 'disabledAuth'
+    | 'outlineGreen';
   fullWidth?: boolean;
 };
 
@@ -45,6 +46,7 @@ function Button({
           [css.light]: variant === 'light',
           [css.disabled]: variant === 'disabled',
           [css.disabledAuth]: variant === 'disabledAuth',
+          [css.outlineGreen]: variant === 'outlineGreen',
           [css.fullWidth]: fullWidth,
         },
         className

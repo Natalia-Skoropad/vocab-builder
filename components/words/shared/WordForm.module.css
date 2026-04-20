@@ -16,6 +16,10 @@
   flex-direction: column;
 }
 
+.verbGroupDisabled {
+  opacity: 0.62;
+}
+
 .categorySelect {
   width: 100%;
   max-width: 100%;

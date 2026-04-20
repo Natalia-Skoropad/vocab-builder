@@ -32,7 +32,7 @@ type Props = {
   onClose: () => void;
 };
 
-const verbOptions: RadioOption[] = [
+const baseVerbOptions: RadioOption[] = [
   { value: 'regular', label: 'Regular' },
   { value: 'irregular', label: 'Irregular' },
 ];
@@ -124,6 +124,15 @@ function AddWordForm({ onClose }: Props) {
     [categories]
   );
 
+  const verbOptions = useMemo<RadioOption[]>(
+    () =>
+      baseVerbOptions.map((option) => ({
+        ...option,
+        disabled: !isVerb,
+      })),
+    [isVerb]
+  );
+
   const onSubmit = async (values: AddWordFormValues) => {
     await createMutation.mutateAsync(values);
   };
@@ -167,32 +176,34 @@ function AddWordForm({ onClose }: Props) {
           className={css.categorySelect}
         />
 
-        {isVerb ? (
-          <div className={css.verbGroup}>
-            <RadioGroup
-              name="add-word-verb-type"
-              value={isIrregular ? 'irregular' : 'regular'}
-              options={verbOptions}
-              onChange={(nextValue) =>
-                setValue('isIrregular', nextValue === 'irregular', {
-                  shouldValidate: true,
-                })
-              }
-              variant="light"
-              className={css.radioGroup}
-              ariaLabel="Verb type"
-            />
+        <div
+          className={`${css.verbGroup} ${!isVerb ? css.verbGroupDisabled : ''}`}
+          aria-disabled={!isVerb}
+        >
+          <RadioGroup
+            name="add-word-verb-type"
+            value={isIrregular ? 'irregular' : 'regular'}
+            options={verbOptions}
+            onChange={(nextValue) => {
+              if (!isVerb) return;
 
-            <div className={css.feedbackSlot}>
-              {isIrregular ? (
-                <p className={css.hintText}>
-                  Such data must be entered in the format I form-II form-III
-                  form.
-                </p>
-              ) : null}
-            </div>
+              setValue('isIrregular', nextValue === 'irregular', {
+                shouldValidate: true,
+              });
+            }}
+            variant="light"
+            className={css.radioGroup}
+            ariaLabel="Verb type"
+          />
+
+          <div className={css.feedbackSlot}>
+            {isVerb && isIrregular ? (
+              <p className={css.hintText}>
+                Such data must be entered in the format I form-II form-III form.
+              </p>
+            ) : null}
           </div>
-        ) : null}
+        </div>
       </div>
 
       <div className={css.wordsGroup}>

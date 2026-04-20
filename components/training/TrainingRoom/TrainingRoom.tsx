@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 import Button from '@/components/common/Button/Button';
 import LanguageBadge from '@/components/common/LanguageBadge/LanguageBadge';
@@ -22,6 +23,11 @@ type Props = {
   showNext: boolean;
   isSubmitting?: boolean;
 };
+
+//===============================================================
+
+const EN_TRAINING_REGEX = /^[A-Za-z'-]+(?:\s+[A-Za-z'-]+)*$/;
+const UA_TRAINING_REGEX = /^(?![A-Za-z])[А-ЯІЄЇҐґа-яієїʼ'`\-\s]+$/u;
 
 //===============================================================
 
@@ -47,11 +53,46 @@ function TrainingRoom({
     ? { iconName: 'icon-ukraine-flag', label: 'Ukrainian' }
     : { iconName: 'icon-united-kingdom-flag', label: 'English' };
 
+  const title = isTranslateToEnglish
+    ? 'Enter a word in English'
+    : 'Enter a word in Ukrainian';
+
+  const trimmedValue = value.trim();
+
+  const isAnswerFormatValid =
+    !trimmedValue ||
+    (isTranslateToEnglish
+      ? EN_TRAINING_REGEX.test(trimmedValue)
+      : UA_TRAINING_REGEX.test(trimmedValue));
+
+  const validationMessage = isTranslateToEnglish
+    ? 'Enter a valid English word or phrase.'
+    : 'Enter a valid Ukrainian word or phrase.';
+
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     onChange(event.target.value);
   };
 
+  const handleNextClick = () => {
+    if (trimmedValue && !isAnswerFormatValid) {
+      toast.error(validationMessage);
+      return;
+    }
+
+    onNext();
+  };
+
+  const handleSaveClick = () => {
+    if (trimmedValue && !isAnswerFormatValid) {
+      toast.error(validationMessage);
+      return;
+    }
+
+    onSave();
+  };
+
   const isNextDisabled = !showNext || isSubmitting;
+  const isSaveDisabled = isSubmitting;
 
   return (
     <div className={css.card}>
@@ -59,7 +100,7 @@ function TrainingRoom({
         <div className={css.top}>
           <div className={css.panel}>
             <div className={css.panelHeader}>
-              <h2 className={css.title}>Enter the word</h2>
+              <h2 className={css.title}>{title}</h2>
 
               <LanguageBadge
                 iconName={answerBadge.iconName}
@@ -82,7 +123,7 @@ function TrainingRoom({
               <button
                 type="button"
                 className={`${css.nextButton} interactive-underline-trigger`}
-                onClick={onNext}
+                onClick={handleNextClick}
                 disabled={isNextDisabled}
                 aria-label="Go to next word"
               >
@@ -123,19 +164,21 @@ function TrainingRoom({
         <Button
           type="button"
           variant="primary"
-          onClick={onSave}
-          disabled={isSubmitting}
-          className={css.actionButton}
+          onClick={handleSaveClick}
+          disabled={isSaveDisabled}
+          className={`${css.actionButton} ${css.saveButton}`}
+          fullWidth={false}
         >
           Save
         </Button>
 
         <Button
           type="button"
-          variant="secondary"
+          variant="outlineGreen"
           onClick={onCancel}
           disabled={isSubmitting}
           className={css.actionButton}
+          fullWidth={false}
         >
           Cancel
         </Button>
