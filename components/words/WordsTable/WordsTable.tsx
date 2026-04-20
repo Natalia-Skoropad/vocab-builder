@@ -12,9 +12,9 @@ import {
 
 import type { WordItem } from '@/types/word';
 
-import ProgressBar from '@/components/words/ProgressBar/ProgressBar';
-import ActionsBtn from '@/components/words/ActionsBtn/ActionsBtn';
 import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
+import ActionsBtn from '@/components/words/ActionsBtn/ActionsBtn';
+import ProgressBar from '@/components/words/ProgressBar/ProgressBar';
 
 import css from './WordsTable.module.css';
 
@@ -47,8 +47,6 @@ function getSafeProgress(value: unknown): number {
 
   return Math.max(0, Math.min(parsed, 100));
 }
-
-//===============================================================
 
 function formatCategory(value: string): string {
   return value
@@ -134,19 +132,24 @@ function WordsTable({
         cell: (info) => {
           const word = info.row.original;
           const isAdding = addingWordId === word._id;
+          const isAlreadyInDictionary = Boolean(word.owner);
+          const label = isAlreadyInDictionary
+            ? 'Already in dictionary'
+            : isAdding
+            ? 'Adding…'
+            : 'Add to dictionary';
 
           return (
             <button
               type="button"
               className={`${css.addButton} interactive-underline-trigger`}
               onClick={() => void onAddToDictionary?.(word)}
-              disabled={isAdding}
-              aria-label={
-                isAdding ? 'Adding word to dictionary' : 'Add to dictionary'
-              }
+              disabled={isAdding || isAlreadyInDictionary}
+              aria-label={label}
+              title={label}
             >
               <span className={`${css.addButtonText} interactive-underline`}>
-                {isAdding ? 'Adding…' : 'Add to dictionary'}
+                {label}
               </span>
 
               <ArrowRight className={css.addButtonIcon} aria-hidden="true" />

@@ -105,6 +105,14 @@ function DictionaryPageClient() {
     [keyword, newWordId, routeFilters]
   );
 
+  const hasIrregularFilter = typeof routeFilters.isIrregular === 'boolean';
+
+  const hasActiveSearchOrFilters =
+    Boolean(keyword) ||
+    routeFilters.category !== 'categories' ||
+    Boolean(routeFilters.sort) ||
+    hasIrregularFilter;
+
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; href?: string }[] = [
       { label: 'Home', href: '/' },
@@ -116,10 +124,7 @@ function DictionaryPageClient() {
         routeFilters.category
       );
 
-      if (
-        routeFilters.category === 'verb' &&
-        typeof routeFilters.isIrregular === 'boolean'
-      ) {
+      if (routeFilters.category === 'verb' && hasIrregularFilter) {
         items.push({
           label: categoryLabel,
           href: buildWordsPath('/dictionary', {
@@ -141,11 +146,26 @@ function DictionaryPageClient() {
     }
 
     return items;
-  }, [routeFilters]);
+  }, [hasIrregularFilter, routeFilters]);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['dictionary-words', queryParams],
-    queryFn: () => wordsService.getOwnWords(queryParams),
+    queryFn: async () => {
+      try {
+        return await wordsService.getOwnWords(queryParams);
+      } catch (queryError) {
+        if (hasActiveSearchOrFilters) {
+          return {
+            results: [],
+            totalPages: 1,
+            page: routeFilters.page,
+            perPage: WORDS_PER_PAGE,
+          };
+        }
+
+        throw queryError;
+      }
+    },
   });
 
   const { data: statistics } = useQuery({
@@ -249,7 +269,7 @@ function DictionaryPageClient() {
     <main className={css.page}>
       <section className="container">
         <Breadcrumbs items={breadcrumbItems} />
-        
+
         <Dashboard
           variant="dictionary"
           totalCount={totalCount}
@@ -264,13 +284,27 @@ function DictionaryPageClient() {
           </div>
         ) : rows.length === 0 ? (
           <EmptyState
-            title="Your dictionary is empty"
-            text="Add your first word and start building your vocabulary."
+            title={
+              hasActiveSearchOrFilters
+                ? 'No words found'
+                : 'Your dictionary is empty'
+            }
+            text={
+              hasActiveSearchOrFilters
+                ? 'There are no words matching your current search or filters.'
+                : 'Add your first word and start building your vocabulary.'
+            }
             imageSrc="/training-empty.png"
             imageWidth={190}
             imageHeight={190}
-            primaryActionLabel="Add word"
-            onPrimaryAction={() => setIsAddModalOpen(true)}
+            primaryActionLabel={
+              hasActiveSearchOrFilters ? undefined : 'Add word'
+            }
+            onPrimaryAction={
+              hasActiveSearchOrFilters
+                ? undefined
+                : () => setIsAddModalOpen(true)
+            }
           />
         ) : (
           <>

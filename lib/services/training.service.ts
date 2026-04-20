@@ -1,4 +1,5 @@
 import type {
+  TrainingTask,
   TrainingTasksResponse,
   TrainingSubmitPayload,
   TrainingSubmitResponse,
@@ -10,18 +11,43 @@ type ErrorResponse = {
   message?: string;
 };
 
+type RawTrainingTasksResponse =
+  | {
+      words: TrainingTask[];
+    }
+  | {
+      tasks: TrainingTask[];
+    };
+
 //===============================================================
 
 function isErrorResponse(data: unknown): data is ErrorResponse {
   return !!data && typeof data === 'object' && 'message' in data;
 }
 
-function isTrainingTasksResponse(data: unknown): data is TrainingTasksResponse {
+function isRawTrainingTasksResponse(
+  data: unknown
+): data is RawTrainingTasksResponse {
   return (
     !!data &&
     typeof data === 'object' &&
-    Array.isArray((data as TrainingTasksResponse).tasks)
+    (Array.isArray((data as { words?: unknown[] }).words) ||
+      Array.isArray((data as { tasks?: unknown[] }).tasks))
   );
+}
+
+function normalizeTrainingTasksResponse(
+  data: RawTrainingTasksResponse
+): TrainingTasksResponse {
+  if ('words' in data) {
+    return {
+      words: data.words,
+    };
+  }
+
+  return {
+    words: data.tasks,
+  };
 }
 
 function isTrainingSubmitResponse(
@@ -60,11 +86,11 @@ async function getTasks(): Promise<TrainingTasksResponse> {
     );
   }
 
-  if (!isTrainingTasksResponse(data)) {
+  if (!isRawTrainingTasksResponse(data)) {
     throw new Error('Invalid training tasks response.');
   }
 
-  return data;
+  return normalizeTrainingTasksResponse(data);
 }
 
 async function submitAnswers(

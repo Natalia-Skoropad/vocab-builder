@@ -6,7 +6,7 @@ export type TrainingTask = {
 };
 
 export type TrainingTasksResponse = {
-  tasks: TrainingTask[];
+  words: TrainingTask[];
 };
 
 export type TrainingAnswer = {

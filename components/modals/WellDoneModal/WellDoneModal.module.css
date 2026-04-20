@@ -49,6 +49,8 @@
   line-height: 1.25;
   font-weight: var(--fw-regular);
   color: var(--background-1);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .item + .item {

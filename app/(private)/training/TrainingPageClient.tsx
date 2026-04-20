@@ -14,11 +14,31 @@ import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import EmptyState from '@/components/common/EmptyState/EmptyState';
 import InlineLoader from '@/components/common/InlineLoader/InlineLoader';
 import Statistics from '@/components/dashboard/Statistics/Statistics';
+import WellDoneModal from '@/components/modals/WellDoneModal/WellDoneModal';
 import TrainingProgress from '@/components/training/TrainingProgress/TrainingProgress';
 import TrainingRoom from '@/components/training/TrainingRoom/TrainingRoom';
-import WellDoneModal from '@/components/modals/WellDoneModal/WellDoneModal';
 
 import css from './page.module.css';
+
+//===============================================================
+
+function upsertAnswer(
+  prev: TrainingAnswer[],
+  nextAnswer: TrainingAnswer | null
+): TrainingAnswer[] {
+  if (!nextAnswer) return prev;
+
+  const existingIndex = prev.findIndex((item) => item._id === nextAnswer._id);
+
+  if (existingIndex === -1) {
+    return [...prev, nextAnswer];
+  }
+
+  const next = [...prev];
+  next[existingIndex] = nextAnswer;
+
+  return next;
+}
 
 //===============================================================
 
@@ -28,7 +48,6 @@ function TrainingPageClient() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [answers, setAnswers] = useState<TrainingAnswer[]>([]);
-
   const [isWellDoneOpen, setIsWellDoneOpen] = useState(false);
   const [trainingResult, setTrainingResult] = useState<TrainingSubmitResponse>(
     []
@@ -57,7 +76,7 @@ function TrainingPageClient() {
     { label: 'Training' },
   ];
 
-  const tasks = data?.tasks ?? [];
+  const tasks = data?.words ?? [];
   const currentTask = tasks[currentIndex];
   const isLastTask = currentIndex === tasks.length - 1;
 
@@ -87,8 +106,7 @@ function TrainingPageClient() {
 
   function buildSubmitPayload(): TrainingAnswer[] {
     const lastAnswer = buildTrainingAnswer();
-
-    return lastAnswer ? [...answers, lastAnswer] : answers;
+    return upsertAnswer(answers, lastAnswer);
   }
 
   const handleNext = () => {
@@ -96,7 +114,7 @@ function TrainingPageClient() {
 
     const nextAnswer = buildTrainingAnswer();
 
-    setAnswers((prev) => (nextAnswer ? [...prev, nextAnswer] : prev));
+    setAnswers((prev) => upsertAnswer(prev, nextAnswer));
     setCurrentAnswer('');
     setCurrentIndex((prev) => prev + 1);
   };
@@ -112,6 +130,7 @@ function TrainingPageClient() {
 
     try {
       const result = await submitMutation.mutateAsync(payload);
+      setAnswers(payload);
       setTrainingResult(result);
       setIsWellDoneOpen(true);
     } catch (submitError) {

@@ -28,6 +28,14 @@ const WORDS_PER_PAGE = 7;
 
 //===============================================================
 
+function normalizeWordKey(word: Pick<WordItem, 'en' | 'ua' | 'category'>) {
+  return `${word.en.trim().toLowerCase()}__${word.ua
+    .trim()
+    .toLowerCase()}__${word.category.trim().toLowerCase()}`;
+}
+
+//===============================================================
+
 function RecommendPageClient() {
   const router = useRouter();
   const params = useParams<{ filters?: string[] | string }>();
@@ -51,12 +59,16 @@ function RecommendPageClient() {
   );
 
   const keyword = searchParams.get('keyword')?.trim() ?? '';
+  const hasIrregularFilter = typeof filters.isIrregular === 'boolean';
+
+  const hasActiveSearchOrFilters =
+    Boolean(keyword) ||
+    filters.category !== 'categories' ||
+    Boolean(filters.sort) ||
+    hasIrregularFilter;
 
   const addToDictionaryMutation = useMutation({
-    mutationFn: async (word: WordItem) => {
-      setAddingWordId(word._id);
-      return wordsService.addWordFromRecommend(word._id);
-    },
+    mutationFn: (word: WordItem) => wordsService.addWordFromRecommend(word._id),
     onSuccess: async () => {
       toast.success('Word added to dictionary.');
 
@@ -64,12 +76,13 @@ function RecommendPageClient() {
         queryClient.invalidateQueries({ queryKey: ['recommend-words'] }),
         queryClient.invalidateQueries({ queryKey: ['dictionary-words'] }),
         queryClient.invalidateQueries({ queryKey: ['words-statistics'] }),
+        queryClient.invalidateQueries({ queryKey: ['recommend-own-words'] }),
       ]);
     },
-    onError: (error) => {
+    onError: (mutationError) => {
       toast.error(
-        error instanceof Error
-          ? error.message
+        mutationError instanceof Error
+          ? mutationError.message
           : 'Failed to add word to dictionary.'
       );
     },
@@ -79,6 +92,9 @@ function RecommendPageClient() {
   });
 
   const handleAddToDictionary = async (word: WordItem) => {
+    if (word.owner) return;
+
+    setAddingWordId(word._id);
     await addToDictionaryMutation.mutateAsync(word);
   };
 
@@ -91,15 +107,38 @@ function RecommendPageClient() {
       filters.page,
       filters.sort,
     ],
+    queryFn: async () => {
+      try {
+        return await wordsService.getAllWords({
+          keyword,
+          category: filters.category,
+          isIrregular:
+            filters.category === 'verb' ? filters.isIrregular : undefined,
+          page: filters.page,
+          limit: WORDS_PER_PAGE,
+          sort: filters.sort,
+        });
+      } catch (queryError) {
+        if (hasActiveSearchOrFilters) {
+          return {
+            results: [],
+            totalPages: 1,
+            page: filters.page,
+            perPage: WORDS_PER_PAGE,
+          };
+        }
+
+        throw queryError;
+      }
+    },
+  });
+
+  const { data: ownWordsData } = useQuery({
+    queryKey: ['recommend-own-words'],
     queryFn: () =>
-      wordsService.getAllWords({
-        keyword,
-        category: filters.category,
-        isIrregular:
-          filters.category === 'verb' ? filters.isIrregular : undefined,
-        page: filters.page,
-        limit: WORDS_PER_PAGE,
-        sort: filters.sort,
+      wordsService.getOwnWords({
+        page: 1,
+        limit: 1000,
       }),
   });
 
@@ -113,7 +152,38 @@ function RecommendPageClient() {
     );
   }, [isError, error]);
 
-  const rows: WordItem[] = data?.results ?? [];
+  const ownWordsMap = useMemo(() => {
+    const map = new Map<string, WordItem>();
+
+    for (const word of ownWordsData?.results ?? []) {
+      map.set(normalizeWordKey(word), word);
+    }
+
+    return map;
+  }, [ownWordsData?.results]);
+
+  const rows: WordItem[] = useMemo(() => {
+    return (data?.results ?? []).map((word) => {
+      const ownWord = ownWordsMap.get(normalizeWordKey(word));
+
+      if (!ownWord) {
+        return {
+          ...word,
+          progress:
+            typeof word.progress === 'number'
+              ? word.progress
+              : Number(word.progress) || 0,
+        };
+      }
+
+      return {
+        ...word,
+        owner: ownWord.owner,
+        progress: ownWord.progress,
+      };
+    });
+  }, [data?.results, ownWordsMap]);
+
   const totalPages = data?.totalPages ?? 1;
   const currentPage = data?.page ?? filters.page;
 
@@ -190,7 +260,7 @@ function RecommendPageClient() {
         ) : rows.length === 0 ? (
           <EmptyState
             title="No recommended words found"
-            text="Try changing the search query or selected category."
+            text="There are no words matching your current search or filters."
             imageSrc="/training-empty.png"
             imageWidth={190}
             imageHeight={190}
