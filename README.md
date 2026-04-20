@@ -24,7 +24,7 @@ The project focuses on a polished user experience, reusable architecture, clear 
 ## Live Demo
 
 ```txt
-https://your-vocabbuilder-domain.vercel.app
+https://vocab-builder-nine.vercel.app/
 ```
 
 ---
@@ -255,7 +255,7 @@ Create a `.env.local` file in the project root.
 
 ```env
 NEXT_PUBLIC_API_URL=https://vocab-builder-backend.p.goit.global/api
-NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
+NEXT_PUBLIC_SITE_URL=https://vocab-builder-nine.vercel.app
 ```
 
 ---
@@ -265,7 +265,7 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/Natalia-Skoropad/vocab-builder
 cd vocab-builder
 ```
 
