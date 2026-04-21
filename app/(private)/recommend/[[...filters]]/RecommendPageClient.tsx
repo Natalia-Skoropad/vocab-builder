@@ -226,12 +226,7 @@ function RecommendPageClient() {
         <section className="container">
           <Breadcrumbs items={breadcrumbItems} />
 
-          <Dashboard
-            variant="recommend"
-            totalCount={0}
-            showAddWord={false}
-            showTrainLink
-          />
+          <Dashboard variant="recommend" showAddWord={false} showTrainLink />
 
           <EmptyState
             title="Something went wrong"
@@ -250,12 +245,7 @@ function RecommendPageClient() {
       <section className="container">
         <Breadcrumbs items={breadcrumbItems} />
 
-        <Dashboard
-          variant="recommend"
-          totalCount={0}
-          showAddWord={false}
-          showTrainLink
-        />
+        <Dashboard variant="recommend" showAddWord={false} showTrainLink />
 
         {isLoading && !data ? (
           <div className={css.loaderWrap}>

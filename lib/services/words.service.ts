@@ -8,6 +8,7 @@ import {
   parseClientJsonSafe,
   throwIfResponseNotOk,
 } from '@/lib/api/client-response';
+
 import { isStatisticsResponse } from '@/lib/words/words-response';
 
 //===============================================================
@@ -31,6 +32,10 @@ type EditWordParams = {
 
 //===============================================================
 
+const LEARNED_COUNT_FALLBACK_LIMIT = 1000;
+
+//===============================================================
+
 function isWordItem(data: unknown): data is WordItem {
   return (
     !!data &&
@@ -42,6 +47,8 @@ function isWordItem(data: unknown): data is WordItem {
   );
 }
 
+//===============================================================
+
 function assertWordItem(
   data: unknown,
   fallbackMessage: string
@@ -50,6 +57,8 @@ function assertWordItem(
     throw new Error(fallbackMessage);
   }
 }
+
+//===============================================================
 
 function buildWordsQuery(params: WordsQueryParams = {}) {
   const searchParams = new URLSearchParams();
@@ -84,6 +93,23 @@ function buildWordsQuery(params: WordsQueryParams = {}) {
 
   return searchParams.toString();
 }
+
+//===============================================================
+
+function getLearnedWordsCountFromResults(
+  results: Array<{ progress: number | string }>
+): number {
+  return results.filter((word) => {
+    const progress =
+      typeof word.progress === 'number'
+        ? word.progress
+        : Number(word.progress) || 0;
+
+    return progress >= 100;
+  }).length;
+}
+
+//===============================================================
 
 async function parseWordsResponse(
   response: Response,
@@ -148,6 +174,17 @@ async function getStatistics(): Promise<WordsStatisticsResponse> {
   }
 
   return data;
+}
+
+//===============================================================
+
+async function getLearnedWordsCount(): Promise<number> {
+  const response = await getOwnWords({
+    page: 1,
+    limit: LEARNED_COUNT_FALLBACK_LIMIT,
+  });
+
+  return getLearnedWordsCountFromResults(response.results);
 }
 
 //===============================================================
@@ -240,6 +277,7 @@ export const wordsService = {
   getOwnWords,
   getAllWords,
   getStatistics,
+  getLearnedWordsCount,
   deleteWord,
   createWord,
   editWord,

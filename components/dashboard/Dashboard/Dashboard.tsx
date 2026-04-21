@@ -17,6 +17,8 @@ import css from './Dashboard.module.css';
 type Props = {
   variant: 'dictionary' | 'recommend';
   totalCount?: number;
+  learnedCount?: number;
+  useFallbackStatistics?: boolean;
   showAddWord?: boolean;
   showTrainLink?: boolean;
   onAddWord?: () => void;
@@ -27,7 +29,9 @@ type Props = {
 
 function Dashboard({
   variant,
-  totalCount = 0,
+  totalCount,
+  learnedCount,
+  useFallbackStatistics = true,
   showAddWord = false,
   showTrainLink = true,
   onAddWord,
@@ -69,7 +73,11 @@ function Dashboard({
 
       <div className={css.metaRow}>
         <div className={css.statisticsWrap}>
-          <Statistics totalCount={totalCount} />
+          <Statistics
+            totalCount={totalCount}
+            learnedCount={learnedCount}
+            useFallbackQueries={useFallbackStatistics}
+          />
         </div>
 
         <div className={css.actionsWrap}>

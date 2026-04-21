@@ -39,6 +39,8 @@ function isTrainingTaskItem(data: unknown): data is TrainingTask {
   );
 }
 
+//===============================================================
+
 function isRawTrainingTasksResponse(
   data: unknown
 ): data is RawTrainingTasksResponse {
@@ -49,6 +51,8 @@ function isRawTrainingTasksResponse(
       Array.isArray((data as { tasks?: unknown[] }).tasks))
   );
 }
+
+//===============================================================
 
 function normalizeTrainingTasksResponse(
   data: RawTrainingTasksResponse
@@ -90,6 +94,8 @@ async function getTasks(): Promise<TrainingTasksResponse> {
 
   return normalizedData;
 }
+
+//===============================================================
 
 async function submitAnswers(
   payload: TrainingSubmitPayload

@@ -13,51 +13,39 @@ type Props = {
   totalCount?: number;
   learnedCount?: number;
   className?: string;
+  useFallbackQueries?: boolean;
 };
 
 //===============================================================
 
-function getLearnedWordsCountFromResults(
-  results: Array<{ progress: number | string }>
-): number {
-  return results.filter((word) => {
-    const progress =
-      typeof word.progress === 'number'
-        ? word.progress
-        : Number(word.progress) || 0;
+function Statistics({
+  totalCount,
+  learnedCount,
+  className,
+  useFallbackQueries = true,
+}: Props) {
+  const shouldFetchTotalCount =
+    useFallbackQueries && typeof totalCount !== 'number';
 
-    return progress >= 100;
-  }).length;
-}
+  const shouldFetchLearnedCount =
+    useFallbackQueries && typeof learnedCount !== 'number';
 
-//===============================================================
-
-function Statistics({ totalCount = 0, learnedCount, className }: Props) {
   const { data: statisticsData } = useQuery({
     queryKey: ['words-statistics'],
     queryFn: wordsService.getStatistics,
+    enabled: shouldFetchTotalCount,
+    staleTime: 60_000,
   });
 
-  const shouldFetchLearnedCount = typeof learnedCount !== 'number';
-
-  const { data: learnedWordsCount = 0 } = useQuery({
+  const { data: fallbackLearnedCount } = useQuery({
     queryKey: ['words-learned-count'],
-    queryFn: async () => {
-      const response = await wordsService.getOwnWords({
-        page: 1,
-        limit: 1000,
-      });
-
-      return getLearnedWordsCountFromResults(response.results);
-    },
+    queryFn: wordsService.getLearnedWordsCount,
     enabled: shouldFetchLearnedCount,
     staleTime: 60_000,
   });
 
-  const toStudyValue = statisticsData?.totalCount ?? totalCount;
-
-  const learnedValue =
-    typeof learnedCount === 'number' ? learnedCount : learnedWordsCount;
+  const toStudyValue = totalCount ?? statisticsData?.totalCount ?? 0;
+  const learnedValue = learnedCount ?? fallbackLearnedCount ?? 0;
 
   return (
     <div className={clsx(css.statisticsWrap, className)}>
