@@ -46,18 +46,6 @@
   min-width: 220px;
 }
 
-.secondaryButton {
-  background-color: transparent;
-  color: var(--green-main);
-  border: 1px solid var(--green-main);
-}
-
-.secondaryButton:hover,
-.secondaryButton:focus-visible {
-  background-color: rgba(133, 170, 159, 0.08);
-  opacity: 1;
-}
-
 .imageWrap {
   display: flex;
   align-items: center;

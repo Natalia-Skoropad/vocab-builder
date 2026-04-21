@@ -7,15 +7,20 @@ import css from './Button.module.css';
 
 //===============================================================
 
+type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'dark'
+  | 'light'
+  | 'outlineGreen';
+
+type LegacyDisabledVariant = 'disabled' | 'disabledAuth';
+
+type DisabledStyle = 'default' | 'auth';
+
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?:
-    | 'primary'
-    | 'secondary'
-    | 'dark'
-    | 'light'
-    | 'disabled'
-    | 'disabledAuth'
-    | 'outlineGreen';
+  variant?: ButtonVariant | LegacyDisabledVariant;
+  disabledStyle?: DisabledStyle;
   fullWidth?: boolean;
 };
 
@@ -23,6 +28,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 function Button({
   variant = 'primary',
+  disabledStyle = 'default',
   className,
   type = 'button',
   children,
@@ -30,23 +36,38 @@ function Button({
   fullWidth = true,
   ...props
 }: Props) {
-  const isDisabled =
-    disabled || variant === 'disabled' || variant === 'disabledAuth';
+  const isLegacyDisabledVariant =
+    variant === 'disabled' || variant === 'disabledAuth';
+
+  const isDisabled = Boolean(disabled) || isLegacyDisabledVariant;
+
+  const resolvedVariant: ButtonVariant =
+    variant === 'disabled'
+      ? 'light'
+      : variant === 'disabledAuth'
+      ? 'primary'
+      : variant;
+
+  const resolvedDisabledStyle: DisabledStyle =
+    variant === 'disabledAuth'
+      ? 'auth'
+      : variant === 'disabled'
+      ? 'default'
+      : disabledStyle;
 
   return (
     <button
       type={type}
       disabled={isDisabled}
+      data-disabled-style={isDisabled ? resolvedDisabledStyle : undefined}
       className={clsx(
         css.button,
         {
-          [css.primary]: variant === 'primary',
-          [css.secondary]: variant === 'secondary',
-          [css.dark]: variant === 'dark',
-          [css.light]: variant === 'light',
-          [css.disabled]: variant === 'disabled',
-          [css.disabledAuth]: variant === 'disabledAuth',
-          [css.outlineGreen]: variant === 'outlineGreen',
+          [css.primary]: resolvedVariant === 'primary',
+          [css.secondary]: resolvedVariant === 'secondary',
+          [css.dark]: resolvedVariant === 'dark',
+          [css.light]: resolvedVariant === 'light',
+          [css.outlineGreen]: resolvedVariant === 'outlineGreen',
           [css.fullWidth]: fullWidth,
         },
         className

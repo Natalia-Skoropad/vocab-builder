@@ -74,30 +74,6 @@
   background-color: var(--text-white);
 }
 
-/* disabled for auth pages */
-.disabledAuth {
-  background-color: var(--disabled-bg-green-soft);
-  color: var(--disabled-text-neutral-soft);
-  border-color: transparent;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* disabled for modal / green surfaces */
-.disabled {
-  background-color: var(--border-3);
-  color: var(--disabled-text-neutral);
-  border-color: transparent;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.secondary:disabled {
-  background-color: var(--disabled-bg-white-soft);
-  color: var(--disabled-text-on-dark);
-  border-color: var(--disabled-border-white);
-}
-
 .outlineGreen {
   background-color: var(--background-1);
   color: var(--green-main);
@@ -109,6 +85,31 @@
   background-color: var(--surface-hover-light);
   color: var(--green-main);
   border-color: var(--green-main);
+}
+
+/* disabled state styles */
+.button:disabled[data-disabled-style='auth'] {
+  background-color: var(--disabled-bg-green-soft);
+  color: var(--disabled-text-neutral-soft);
+  border-color: transparent;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.button:disabled[data-disabled-style='default'] {
+  background-color: var(--border-3);
+  color: var(--disabled-text-neutral);
+  border-color: transparent;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.secondary:disabled {
+  background-color: var(--disabled-bg-white-soft);
+  color: var(--disabled-text-on-dark);
+  border-color: var(--disabled-border-white);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .outlineGreen:disabled {

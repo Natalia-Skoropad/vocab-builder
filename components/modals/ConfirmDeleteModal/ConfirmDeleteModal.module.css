@@ -42,16 +42,6 @@
   min-width: 0;
 }
 
-.cancelButton {
-  color: var(--background-1);
-  border-color: var(--border-3);
-}
-
-.cancelButton:hover,
-.cancelButton:focus-visible {
-  background-color: rgba(252, 252, 252, 0.08);
-}
-
 @media only screen and (min-width: 768px) {
   .title {
     margin-bottom: 18px;

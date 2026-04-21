@@ -43,14 +43,15 @@ function ConfirmDeleteModal({
             'Do you really want to delete this word?'
           )}
         </p>
-        
+
         <ul className={css.actions}>
           <li>
             <Button
               type="button"
-              variant={isSubmitting ? 'disabled' : 'light'}
-              className={css.confirmButton}
+              variant="light"
               disabled={isSubmitting}
+              disabledStyle="default"
+              className={css.confirmButton}
               onClick={onConfirm}
             >
               {isSubmitting ? 'Deleting...' : 'Delete'}
