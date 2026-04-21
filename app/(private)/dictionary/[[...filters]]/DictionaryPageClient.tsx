@@ -36,6 +36,7 @@ import css from './page.module.css';
 //===============================================================
 
 const WORDS_PER_PAGE = 7;
+const PROGRESS_FILTER_FALLBACK_LIMIT = 1000;
 
 //===============================================================
 
@@ -172,7 +173,7 @@ function DictionaryPageClient() {
         const allData = await wordsService.getOwnWords({
           ...queryParams,
           page: 1,
-          limit: 1000,
+          limit: PROGRESS_FILTER_FALLBACK_LIMIT,
           newWordId: undefined,
         });
 
@@ -211,11 +212,6 @@ function DictionaryPageClient() {
     },
   });
 
-  const { data: statistics } = useQuery({
-    queryKey: ['words-statistics'],
-    queryFn: wordsService.getStatistics,
-  });
-
   const deleteMutation = useMutation({
     mutationFn: (id: string) => wordsService.deleteWord(id),
     onSuccess: (result) => {
@@ -247,7 +243,6 @@ function DictionaryPageClient() {
   const rows = data?.results ?? [];
   const totalPages = data?.totalPages ?? 1;
   const currentPage = data?.page ?? routeFilters.page;
-  const totalCount = statistics?.totalCount ?? 0;
 
   const handlePageChange = (nextPage: number) => {
     const nextPath = buildWordsPath('/dictionary', {
@@ -295,7 +290,6 @@ function DictionaryPageClient() {
 
           <Dashboard
             variant="dictionary"
-            totalCount={totalCount}
             showAddWord
             showTrainLink
             onAddWord={() => setIsAddModalOpen(true)}
@@ -325,7 +319,6 @@ function DictionaryPageClient() {
 
         <Dashboard
           variant="dictionary"
-          totalCount={totalCount}
           showAddWord
           showTrainLink
           onAddWord={() => setIsAddModalOpen(true)}
