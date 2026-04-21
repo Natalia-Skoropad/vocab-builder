@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
 
@@ -21,6 +21,10 @@ type Props = {
   className?: string;
   variant?: 'page' | 'modal';
   isActive?: boolean;
+  buttonId?: string;
+  menuId?: string;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
 };
 
 //===============================================================
@@ -33,9 +37,17 @@ function CustomSelect({
   className,
   variant = 'page',
   isActive = false,
+  buttonId,
+  menuId,
+  ariaLabel,
+  ariaLabelledBy,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+
+  const reactId = useId();
+  const triggerId = buttonId ?? `custom-select-trigger-${reactId}`;
+  const listboxId = menuId ?? `custom-select-listbox-${reactId}`;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -61,6 +73,10 @@ function CustomSelect({
 
   const selectedOption = options.find((option) => option.value === value);
 
+  const labelledBy = ariaLabelledBy
+    ? `${ariaLabelledBy} ${triggerId}`
+    : undefined;
+
   return (
     <div
       ref={rootRef}
@@ -71,6 +87,7 @@ function CustomSelect({
       )}
     >
       <button
+        id={triggerId}
         type="button"
         className={clsx(
           css.trigger,
@@ -82,6 +99,9 @@ function CustomSelect({
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
+        aria-controls={listboxId}
+        aria-label={ariaLabel}
+        aria-labelledby={labelledBy}
       >
         <span className={css.triggerText}>
           {selectedOption?.label ?? placeholder}
@@ -95,8 +115,10 @@ function CustomSelect({
 
       {isOpen ? (
         <ul
+          id={listboxId}
           className={clsx(css.menu, variant === 'modal' && css.modalMenu)}
           role="listbox"
+          aria-labelledby={ariaLabelledBy}
         >
           {options.map((option) => {
             const isSelected = option.value === value;

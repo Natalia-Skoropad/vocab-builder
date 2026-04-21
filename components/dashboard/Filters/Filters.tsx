@@ -67,9 +67,18 @@ function Filters({
   onAppliedStateChange,
 }: Props) {
   const searchId = useId();
-  const categoryId = useId();
-  const sortId = useId();
-  const progressId = useId();
+
+  const sortLabelId = useId();
+  const progressLabelId = useId();
+  const categoryLabelId = useId();
+
+  const sortButtonId = useId();
+  const progressButtonId = useId();
+  const categoryButtonId = useId();
+
+  const sortMenuId = useId();
+  const progressMenuId = useId();
+  const categoryMenuId = useId();
 
   const router = useRouter();
   const params = useParams<{ filters?: string[] | string }>();
@@ -277,6 +286,7 @@ function Filters({
               onChange={(nextValue) => setSort(nextValue as SortValue)}
               placeholder="Sort"
               isActive={hasAppliedSort}
+              ariaLabel="Sort words"
             />
           </div>
 
@@ -287,6 +297,7 @@ function Filters({
               onChange={(nextValue) => setProgress(nextValue as ProgressValue)}
               placeholder="Progress"
               isActive={hasAppliedProgress}
+              ariaLabel="Filter by progress"
             />
           </div>
 
@@ -299,6 +310,7 @@ function Filters({
               }
               placeholder="Categories"
               isActive={hasAppliedCategory}
+              ariaLabel="Filter by category"
             />
           </div>
 
@@ -333,9 +345,9 @@ function Filters({
 
             <div className={css.panelContent}>
               <div className={css.panelField}>
-                <label htmlFor={sortId} className={css.panelLabel}>
+                <span id={sortLabelId} className={css.panelLabel}>
                   Sort
-                </label>
+                </span>
 
                 <CustomSelect
                   value={sort}
@@ -344,13 +356,16 @@ function Filters({
                   placeholder="Sort"
                   variant="modal"
                   isActive={hasAppliedSort}
+                  buttonId={sortButtonId}
+                  menuId={sortMenuId}
+                  ariaLabelledBy={sortLabelId}
                 />
               </div>
 
               <div className={css.panelField}>
-                <label htmlFor={progressId} className={css.panelLabel}>
+                <span id={progressLabelId} className={css.panelLabel}>
                   Progress
-                </label>
+                </span>
 
                 <CustomSelect
                   value={progress}
@@ -361,13 +376,16 @@ function Filters({
                   placeholder="Progress"
                   variant="modal"
                   isActive={hasAppliedProgress}
+                  buttonId={progressButtonId}
+                  menuId={progressMenuId}
+                  ariaLabelledBy={progressLabelId}
                 />
               </div>
 
               <div className={css.panelField}>
-                <label htmlFor={categoryId} className={css.panelLabel}>
+                <span id={categoryLabelId} className={css.panelLabel}>
                   Category
-                </label>
+                </span>
 
                 <CustomSelect
                   value={category}
@@ -378,6 +396,9 @@ function Filters({
                   placeholder="Categories"
                   variant="modal"
                   isActive={hasAppliedCategory}
+                  buttonId={categoryButtonId}
+                  menuId={categoryMenuId}
+                  ariaLabelledBy={categoryLabelId}
                 />
               </div>
 
