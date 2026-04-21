@@ -1,5 +1,4 @@
 import type { TrainingSubmitResponse } from '@/types/training';
-import type { WordsResponse } from '@/types/word';
 
 //===============================================================
 
@@ -33,9 +32,12 @@ export function throwIfResponseNotOk(
 
 //===============================================================
 
-export function assertPaginatedWordsResponse(
-  data: unknown
-): asserts data is WordsResponse {
+export function assertPaginatedWordsResponse(data: unknown): asserts data is {
+  results: unknown[];
+  totalPages: number;
+  page: number;
+  perPage: number;
+} {
   if (
     !data ||
     typeof data !== 'object' ||

@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
-import type { WordItem } from '@/types/word';
+import type { RecommendedWordItem, WordItem } from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
 
 import {
@@ -26,22 +26,27 @@ import css from './page.module.css';
 //===============================================================
 
 const WORDS_PER_PAGE = 7;
+const OWN_WORDS_LOOKUP_LIMIT = 1000;
+const PROGRESS_FILTER_FALLBACK_LIMIT = 1000;
 
 //===============================================================
 
-function normalizeWordKey(word: Pick<WordItem, 'en' | 'ua' | 'category'>) {
+function normalizeWordKey(
+  word: Pick<RecommendedWordItem | WordItem, 'en' | 'ua' | 'category'>
+) {
   return `${word.en.trim().toLowerCase()}__${word.ua
     .trim()
     .toLowerCase()}__${word.category.trim().toLowerCase()}`;
 }
 
 function filterRowsByProgress(
-  rows: WordItem[],
+  rows: RecommendedWordItem[],
   progressFilter?: WordProgressFilter
-): WordItem[] {
+): RecommendedWordItem[] {
   if (!progressFilter) return rows;
 
   const target = Number(progressFilter);
+
   return rows.filter((row) => Math.round(Number(row.progress) || 0) === target);
 }
 
@@ -80,7 +85,8 @@ function RecommendPageClient() {
     Boolean(filters.progress);
 
   const addToDictionaryMutation = useMutation({
-    mutationFn: (word: WordItem) => wordsService.addWordFromRecommend(word._id),
+    mutationFn: (word: RecommendedWordItem) =>
+      wordsService.addWordFromRecommend(word._id),
     onSuccess: async () => {
       toast.success('Word added to dictionary.');
 
@@ -123,7 +129,7 @@ function RecommendPageClient() {
     queryFn: () =>
       wordsService.getOwnWords({
         page: 1,
-        limit: 1000,
+        limit: OWN_WORDS_LOOKUP_LIMIT,
       }),
     placeholderData: (previousData) => previousData,
   });
@@ -138,7 +144,7 @@ function RecommendPageClient() {
       const allData = await wordsService.getAllWords({
         ...queryParams,
         page: 1,
-        limit: 1000,
+        limit: PROGRESS_FILTER_FALLBACK_LIMIT,
       });
 
       const filtered = filterRowsByProgress(allData.results, filters.progress);
@@ -160,11 +166,11 @@ function RecommendPageClient() {
     placeholderData: (previousData) => previousData,
   });
 
-  const rows = useMemo(() => {
+  const rows = useMemo<WordItem[]>(() => {
     const recommendRows = data?.results ?? [];
     const ownWords = ownWordsData?.results ?? [];
 
-    if (!recommendRows.length || !ownWords.length) return recommendRows;
+    if (!recommendRows.length) return [];
 
     const ownWordsMap = new Map(
       ownWords.map((word) => [normalizeWordKey(word), word])
@@ -173,12 +179,10 @@ function RecommendPageClient() {
     return recommendRows.map((word) => {
       const matchedOwnWord = ownWordsMap.get(normalizeWordKey(word));
 
-      if (!matchedOwnWord) return word;
-
       return {
         ...word,
-        owner: matchedOwnWord.owner,
-        progress: matchedOwnWord.progress,
+        owner: matchedOwnWord?.owner ?? word.owner,
+        progress: matchedOwnWord?.progress ?? word.progress ?? 0,
       };
     });
   }, [data?.results, ownWordsData?.results]);

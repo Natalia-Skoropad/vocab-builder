@@ -1,5 +1,13 @@
 import type { AddWordFormValues } from '@/types/forms';
-import type { WordsResponse, WordItem, WordsQueryParams } from '@/types/word';
+
+import type {
+  OwnWordsResponse,
+  RecommendedWordItem,
+  RecommendedWordsResponse,
+  WordItem,
+  WordsQueryParams,
+} from '@/types/word';
+
 import type { WordsStatisticsResponse } from '@/types/statistics';
 
 import {
@@ -36,7 +44,13 @@ const LEARNED_COUNT_FALLBACK_LIMIT = 1000;
 
 //===============================================================
 
-function isWordItem(data: unknown): data is WordItem {
+function isBaseWordShape(data: unknown): data is {
+  _id: string;
+  en: string;
+  ua: string;
+  category: string;
+  isIrregular?: boolean;
+} {
   return (
     !!data &&
     typeof data === 'object' &&
@@ -47,18 +61,49 @@ function isWordItem(data: unknown): data is WordItem {
   );
 }
 
-//===============================================================
+function isOwnWordItem(data: unknown): data is WordItem {
+  return (
+    isBaseWordShape(data) &&
+    typeof (data as { progress?: unknown }).progress === 'number'
+  );
+}
 
-function assertWordItem(
+function isRecommendedWordItem(data: unknown): data is RecommendedWordItem {
+  return (
+    isBaseWordShape(data) &&
+    (typeof (data as { progress?: unknown }).progress === 'number' ||
+      typeof (data as { progress?: unknown }).progress === 'undefined')
+  );
+}
+
+function assertOwnWordItem(
   data: unknown,
   fallbackMessage: string
 ): asserts data is WordItem {
-  if (!isWordItem(data)) {
+  if (!isOwnWordItem(data)) {
     throw new Error(fallbackMessage);
   }
 }
 
-//===============================================================
+function assertOwnWordsResponse(
+  data: unknown
+): asserts data is OwnWordsResponse {
+  assertPaginatedWordsResponse(data);
+
+  if (!data.results.every(isOwnWordItem)) {
+    throw new Error('Invalid words response.');
+  }
+}
+
+function assertRecommendedWordsResponse(
+  data: unknown
+): asserts data is RecommendedWordsResponse {
+  assertPaginatedWordsResponse(data);
+
+  if (!data.results.every(isRecommendedWordItem)) {
+    throw new Error('Invalid recommended words response.');
+  }
+}
 
 function buildWordsQuery(params: WordsQueryParams = {}) {
   const searchParams = new URLSearchParams();
@@ -94,8 +139,6 @@ function buildWordsQuery(params: WordsQueryParams = {}) {
   return searchParams.toString();
 }
 
-//===============================================================
-
 function getLearnedWordsCountFromResults(
   results: Array<{ progress: number | string }>
 ): number {
@@ -109,18 +152,30 @@ function getLearnedWordsCountFromResults(
   }).length;
 }
 
-//===============================================================
-
-async function parseWordsResponse(
+async function parseOwnWordsResponse(
   response: Response,
   fallbackMessage: string
-): Promise<WordsResponse> {
-  const data = await parseClientJsonSafe<WordsResponse | ErrorResponse>(
+): Promise<OwnWordsResponse> {
+  const data = await parseClientJsonSafe<OwnWordsResponse | ErrorResponse>(
     response
   );
 
   throwIfResponseNotOk(response, data, fallbackMessage);
-  assertPaginatedWordsResponse(data);
+  assertOwnWordsResponse(data);
+
+  return data;
+}
+
+async function parseRecommendedWordsResponse(
+  response: Response,
+  fallbackMessage: string
+): Promise<RecommendedWordsResponse> {
+  const data = await parseClientJsonSafe<
+    RecommendedWordsResponse | ErrorResponse
+  >(response);
+
+  throwIfResponseNotOk(response, data, fallbackMessage);
+  assertRecommendedWordsResponse(data);
 
   return data;
 }
@@ -129,7 +184,7 @@ async function parseWordsResponse(
 
 async function getOwnWords(
   params: WordsQueryParams = {}
-): Promise<WordsResponse> {
+): Promise<OwnWordsResponse> {
   const query = buildWordsQuery(params);
   const url = `/api/words/own${query ? `?${query}` : ''}`;
 
@@ -138,12 +193,12 @@ async function getOwnWords(
     cache: 'no-store',
   });
 
-  return parseWordsResponse(response, 'Failed to fetch words.');
+  return parseOwnWordsResponse(response, 'Failed to fetch words.');
 }
 
 async function getAllWords(
   params: WordsQueryParams = {}
-): Promise<WordsResponse> {
+): Promise<RecommendedWordsResponse> {
   const query = buildWordsQuery(params);
   const url = `/api/words/recommend${query ? `?${query}` : ''}`;
 
@@ -152,7 +207,10 @@ async function getAllWords(
     cache: 'no-store',
   });
 
-  return parseWordsResponse(response, 'Failed to fetch recommended words.');
+  return parseRecommendedWordsResponse(
+    response,
+    'Failed to fetch recommended words.'
+  );
 }
 
 //===============================================================
@@ -225,7 +283,7 @@ async function createWord(values: AddWordFormValues): Promise<WordItem> {
   const data = await parseClientJsonSafe<WordItem | ErrorResponse>(response);
 
   throwIfResponseNotOk(response, data, 'Failed to create word.');
-  assertWordItem(data, 'Invalid create response.');
+  assertOwnWordItem(data, 'Invalid create response.');
 
   return data;
 }
@@ -250,7 +308,7 @@ async function editWord(params: EditWordParams): Promise<WordItem> {
   const data = await parseClientJsonSafe<WordItem | ErrorResponse>(response);
 
   throwIfResponseNotOk(response, data, 'Failed to edit word.');
-  assertWordItem(data, 'Invalid edit response.');
+  assertOwnWordItem(data, 'Invalid edit response.');
 
   return data;
 }
@@ -266,7 +324,7 @@ async function addWordFromRecommend(id: string): Promise<WordItem> {
   const data = await parseClientJsonSafe<WordItem | ErrorResponse>(response);
 
   throwIfResponseNotOk(response, data, 'Failed to add word to dictionary.');
-  assertWordItem(data, 'Invalid add-to-dictionary response.');
+  assertOwnWordItem(data, 'Invalid add-to-dictionary response.');
 
   return data;
 }

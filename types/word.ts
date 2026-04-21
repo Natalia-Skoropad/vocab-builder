@@ -17,19 +17,34 @@ export type WordCategory =
 
 export type WordSort = 'a-z' | 'z-a';
 
-export type WordItem = {
+//===============================================================
+
+export type BaseWordItem = {
   _id: string;
   en: string;
   ua: string;
   category: WordCategory;
   isIrregular?: boolean;
+};
+
+export type WordItem = BaseWordItem & {
   owner?: string;
   progress: number;
 };
 
+export type RecommendedWordItem = BaseWordItem & {
+  owner?: string;
+  progress?: number;
+};
+
 //===============================================================
 
-export type WordsResponse = PaginatedResponse<WordItem>;
+export type OwnWordsResponse = PaginatedResponse<WordItem>;
+export type RecommendedWordsResponse = PaginatedResponse<RecommendedWordItem>;
+
+//===============================================================
+
+export type WordsResponse = OwnWordsResponse;
 
 export type WordsQueryParams = {
   keyword?: string;
