@@ -3,13 +3,20 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-hot-toast';
 
 import type { RecommendedWordItem, WordItem } from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
 
 import { type WordProgressFilter } from '@/lib/utils/dictionary.query';
 import { useWordsRouteState } from '@/hooks/useWordsRouteState';
+
+import {
+  invalidateRecommendDashboardQueries,
+  showMutationErrorToast,
+  showMutationSuccessToast,
+} from '@/lib/words/mutation-helpers';
+
+import { wordsQueryKeys } from '@/lib/words/query-keys';
 
 import Dashboard from '@/components/dashboard/Dashboard/Dashboard';
 import EmptyState from '@/components/common/EmptyState/EmptyState';
@@ -65,21 +72,16 @@ function RecommendPageClient() {
     mutationFn: (word: RecommendedWordItem) =>
       wordsService.addWordFromRecommend(word._id),
     onSuccess: async () => {
-      toast.success('Word added to dictionary.');
-
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['recommend-words'] }),
-        queryClient.invalidateQueries({ queryKey: ['dictionary-words'] }),
-        queryClient.invalidateQueries({ queryKey: ['words-statistics'] }),
-        queryClient.invalidateQueries({ queryKey: ['recommend-own-words'] }),
-        queryClient.invalidateQueries({ queryKey: ['words-learned-count'] }),
-      ]);
+      showMutationSuccessToast(
+        'Word added to dictionary.',
+        'Word added to dictionary.'
+      );
+      await invalidateRecommendDashboardQueries(queryClient);
     },
     onError: (mutationError) => {
-      toast.error(
-        mutationError instanceof Error
-          ? mutationError.message
-          : 'Failed to add word to dictionary.'
+      showMutationErrorToast(
+        mutationError,
+        'Failed to add word to dictionary.'
       );
     },
     onSettled: () => {
@@ -88,7 +90,7 @@ function RecommendPageClient() {
   });
 
   const { data: ownWordsData } = useQuery({
-    queryKey: ['recommend-own-words'],
+    queryKey: wordsQueryKeys.recommendOwn,
     queryFn: () =>
       wordsService.getOwnWords({
         page: 1,
@@ -98,7 +100,7 @@ function RecommendPageClient() {
   });
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['recommend-words', queryParams, filters.progress],
+    queryKey: wordsQueryKeys.recommend(queryParams, filters.progress),
     queryFn: async () => {
       if (!filters.progress) {
         return wordsService.getAllWords(queryParams);

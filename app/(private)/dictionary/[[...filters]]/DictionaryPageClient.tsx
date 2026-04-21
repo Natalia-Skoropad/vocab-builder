@@ -14,8 +14,17 @@ import {
   formatDictionaryCategoryLabel,
   type WordProgressFilter,
 } from '@/lib/utils/dictionary.query';
+
 import { useWordsRouteState } from '@/hooks/useWordsRouteState';
 import { useDictionaryModals } from '@/hooks/useDictionaryModals';
+
+import {
+  invalidateDictionaryDashboardQueries,
+  showMutationErrorToast,
+  showMutationSuccessToast,
+} from '@/lib/words/mutation-helpers';
+
+import { wordsQueryKeys } from '@/lib/words/query-keys';
 
 import Dashboard from '@/components/dashboard/Dashboard/Dashboard';
 import WordsTable from '@/components/words/WordsTable/WordsTable';
@@ -115,7 +124,7 @@ function DictionaryPageClient() {
   }, [hasIrregularFilter, routeFilters]);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['dictionary-words', queryParams, routeFilters.progress],
+    queryKey: wordsQueryKeys.dictionary(queryParams, routeFilters.progress),
     queryFn: async () => {
       try {
         if (!routeFilters.progress) {
@@ -166,29 +175,14 @@ function DictionaryPageClient() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => wordsService.deleteWord(id),
-    onSuccess: (result) => {
-      toast.success(result.message || 'Word deleted successfully.');
+    onSuccess: async (result) => {
+      showMutationSuccessToast(result.message, 'Word deleted successfully.');
 
       clearDeletingWord();
-
-      void queryClient.invalidateQueries({
-        queryKey: ['dictionary-words'],
-      });
-
-      void queryClient.invalidateQueries({
-        queryKey: ['words-statistics'],
-      });
-
-      void queryClient.invalidateQueries({
-        queryKey: ['words-learned-count'],
-      });
+      await invalidateDictionaryDashboardQueries(queryClient);
     },
     onError: (mutationError) => {
-      toast.error(
-        mutationError instanceof Error
-          ? mutationError.message
-          : 'Failed to delete word.'
-      );
+      showMutationErrorToast(mutationError, 'Failed to delete word.');
     },
   });
 

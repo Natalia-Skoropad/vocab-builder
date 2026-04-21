@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { useQuery } from '@tanstack/react-query';
 
 import { wordsService } from '@/lib/services/words.service';
+import { wordsQueryKeys } from '@/lib/words/query-keys';
 
 import css from './Statistics.module.css';
 
@@ -31,14 +32,14 @@ function Statistics({
     useFallbackQueries && typeof learnedCount !== 'number';
 
   const { data: statisticsData } = useQuery({
-    queryKey: ['words-statistics'],
+    queryKey: wordsQueryKeys.statistics,
     queryFn: wordsService.getStatistics,
     enabled: shouldFetchTotalCount,
     staleTime: 60_000,
   });
 
   const { data: fallbackLearnedCount } = useQuery({
-    queryKey: ['words-learned-count'],
+    queryKey: wordsQueryKeys.learnedCount,
     queryFn: wordsService.getLearnedWordsCount,
     enabled: shouldFetchLearnedCount,
     staleTime: 60_000,
