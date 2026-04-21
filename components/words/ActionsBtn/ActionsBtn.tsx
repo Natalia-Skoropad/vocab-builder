@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Ellipsis, PencilLine, Trash2 } from 'lucide-react';
 
 import type { WordItem } from '@/types/word';
@@ -20,6 +20,8 @@ type Props = {
 function ActionsBtn({ word, onEdit, onDelete }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+
+  const menuId = useId();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -52,41 +54,39 @@ function ActionsBtn({ word, onEdit, onDelete }: Props) {
         className={css.trigger}
         aria-label="Open word actions"
         aria-expanded={isOpen}
+        aria-haspopup="true"
+        aria-controls={isOpen ? menuId : undefined}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <Ellipsis className={css.triggerIcon} aria-hidden="true" />
       </button>
 
       {isOpen ? (
-        <ul className={css.menu} role="menu">
-          <li>
-            <button
-              type="button"
-              className={css.menuItem}
-              onClick={() => {
-                onEdit?.(word);
-                setIsOpen(false);
-              }}
-            >
-              <PencilLine className={css.menuIcon} aria-hidden="true" />
-              <span>Edit</span>
-            </button>
-          </li>
+        <div id={menuId} className={css.menu}>
+          <button
+            type="button"
+            className={css.menuItem}
+            onClick={() => {
+              onEdit?.(word);
+              setIsOpen(false);
+            }}
+          >
+            <PencilLine className={css.menuIcon} aria-hidden="true" />
+            <span>Edit</span>
+          </button>
 
-          <li>
-            <button
-              type="button"
-              className={css.menuItem}
-              onClick={() => {
-                onDelete?.(word);
-                setIsOpen(false);
-              }}
-            >
-              <Trash2 className={css.menuIcon} aria-hidden="true" />
-              <span>Delete</span>
-            </button>
-          </li>
-        </ul>
+          <button
+            type="button"
+            className={css.menuItem}
+            onClick={() => {
+              onDelete?.(word);
+              setIsOpen(false);
+            }}
+          >
+            <Trash2 className={css.menuIcon} aria-hidden="true" />
+            <span>Delete</span>
+          </button>
+        </div>
       ) : null}
     </div>
   );
