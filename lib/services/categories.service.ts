@@ -1,5 +1,10 @@
 import type { WordCategory } from '@/types/word';
 
+import {
+  parseClientJsonSafe,
+  throwIfResponseNotOk,
+} from '@/lib/api/client-response';
+
 //===============================================================
 
 type ErrorResponse = {
@@ -14,18 +19,11 @@ async function getCategories(): Promise<WordCategory[]> {
     cache: 'no-store',
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | WordCategory[]
-    | ErrorResponse
-    | null;
+  const data = await parseClientJsonSafe<WordCategory[] | ErrorResponse>(
+    response
+  );
 
-  if (!response.ok) {
-    throw new Error(
-      !Array.isArray(data) && data?.message
-        ? data.message
-        : 'Failed to fetch categories.'
-    );
-  }
+  throwIfResponseNotOk(response, data, 'Failed to fetch categories.');
 
   if (!Array.isArray(data)) {
     throw new Error('Invalid categories response.');

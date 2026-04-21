@@ -2,6 +2,14 @@ import type { AddWordFormValues } from '@/types/forms';
 import type { WordsResponse, WordItem, WordsQueryParams } from '@/types/word';
 import type { WordsStatisticsResponse } from '@/types/statistics';
 
+import {
+  assertDeleteResponse,
+  assertPaginatedWordsResponse,
+  parseClientJsonSafe,
+  throwIfResponseNotOk,
+} from '@/lib/api/client-response';
+import { isStatisticsResponse } from '@/lib/words/words-response';
+
 //===============================================================
 
 type ErrorResponse = {
@@ -23,16 +31,6 @@ type EditWordParams = {
 
 //===============================================================
 
-function isWordsStatisticsResponse(
-  data: unknown
-): data is WordsStatisticsResponse {
-  return (
-    !!data &&
-    typeof data === 'object' &&
-    typeof (data as { totalCount?: unknown }).totalCount === 'number'
-  );
-}
-
 function isWordItem(data: unknown): data is WordItem {
   return (
     !!data &&
@@ -42,6 +40,15 @@ function isWordItem(data: unknown): data is WordItem {
     typeof (data as { ua?: unknown }).ua === 'string' &&
     typeof (data as { category?: unknown }).category === 'string'
   );
+}
+
+function assertWordItem(
+  data: unknown,
+  fallbackMessage: string
+): asserts data is WordItem {
+  if (!isWordItem(data)) {
+    throw new Error(fallbackMessage);
+  }
 }
 
 function buildWordsQuery(params: WordsQueryParams = {}) {
@@ -82,29 +89,12 @@ async function parseWordsResponse(
   response: Response,
   fallbackMessage: string
 ): Promise<WordsResponse> {
-  const data = (await response.json().catch(() => null)) as
-    | WordsResponse
-    | ErrorResponse
-    | null;
+  const data = await parseClientJsonSafe<WordsResponse | ErrorResponse>(
+    response
+  );
 
-  if (!response.ok) {
-    throw new Error(
-      data && !('results' in data) && data.message
-        ? data.message
-        : fallbackMessage
-    );
-  }
-
-  if (
-    !data ||
-    !('results' in data) ||
-    !Array.isArray(data.results) ||
-    typeof data.totalPages !== 'number' ||
-    typeof data.page !== 'number' ||
-    typeof data.perPage !== 'number'
-  ) {
-    throw new Error('Invalid words response.');
-  }
+  throwIfResponseNotOk(response, data, fallbackMessage);
+  assertPaginatedWordsResponse(data);
 
   return data;
 }
@@ -147,20 +137,13 @@ async function getStatistics(): Promise<WordsStatisticsResponse> {
     cache: 'no-store',
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | WordsStatisticsResponse
-    | ErrorResponse
-    | null;
+  const data = await parseClientJsonSafe<
+    WordsStatisticsResponse | ErrorResponse
+  >(response);
 
-  if (!response.ok) {
-    throw new Error(
-      data && 'message' in data && data.message
-        ? data.message
-        : 'Failed to fetch statistics.'
-    );
-  }
+  throwIfResponseNotOk(response, data, 'Failed to fetch statistics.');
 
-  if (!isWordsStatisticsResponse(data)) {
+  if (!isStatisticsResponse(data)) {
     throw new Error('Invalid statistics response.');
   }
 
@@ -175,29 +158,14 @@ async function deleteWord(id: string): Promise<DeleteWordResponse> {
     cache: 'no-store',
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | DeleteWordResponse
-    | ErrorResponse
-    | null;
+  const data = await parseClientJsonSafe<DeleteWordResponse | ErrorResponse>(
+    response
+  );
 
-  if (!response.ok) {
-    throw new Error(
-      data && 'message' in data && data.message
-        ? data.message
-        : 'Failed to delete word.'
-    );
-  }
+  throwIfResponseNotOk(response, data, 'Failed to delete word.');
+  assertDeleteResponse(data);
 
-  if (
-    !data ||
-    typeof data !== 'object' ||
-    typeof (data as { id?: unknown }).id !== 'string' ||
-    typeof (data as { message?: unknown }).message !== 'string'
-  ) {
-    throw new Error('Invalid delete response.');
-  }
-
-  return data as DeleteWordResponse;
+  return data;
 }
 
 //===============================================================
@@ -217,22 +185,10 @@ async function createWord(values: AddWordFormValues): Promise<WordItem> {
     cache: 'no-store',
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | WordItem
-    | ErrorResponse
-    | null;
+  const data = await parseClientJsonSafe<WordItem | ErrorResponse>(response);
 
-  if (!response.ok) {
-    throw new Error(
-      data && 'message' in data && data.message
-        ? data.message
-        : 'Failed to create word.'
-    );
-  }
-
-  if (!isWordItem(data)) {
-    throw new Error('Invalid create response.');
-  }
+  throwIfResponseNotOk(response, data, 'Failed to create word.');
+  assertWordItem(data, 'Invalid create response.');
 
   return data;
 }
@@ -254,22 +210,10 @@ async function editWord(params: EditWordParams): Promise<WordItem> {
     cache: 'no-store',
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | WordItem
-    | ErrorResponse
-    | null;
+  const data = await parseClientJsonSafe<WordItem | ErrorResponse>(response);
 
-  if (!response.ok) {
-    throw new Error(
-      data && 'message' in data && data.message
-        ? data.message
-        : 'Failed to edit word.'
-    );
-  }
-
-  if (!isWordItem(data)) {
-    throw new Error('Invalid edit response.');
-  }
+  throwIfResponseNotOk(response, data, 'Failed to edit word.');
+  assertWordItem(data, 'Invalid edit response.');
 
   return data;
 }
@@ -282,22 +226,10 @@ async function addWordFromRecommend(id: string): Promise<WordItem> {
     cache: 'no-store',
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | WordItem
-    | ErrorResponse
-    | null;
+  const data = await parseClientJsonSafe<WordItem | ErrorResponse>(response);
 
-  if (!response.ok) {
-    throw new Error(
-      data && 'message' in data && data.message
-        ? data.message
-        : 'Failed to add word to dictionary.'
-    );
-  }
-
-  if (!isWordItem(data)) {
-    throw new Error('Invalid add-to-dictionary response.');
-  }
+  throwIfResponseNotOk(response, data, 'Failed to add word to dictionary.');
+  assertWordItem(data, 'Invalid add-to-dictionary response.');
 
   return data;
 }

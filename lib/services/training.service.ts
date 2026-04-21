@@ -5,6 +5,12 @@ import type {
   TrainingSubmitResponse,
 } from '@/types/training';
 
+import {
+  assertTrainingSubmitResponse,
+  parseClientJsonSafe,
+  throwIfResponseNotOk,
+} from '@/lib/api/client-response';
+
 //===============================================================
 
 type ErrorResponse = {
@@ -20,10 +26,6 @@ type RawTrainingTasksResponse =
     };
 
 //===============================================================
-
-function isErrorResponse(data: unknown): data is ErrorResponse {
-  return !!data && typeof data === 'object' && 'message' in data;
-}
 
 function isTrainingTaskItem(data: unknown): data is TrainingTask {
   return (
@@ -62,24 +64,6 @@ function normalizeTrainingTasksResponse(
   };
 }
 
-function isTrainingSubmitResponse(
-  data: unknown
-): data is TrainingSubmitResponse {
-  return (
-    Array.isArray(data) &&
-    data.every(
-      (item) =>
-        !!item &&
-        typeof item === 'object' &&
-        typeof item._id === 'string' &&
-        typeof item.en === 'string' &&
-        typeof item.ua === 'string' &&
-        (item.task === 'en' || item.task === 'ua') &&
-        typeof item.isDone === 'boolean'
-    )
-  );
-}
-
 //===============================================================
 
 async function getTasks(): Promise<TrainingTasksResponse> {
@@ -88,15 +72,11 @@ async function getTasks(): Promise<TrainingTasksResponse> {
     cache: 'no-store',
   });
 
-  const data: unknown = await response.json().catch(() => null);
+  const data = await parseClientJsonSafe<
+    TrainingTasksResponse | RawTrainingTasksResponse | ErrorResponse
+  >(response);
 
-  if (!response.ok) {
-    throw new Error(
-      isErrorResponse(data) && typeof data.message === 'string'
-        ? data.message
-        : 'Failed to fetch training tasks.'
-    );
-  }
+  throwIfResponseNotOk(response, data, 'Failed to fetch training tasks.');
 
   if (!isRawTrainingTasksResponse(data)) {
     throw new Error('Invalid training tasks response.');
@@ -123,19 +103,12 @@ async function submitAnswers(
     cache: 'no-store',
   });
 
-  const data: unknown = await response.json().catch(() => null);
+  const data = await parseClientJsonSafe<
+    TrainingSubmitResponse | ErrorResponse
+  >(response);
 
-  if (!response.ok) {
-    throw new Error(
-      isErrorResponse(data) && typeof data.message === 'string'
-        ? data.message
-        : 'Failed to save training answers.'
-    );
-  }
-
-  if (!isTrainingSubmitResponse(data)) {
-    throw new Error('Invalid training submit response.');
-  }
+  throwIfResponseNotOk(response, data, 'Failed to save training answers.');
+  assertTrainingSubmitResponse(data);
 
   return data;
 }
