@@ -4,14 +4,19 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { RecommendedWordItem, WordItem } from '@/types/word';
+import type {
+  OwnWordsResponse,
+  RecommendedWordItem,
+  WordItem,
+} from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
 
 import { type WordProgressFilter } from '@/lib/utils/dictionary.query';
 import { useWordsRouteState } from '@/hooks/useWordsRouteState';
 
 import {
-  invalidateRecommendDashboardQueries,
+  invalidateDictionaryQueries,
+  invalidateWordsStatisticsQueries,
   showMutationErrorToast,
   showMutationSuccessToast,
 } from '@/lib/words/mutation-helpers';
@@ -44,14 +49,32 @@ function normalizeWordKey(
 }
 
 function filterRowsByProgress(
-  rows: RecommendedWordItem[],
+  rows: WordItem[],
   progressFilter?: WordProgressFilter
-): RecommendedWordItem[] {
+): WordItem[] {
   if (!progressFilter) return rows;
 
   const target = Number(progressFilter);
 
   return rows.filter((row) => Math.round(Number(row.progress) || 0) === target);
+}
+
+function appendOwnWordToCache(
+  previousData: OwnWordsResponse | undefined,
+  nextWord: WordItem
+): OwnWordsResponse | undefined {
+  if (!previousData) return previousData;
+
+  const alreadyExists = previousData.results.some(
+    (word) => word._id === nextWord._id
+  );
+
+  if (alreadyExists) return previousData;
+
+  return {
+    ...previousData,
+    results: [nextWord, ...previousData.results],
+  };
 }
 
 //===============================================================
@@ -69,14 +92,22 @@ function RecommendPageClient() {
     });
 
   const addToDictionaryMutation = useMutation({
-    mutationFn: (word: RecommendedWordItem) =>
-      wordsService.addWordFromRecommend(word._id),
-    onSuccess: async () => {
+    mutationFn: (wordId: string) => wordsService.addWordFromRecommend(wordId),
+    onSuccess: async (addedWord) => {
       showMutationSuccessToast(
         'Word added to dictionary.',
         'Word added to dictionary.'
       );
-      await invalidateRecommendDashboardQueries(queryClient);
+
+      queryClient.setQueryData<OwnWordsResponse | undefined>(
+        wordsQueryKeys.recommendOwn,
+        (previousData) => appendOwnWordToCache(previousData, addedWord)
+      );
+
+      await Promise.all([
+        invalidateDictionaryQueries(queryClient),
+        invalidateWordsStatisticsQueries(queryClient),
+      ]);
     },
     onError: (mutationError) => {
       showMutationErrorToast(
@@ -99,39 +130,35 @@ function RecommendPageClient() {
     placeholderData: (previousData) => previousData,
   });
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isFetching, isError } = useQuery({
     queryKey: wordsQueryKeys.recommend(queryParams, filters.progress),
     queryFn: async () => {
-      if (!filters.progress) {
-        return wordsService.getAllWords(queryParams);
+      try {
+        if (!filters.progress) {
+          return await wordsService.getAllWords(queryParams);
+        }
+
+        return await wordsService.getAllWords({
+          ...queryParams,
+          page: 1,
+          limit: PROGRESS_FILTER_FALLBACK_LIMIT,
+        });
+      } catch (queryError) {
+        if (hasActiveSearchOrFilters) {
+          return {
+            results: [],
+            totalPages: 1,
+            page: filters.page,
+            perPage: WORDS_PER_PAGE,
+          };
+        }
+
+        throw queryError;
       }
-
-      const allData = await wordsService.getAllWords({
-        ...queryParams,
-        page: 1,
-        limit: PROGRESS_FILTER_FALLBACK_LIMIT,
-      });
-
-      const filtered = filterRowsByProgress(allData.results, filters.progress);
-      const totalPages = Math.max(
-        1,
-        Math.ceil(filtered.length / WORDS_PER_PAGE)
-      );
-      const safePage = Math.min(filters.page, totalPages);
-      const start = (safePage - 1) * WORDS_PER_PAGE;
-      const paged = filtered.slice(start, start + WORDS_PER_PAGE);
-
-      return {
-        results: paged,
-        totalPages,
-        page: safePage,
-        perPage: WORDS_PER_PAGE,
-      };
     },
-    placeholderData: (previousData) => previousData,
   });
 
-  const rows = useMemo<WordItem[]>(() => {
+  const mergedRows = useMemo<WordItem[]>(() => {
     const recommendRows = data?.results ?? [];
     const ownWords = ownWordsData?.results ?? [];
 
@@ -152,14 +179,48 @@ function RecommendPageClient() {
     });
   }, [data?.results, ownWordsData?.results]);
 
-  const totalPages = data?.totalPages ?? 1;
-  const currentPage = data?.page ?? filters.page;
+  const pagedState = useMemo(() => {
+    if (!filters.progress) {
+      return {
+        rows: mergedRows,
+        totalPages: data?.totalPages ?? 1,
+        currentPage: data?.page ?? filters.page,
+      };
+    }
+
+    const filteredRows = filterRowsByProgress(mergedRows, filters.progress);
+    const totalPages = Math.max(
+      1,
+      Math.ceil(filteredRows.length / WORDS_PER_PAGE)
+    );
+    const currentPage = Math.min(filters.page, totalPages);
+    const start = (currentPage - 1) * WORDS_PER_PAGE;
+
+    return {
+      rows: filteredRows.slice(start, start + WORDS_PER_PAGE),
+      totalPages,
+      currentPage,
+    };
+  }, [
+    data?.page,
+    data?.totalPages,
+    filters.page,
+    filters.progress,
+    mergedRows,
+  ]);
+
+  const rows = pagedState.rows;
+  const totalPages = pagedState.totalPages;
+  const currentPage = pagedState.currentPage;
+
+  const showLoader =
+    (isLoading || isFetching) && !addToDictionaryMutation.isPending;
 
   const handleAddToDictionary = async (word: WordItem) => {
-    if (addingWordId || word.owner) return;
+    if (addingWordId || word.owner || addToDictionaryMutation.isPending) return;
 
     setAddingWordId(word._id);
-    await addToDictionaryMutation.mutateAsync(word);
+    await addToDictionaryMutation.mutateAsync(word._id);
   };
 
   const handlePageChange = (nextPage: number) => {
@@ -198,7 +259,7 @@ function RecommendPageClient() {
 
         <Dashboard variant="recommend" showAddWord={false} showTrainLink />
 
-        {isLoading && !data ? (
+        {showLoader ? (
           <div className={css.loaderWrap}>
             <InlineLoader
               text="Loading recommended words…"
