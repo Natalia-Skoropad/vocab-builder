@@ -113,7 +113,8 @@ function LoginForm() {
         type="submit"
         className={css.submitBtn}
         disabled={isSubmitDisabled}
-        variant={isSubmitDisabled ? 'disabledAuth' : 'primary'}
+        disabledStyle="auth"
+        variant="primary"
       >
         {isSubmitting ? 'Logging in...' : 'Login'}
       </Button>
