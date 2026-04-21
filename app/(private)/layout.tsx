@@ -3,8 +3,6 @@ import type { ReactNode } from 'react';
 
 import { PRIVATE_DESCRIPTION, SITE_NAME } from '@/lib/constants/metadata';
 
-import PrivateRoute from '@/components/auth/PrivateRoute/PrivateRoute';
-
 //===========================================================================
 
 export const metadata: Metadata = {
@@ -30,7 +28,7 @@ type Props = {
 //===========================================================================
 
 function PrivateLayout({ children }: Props) {
-  return <PrivateRoute>{children}</PrivateRoute>;
+  return <>{children}</>;
 }
 
 export default PrivateLayout;
