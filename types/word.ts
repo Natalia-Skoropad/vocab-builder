@@ -40,16 +40,3 @@ export type WordsQueryParams = {
   sort?: WordSort;
   newWordId?: string;
 };
-
-//===============================================================
-
-export type TrainingTaskItem = {
-  _id: string;
-  en?: string;
-  ua?: string;
-  task: 'en' | 'ua';
-};
-
-export type TrainingTasksResponse = {
-  words: TrainingTaskItem[];
-};
