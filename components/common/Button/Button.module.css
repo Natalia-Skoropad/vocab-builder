@@ -45,13 +45,13 @@
 .secondary {
   background-color: transparent;
   color: var(--background-1);
-  border: 1px solid rgba(252, 252, 252, 0.4);
+  border: 1px solid var(--panel-border-white);
 }
 
 .secondary:hover,
 .secondary:focus-visible {
-  background-color: rgba(252, 252, 252, 0.08);
-  border-color: rgba(252, 252, 252, 0.55);
+  background-color: var(--surface-hover-white);
+  border-color: var(--panel-border-white-strong);
 }
 
 .dark {
@@ -76,8 +76,8 @@
 
 /* disabled for auth pages */
 .disabledAuth {
-  background-color: rgba(133, 170, 159, 0.3);
-  color: rgba(18, 20, 23, 0.3);
+  background-color: var(--disabled-bg-green-soft);
+  color: var(--disabled-text-neutral-soft);
   border-color: transparent;
   cursor: not-allowed;
   box-shadow: none;
@@ -86,16 +86,16 @@
 /* disabled for modal / green surfaces */
 .disabled {
   background-color: var(--border-3);
-  color: rgba(18, 20, 23, 0.55);
+  color: var(--disabled-text-neutral);
   border-color: transparent;
   cursor: not-allowed;
   box-shadow: none;
 }
 
 .secondary:disabled {
-  background-color: rgba(252, 252, 252, 0.08);
-  color: rgba(252, 252, 252, 0.45);
-  border-color: rgba(252, 252, 252, 0.18);
+  background-color: var(--disabled-bg-white-soft);
+  color: var(--disabled-text-on-dark);
+  border-color: var(--disabled-border-white);
 }
 
 .outlineGreen {
@@ -106,7 +106,7 @@
 
 .outlineGreen:hover,
 .outlineGreen:focus-visible {
-  background-color: rgba(133, 170, 159, 0.08);
+  background-color: var(--surface-hover-light);
   color: var(--green-main);
   border-color: var(--green-main);
 }
@@ -114,7 +114,7 @@
 .outlineGreen:disabled {
   background-color: var(--background-1);
   color: rgba(133, 170, 159, 0.55);
-  border-color: rgba(133, 170, 159, 0.4);
+  border-color: var(--disabled-border-green);
   box-shadow: none;
   cursor: not-allowed;
 }

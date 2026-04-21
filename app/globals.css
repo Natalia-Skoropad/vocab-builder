@@ -243,6 +243,40 @@ svg {
   --btn-focus-ring: 0 0 0 3px rgba(133, 170, 159, 0.16);
 
   --black-45: rgba(18, 20, 23, 0.45);
+
+  --surface-hover-light: rgba(133, 170, 159, 0.08);
+  --surface-hover-light-strong: rgba(133, 170, 159, 0.12);
+  --surface-hover-white: rgba(252, 252, 252, 0.08);
+
+  --panel-border-light: rgba(18, 20, 23, 0.1);
+  --panel-border-light-soft: rgba(18, 20, 23, 0.04);
+  --panel-border-white: rgba(252, 252, 252, 0.4);
+  --panel-border-white-strong: rgba(252, 252, 252, 0.55);
+
+  --overlay-backdrop: rgba(18, 20, 23, 0.2);
+  --overlay-backdrop-strong: rgba(18, 20, 23, 0.38);
+
+  --focus-ring-green: 0 0 0 2px rgba(133, 170, 159, 0.12);
+  --focus-ring-green-strong: 0 0 0 4px rgba(133, 170, 159, 0.14);
+  --focus-ring-light: 0 0 0 2px rgba(252, 252, 252, 0.08);
+
+  --focus-outline-dark: 2px solid rgba(18, 20, 23, 0.2);
+  --focus-outline-dark-soft: 2px solid rgba(18, 20, 23, 0.15);
+  --focus-outline-light: 2px solid rgba(252, 252, 252, 0.55);
+
+  --shadow-popup: 0 10px 30px var(--border-light);
+  --shadow-popup-soft: 0 4px 47px var(--border-light);
+  --shadow-toast: 0 10px 26px var(--border-light);
+
+  --disabled-bg-green-soft: rgba(133, 170, 159, 0.3);
+  --disabled-bg-white-soft: rgba(252, 252, 252, 0.08);
+
+  --disabled-text-neutral: rgba(18, 20, 23, 0.55);
+  --disabled-text-neutral-soft: rgba(18, 20, 23, 0.3);
+  --disabled-text-on-dark: rgba(252, 252, 252, 0.45);
+
+  --disabled-border-white: rgba(252, 252, 252, 0.18);
+  --disabled-border-green: rgba(133, 170, 159, 0.4);
 }
 
 /* ===============================================================
