@@ -17,14 +17,6 @@ type ErrorResponse = {
   message?: string;
 };
 
-type RawTrainingTasksResponse =
-  | {
-      words: TrainingTask[];
-    }
-  | {
-      tasks: TrainingTask[];
-    };
-
 //===============================================================
 
 function isTrainingTaskItem(data: unknown): data is TrainingTask {
@@ -32,40 +24,20 @@ function isTrainingTaskItem(data: unknown): data is TrainingTask {
     !!data &&
     typeof data === 'object' &&
     typeof (data as TrainingTask)._id === 'string' &&
-    (((data as TrainingTask).task === 'en' &&
-      typeof (data as TrainingTask).ua === 'string') ||
-      ((data as TrainingTask).task === 'ua' &&
-        typeof (data as TrainingTask).en === 'string'))
+    ((data as TrainingTask).task === 'en' ||
+      (data as TrainingTask).task === 'ua') &&
+    (typeof (data as TrainingTask).en === 'string' ||
+      typeof (data as TrainingTask).ua === 'string')
   );
 }
 
-//===============================================================
-
-function isRawTrainingTasksResponse(
-  data: unknown
-): data is RawTrainingTasksResponse {
+function isTrainingTasksResponse(data: unknown): data is TrainingTasksResponse {
   return (
     !!data &&
     typeof data === 'object' &&
-    (Array.isArray((data as { words?: unknown[] }).words) ||
-      Array.isArray((data as { tasks?: unknown[] }).tasks))
+    Array.isArray((data as { words?: unknown[] }).words) &&
+    (data as { words: unknown[] }).words.every(isTrainingTaskItem)
   );
-}
-
-//===============================================================
-
-function normalizeTrainingTasksResponse(
-  data: RawTrainingTasksResponse
-): TrainingTasksResponse {
-  if ('words' in data) {
-    return {
-      words: data.words,
-    };
-  }
-
-  return {
-    words: data.tasks,
-  };
 }
 
 //===============================================================
@@ -76,26 +48,18 @@ async function getTasks(): Promise<TrainingTasksResponse> {
     cache: 'no-store',
   });
 
-  const data = await parseClientJsonSafe<
-    TrainingTasksResponse | RawTrainingTasksResponse | ErrorResponse
-  >(response);
+  const data = await parseClientJsonSafe<TrainingTasksResponse | ErrorResponse>(
+    response
+  );
 
   throwIfResponseNotOk(response, data, 'Failed to fetch training tasks.');
 
-  if (!isRawTrainingTasksResponse(data)) {
+  if (!isTrainingTasksResponse(data)) {
     throw new Error('Invalid training tasks response.');
   }
 
-  const normalizedData = normalizeTrainingTasksResponse(data);
-
-  if (!normalizedData.words.every(isTrainingTaskItem)) {
-    throw new Error('Invalid training tasks response.');
-  }
-
-  return normalizedData;
+  return data;
 }
-
-//===============================================================
 
 async function submitAnswers(
   payload: TrainingSubmitPayload
