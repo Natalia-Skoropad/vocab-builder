@@ -9,10 +9,12 @@ import type {
   RecommendedWordItem,
   WordItem,
 } from '@/types/word';
+
 import { wordsService } from '@/lib/services/words.service';
 
 import { type WordProgressFilter } from '@/lib/utils/dictionary.query';
 import { useWordsRouteState } from '@/hooks/useWordsRouteState';
+import { buildWordsBreadcrumbs } from '@/lib/utils/words-breadcrumbs';
 
 import {
   invalidateDictionaryQueries,
@@ -90,6 +92,11 @@ function RecommendPageClient() {
       variant: 'recommend',
       wordsPerPage: WORDS_PER_PAGE,
     });
+
+  const breadcrumbItems = useMemo(
+    () => buildWordsBreadcrumbs('recommend', filters),
+    [filters]
+  );
 
   const addToDictionaryMutation = useMutation({
     mutationFn: (wordId: string) => wordsService.addWordFromRecommend(wordId),
@@ -226,11 +233,6 @@ function RecommendPageClient() {
   const handlePageChange = (nextPage: number) => {
     router.push(buildPageUrl(nextPage), { scroll: false });
   };
-
-  const breadcrumbItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Recommend' },
-  ];
 
   if (isError) {
     return (

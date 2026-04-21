@@ -9,14 +9,10 @@ import { toast } from 'react-hot-toast';
 import type { WordItem } from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
 
-import {
-  buildWordsPath,
-  formatDictionaryCategoryLabel,
-  type WordProgressFilter,
-} from '@/lib/utils/dictionary.query';
-
+import { type WordProgressFilter } from '@/lib/utils/dictionary.query';
 import { useWordsRouteState } from '@/hooks/useWordsRouteState';
 import { useDictionaryModals } from '@/hooks/useDictionaryModals';
+import { buildWordsBreadcrumbs } from '@/lib/utils/words-breadcrumbs';
 
 import {
   invalidateDictionaryDashboardQueries,
@@ -78,7 +74,6 @@ function DictionaryPageClient() {
   const {
     filters: routeFilters,
     queryParams,
-    hasIrregularFilter,
     hasActiveSearchOrFilters,
     buildPageUrl,
   } = useWordsRouteState({
@@ -87,41 +82,10 @@ function DictionaryPageClient() {
     includeNewWordId: true,
   });
 
-  const breadcrumbItems = useMemo(() => {
-    const items: { label: string; href?: string }[] = [
-      { label: 'Home', href: '/' },
-      { label: 'Dictionary', href: '/dictionary' },
-    ];
-
-    if (routeFilters.category !== 'categories') {
-      const categoryLabel = formatDictionaryCategoryLabel(
-        routeFilters.category
-      );
-
-      if (routeFilters.category === 'verb' && hasIrregularFilter) {
-        items.push({
-          label: categoryLabel,
-          href: buildWordsPath('/dictionary', {
-            category: routeFilters.category,
-            isIrregular: undefined,
-            page: 1,
-            sort: routeFilters.sort,
-            progress: routeFilters.progress,
-          }),
-        });
-
-        items.push({
-          label: routeFilters.isIrregular ? 'Irregular' : 'Regular',
-        });
-      } else {
-        items.push({
-          label: categoryLabel,
-        });
-      }
-    }
-
-    return items;
-  }, [hasIrregularFilter, routeFilters]);
+  const breadcrumbItems = useMemo(
+    () => buildWordsBreadcrumbs('dictionary', routeFilters),
+    [routeFilters]
+  );
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: wordsQueryKeys.dictionary(queryParams, routeFilters.progress),
