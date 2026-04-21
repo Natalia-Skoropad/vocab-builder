@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from 'react-hot-toast';
@@ -15,6 +15,7 @@ import {
   type WordProgressFilter,
 } from '@/lib/utils/dictionary.query';
 import { useWordsRouteState } from '@/hooks/useWordsRouteState';
+import { useDictionaryModals } from '@/hooks/useDictionaryModals';
 
 import Dashboard from '@/components/dashboard/Dashboard/Dashboard';
 import WordsTable from '@/components/words/WordsTable/WordsTable';
@@ -50,17 +51,20 @@ function filterRowsByProgress(
 
 function DictionaryPageClient() {
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
-  const shouldAutoOpenAddModal = searchParams.get('openModal') === 'add-word';
-
-  const [isAddModalOpen, setIsAddModalOpen] = useState(
-    () => shouldAutoOpenAddModal
-  );
-  const [editingWord, setEditingWord] = useState<WordItem | null>(null);
-  const [deletingWord, setDeletingWord] = useState<WordItem | null>(null);
+  const {
+    isAddModalOpen,
+    openAddModal,
+    closeAddModal,
+    editingWord,
+    startEditWord,
+    stopEditWord,
+    deletingWord,
+    startDeleteWord,
+    stopDeleteWord,
+    clearDeletingWord,
+  } = useDictionaryModals();
 
   const {
     filters: routeFilters,
@@ -73,18 +77,6 @@ function DictionaryPageClient() {
     wordsPerPage: WORDS_PER_PAGE,
     includeNewWordId: true,
   });
-
-  useEffect(() => {
-    if (!shouldAutoOpenAddModal) return;
-
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete('openModal');
-
-    const nextQuery = nextParams.toString();
-    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
-
-    router.replace(nextUrl, { scroll: false });
-  }, [pathname, router, searchParams, shouldAutoOpenAddModal]);
 
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; href?: string }[] = [
@@ -177,7 +169,7 @@ function DictionaryPageClient() {
     onSuccess: (result) => {
       toast.success(result.message || 'Word deleted successfully.');
 
-      setDeletingWord(null);
+      clearDeletingWord();
 
       void queryClient.invalidateQueries({
         queryKey: ['dictionary-words'],
@@ -235,7 +227,7 @@ function DictionaryPageClient() {
             variant="dictionary"
             showAddWord
             showTrainLink
-            onAddWord={() => setIsAddModalOpen(true)}
+            onAddWord={openAddModal}
           />
 
           <EmptyState
@@ -246,10 +238,7 @@ function DictionaryPageClient() {
             imageHeight={190}
           />
 
-          <AddWordModal
-            isOpen={isAddModalOpen}
-            onClose={() => setIsAddModalOpen(false)}
-          />
+          <AddWordModal isOpen={isAddModalOpen} onClose={closeAddModal} />
         </section>
       </main>
     );
@@ -264,7 +253,7 @@ function DictionaryPageClient() {
           variant="dictionary"
           showAddWord
           showTrainLink
-          onAddWord={() => setIsAddModalOpen(true)}
+          onAddWord={openAddModal}
         />
 
         {isLoading ? (
@@ -290,9 +279,7 @@ function DictionaryPageClient() {
               hasActiveSearchOrFilters ? undefined : 'Add word'
             }
             onPrimaryAction={
-              hasActiveSearchOrFilters
-                ? undefined
-                : () => setIsAddModalOpen(true)
+              hasActiveSearchOrFilters ? undefined : openAddModal
             }
           />
         ) : (
@@ -300,8 +287,8 @@ function DictionaryPageClient() {
             <WordsTable
               variant="dictionary"
               rows={rows}
-              onEdit={(word) => setEditingWord(word)}
-              onDelete={(word) => setDeletingWord(word)}
+              onEdit={startEditWord}
+              onDelete={startDeleteWord}
             />
 
             <WordsPagination
@@ -312,22 +299,19 @@ function DictionaryPageClient() {
           </>
         )}
 
-        <AddWordModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-        />
+        <AddWordModal isOpen={isAddModalOpen} onClose={closeAddModal} />
 
         <EditWordModal
           isOpen={Boolean(editingWord)}
           word={editingWord}
-          onClose={() => setEditingWord(null)}
+          onClose={stopEditWord}
         />
 
         <ConfirmDeleteModal
           isOpen={Boolean(deletingWord)}
           wordLabel={deletingWord?.en}
           isSubmitting={deleteMutation.isPending}
-          onClose={() => setDeletingWord(null)}
+          onClose={stopDeleteWord}
           onConfirm={handleDeleteConfirm}
         />
       </section>
