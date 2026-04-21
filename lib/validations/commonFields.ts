@@ -2,7 +2,6 @@ import * as yup from 'yup';
 
 //===============================================================
 
-const EMAIL_REGEX = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 const PASSWORD_REGEX = /^(?=.*[a-zA-Z]{6})(?=.*\d)[a-zA-Z\d]{7}$/;
 
 //===============================================================
@@ -29,7 +28,7 @@ export const emailSchema = yup
     AUTH_EMAIL_MAX_LENGTH,
     `Email must be at most ${AUTH_EMAIL_MAX_LENGTH} characters`
   )
-  .matches(EMAIL_REGEX, 'Enter a valid email')
+  .email('Enter a valid email')
   .required('Email is required');
 
 export const passwordSchema = yup
