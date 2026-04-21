@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
 import type { TrainingSubmitResponse } from '@/types/training';
@@ -10,6 +10,13 @@ import type { TrainingSubmitResponse } from '@/types/training';
 import { ROUTES } from '@/lib/constants/routes';
 import { trainingService } from '@/lib/services/training.service';
 import { useTrainingSession } from '@/hooks/useTrainingSession';
+
+import {
+  invalidateDictionaryQueries,
+  invalidateWordsStatisticsQueries,
+} from '@/lib/words/mutation-helpers';
+
+import { wordsQueryKeys } from '@/lib/words/query-keys';
 
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import EmptyState from '@/components/common/EmptyState/EmptyState';
@@ -25,6 +32,7 @@ import css from './page.module.css';
 
 function TrainingPageClient() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [isWellDoneOpen, setIsWellDoneOpen] = useState(false);
   const [trainingResult, setTrainingResult] = useState<TrainingSubmitResponse>(
@@ -78,6 +86,15 @@ function TrainingPageClient() {
 
     try {
       const result = await submitMutation.mutateAsync(payload);
+
+      await Promise.all([
+        invalidateDictionaryQueries(queryClient),
+        invalidateWordsStatisticsQueries(queryClient),
+        queryClient.invalidateQueries({
+          queryKey: wordsQueryKeys.recommendOwn,
+        }),
+      ]);
+
       applySubmittedPayload(payload);
       setTrainingResult(result);
       setIsWellDoneOpen(true);
