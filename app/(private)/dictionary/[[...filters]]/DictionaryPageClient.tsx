@@ -1,12 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from 'react-hot-toast';
@@ -17,9 +12,9 @@ import { wordsService } from '@/lib/services/words.service';
 import {
   buildWordsPath,
   formatDictionaryCategoryLabel,
-  parseDictionarySegments,
   type WordProgressFilter,
 } from '@/lib/utils/dictionary.query';
+import { useWordsRouteState } from '@/hooks/useWordsRouteState';
 
 import Dashboard from '@/components/dashboard/Dashboard/Dashboard';
 import WordsTable from '@/components/words/WordsTable/WordsTable';
@@ -56,7 +51,6 @@ function filterRowsByProgress(
 function DictionaryPageClient() {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useParams<{ filters?: string[] | string }>();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
@@ -68,7 +62,17 @@ function DictionaryPageClient() {
   const [editingWord, setEditingWord] = useState<WordItem | null>(null);
   const [deletingWord, setDeletingWord] = useState<WordItem | null>(null);
 
-  const rawFiltersParam = params.filters;
+  const {
+    filters: routeFilters,
+    queryParams,
+    hasIrregularFilter,
+    hasActiveSearchOrFilters,
+    buildPageUrl,
+  } = useWordsRouteState({
+    variant: 'dictionary',
+    wordsPerPage: WORDS_PER_PAGE,
+    includeNewWordId: true,
+  });
 
   useEffect(() => {
     if (!shouldAutoOpenAddModal) return;
@@ -81,50 +85,6 @@ function DictionaryPageClient() {
 
     router.replace(nextUrl, { scroll: false });
   }, [pathname, router, searchParams, shouldAutoOpenAddModal]);
-
-  const routeSegments = useMemo<string[]>(() => {
-    if (Array.isArray(rawFiltersParam)) return rawFiltersParam;
-
-    if (typeof rawFiltersParam === 'string' && rawFiltersParam.trim()) {
-      return [rawFiltersParam];
-    }
-
-    return [];
-  }, [rawFiltersParam]);
-
-  const { filters: routeFilters } = useMemo(
-    () => parseDictionarySegments(routeSegments),
-    [routeSegments]
-  );
-
-  const keyword = searchParams.get('keyword')?.trim() ?? '';
-  const newWordId = searchParams.get('newWordId')?.trim() ?? '';
-
-  const queryParams = useMemo(
-    () => ({
-      page: routeFilters.page,
-      limit: WORDS_PER_PAGE,
-      keyword: keyword || undefined,
-      category:
-        routeFilters.category !== 'categories'
-          ? routeFilters.category
-          : undefined,
-      isIrregular:
-        routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined,
-      sort: routeFilters.sort,
-      newWordId: newWordId || undefined,
-    }),
-    [keyword, newWordId, routeFilters]
-  );
-
-  const hasIrregularFilter = typeof routeFilters.isIrregular === 'boolean';
-
-  const hasActiveSearchOrFilters =
-    Boolean(keyword) ||
-    routeFilters.category !== 'categories' ||
-    Boolean(routeFilters.sort) ||
-    hasIrregularFilter ||
-    Boolean(routeFilters.progress);
 
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; href?: string }[] = [
@@ -245,24 +205,7 @@ function DictionaryPageClient() {
   const currentPage = data?.page ?? routeFilters.page;
 
   const handlePageChange = (nextPage: number) => {
-    const nextPath = buildWordsPath('/dictionary', {
-      category: routeFilters.category,
-      isIrregular:
-        routeFilters.category === 'verb' ? routeFilters.isIrregular : undefined,
-      page: nextPage,
-      sort: routeFilters.sort,
-      progress: routeFilters.progress,
-    });
-
-    const nextParams = new URLSearchParams();
-
-    if (keyword) {
-      nextParams.set('keyword', keyword);
-    }
-
-    const query = nextParams.toString();
-
-    router.push(query ? `${nextPath}?${query}` : nextPath, {
+    router.push(buildPageUrl(nextPage), {
       scroll: false,
     });
   };

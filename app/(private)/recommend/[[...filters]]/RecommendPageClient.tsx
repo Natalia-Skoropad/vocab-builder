@@ -1,18 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
 import type { RecommendedWordItem, WordItem } from '@/types/word';
 import { wordsService } from '@/lib/services/words.service';
 
-import {
-  buildWordsPath,
-  parseDictionarySegments,
-  type WordProgressFilter,
-} from '@/lib/utils/dictionary.query';
+import { type WordProgressFilter } from '@/lib/utils/dictionary.query';
+import { useWordsRouteState } from '@/hooks/useWordsRouteState';
 
 import Dashboard from '@/components/dashboard/Dashboard/Dashboard';
 import EmptyState from '@/components/common/EmptyState/EmptyState';
@@ -54,35 +51,15 @@ function filterRowsByProgress(
 
 function RecommendPageClient() {
   const router = useRouter();
-  const params = useParams<{ filters?: string[] | string }>();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
-  const rawFiltersParam = params.filters;
   const [addingWordId, setAddingWordId] = useState<string | null>(null);
 
-  const routeSegments = useMemo<string[]>(() => {
-    if (Array.isArray(rawFiltersParam)) return rawFiltersParam;
-    if (typeof rawFiltersParam === 'string' && rawFiltersParam.trim()) {
-      return [rawFiltersParam];
-    }
-    return [];
-  }, [rawFiltersParam]);
-
-  const { filters } = useMemo(
-    () => parseDictionarySegments(routeSegments),
-    [routeSegments]
-  );
-
-  const keyword = searchParams.get('keyword')?.trim() ?? '';
-  const hasIrregularFilter = typeof filters.isIrregular === 'boolean';
-
-  const hasActiveSearchOrFilters =
-    Boolean(keyword) ||
-    filters.category !== 'categories' ||
-    Boolean(filters.sort) ||
-    hasIrregularFilter ||
-    Boolean(filters.progress);
+  const { filters, queryParams, hasActiveSearchOrFilters, buildPageUrl } =
+    useWordsRouteState({
+      variant: 'recommend',
+      wordsPerPage: WORDS_PER_PAGE,
+    });
 
   const addToDictionaryMutation = useMutation({
     mutationFn: (word: RecommendedWordItem) =>
@@ -109,20 +86,6 @@ function RecommendPageClient() {
       setAddingWordId(null);
     },
   });
-
-  const queryParams = useMemo(
-    () => ({
-      page: filters.page,
-      limit: WORDS_PER_PAGE,
-      keyword: keyword || undefined,
-      category:
-        filters.category !== 'categories' ? filters.category : undefined,
-      isIrregular:
-        filters.category === 'verb' ? filters.isIrregular : undefined,
-      sort: filters.sort,
-    }),
-    [filters, keyword]
-  );
 
   const { data: ownWordsData } = useQuery({
     queryKey: ['recommend-own-words'],
@@ -198,25 +161,7 @@ function RecommendPageClient() {
   };
 
   const handlePageChange = (nextPage: number) => {
-    const nextPath = buildWordsPath('/recommend', {
-      category: filters.category,
-      isIrregular:
-        filters.category === 'verb' ? filters.isIrregular : undefined,
-      page: nextPage,
-      sort: filters.sort,
-      progress: filters.progress,
-    });
-
-    const nextParams = new URLSearchParams();
-
-    if (keyword) {
-      nextParams.set('keyword', keyword);
-    }
-
-    const nextQuery = nextParams.toString();
-    const nextUrl = nextQuery ? `${nextPath}?${nextQuery}` : nextPath;
-
-    router.push(nextUrl, { scroll: false });
+    router.push(buildPageUrl(nextPage), { scroll: false });
   };
 
   const breadcrumbItems = [
