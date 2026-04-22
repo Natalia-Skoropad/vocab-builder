@@ -4,13 +4,19 @@ import { useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
 
 import type { EditWordFormValues } from '@/types/forms';
 import type { WordItem } from '@/types/word';
 import { setFormValueWithMeta } from '@/lib/forms/setWordFormValue';
 import { wordsService } from '@/lib/services/words.service';
 import { editWordSchema } from '@/lib/validations/editWordSchema';
+
+import {
+  handleWordsMutationError,
+  handleWordsMutationSuccess,
+  invalidateDictionaryQueries,
+} from '@/lib/words/mutation-helpers';
+
 import WordFormActions from '@/components/words/WordFormActions/WordFormActions';
 
 import WordFormFieldRow, {
@@ -63,14 +69,18 @@ function EditWordForm({ word, onClose }: Props) {
         isIrregular: word.isIrregular,
       }),
     onSuccess: async () => {
-      toast.success('Word updated successfully.');
-      await queryClient.invalidateQueries({ queryKey: ['dictionary-words'] });
-      onClose();
+      await handleWordsMutationSuccess({
+        queryClient,
+        fallbackMessage: 'Word updated successfully.',
+        invalidate: invalidateDictionaryQueries,
+        onAfterSuccess: onClose,
+      });
     },
     onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to edit word.'
-      );
+      handleWordsMutationError({
+        error,
+        fallbackMessage: 'Failed to edit word.',
+      });
     },
   });
 

@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 
 //===============================================================
 
-export async function parseJsonSafe<T>(response: Response): Promise<T | null> {
+export async function parseServerJsonSafe<T>(
+  response: Response
+): Promise<T | null> {
   return (await response.json().catch(() => null)) as T | null;
 }
 

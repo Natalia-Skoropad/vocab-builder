@@ -1,4 +1,4 @@
-import type { WordCategory, WordSort } from '@/types/word';
+import type { WordCategory, WordsQueryParams, WordSort } from '@/types/word';
 
 //===============================================================
 
@@ -14,6 +14,13 @@ export type WordsRouteFilters = {
 
 type WordsRouteState = {
   filters: WordsRouteFilters;
+};
+
+type BuildWordsQueryParamsOptions = {
+  wordsPerPage: number;
+  keyword?: string;
+  includeNewWordId?: boolean;
+  newWordId?: string;
 };
 
 //===============================================================
@@ -131,6 +138,36 @@ export function parseDictionarySegments(segments?: string[]): WordsRouteState {
   }
 
   return { filters };
+}
+
+//===============================================================
+
+export function buildWordsQueryParams(
+  filters: WordsRouteFilters,
+  {
+    wordsPerPage,
+    keyword,
+    includeNewWordId = false,
+    newWordId,
+  }: BuildWordsQueryParamsOptions
+): WordsQueryParams {
+  const normalizedKeyword = keyword?.trim() ?? '';
+  const normalizedNewWordId = newWordId?.trim() ?? '';
+
+  const params: WordsQueryParams = {
+    page: filters.page,
+    limit: wordsPerPage,
+    keyword: normalizedKeyword || undefined,
+    category: filters.category !== 'categories' ? filters.category : undefined,
+    isIrregular: filters.category === 'verb' ? filters.isIrregular : undefined,
+    sort: filters.sort,
+  };
+
+  if (includeNewWordId && normalizedNewWordId) {
+    params.newWordId = normalizedNewWordId;
+  }
+
+  return params;
 }
 
 //===============================================================

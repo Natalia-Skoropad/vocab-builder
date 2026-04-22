@@ -13,7 +13,10 @@ import {
   isBackendCurrentUserResponse,
 } from '@/lib/auth/auth-response';
 
-import { createErrorResponse, parseJsonSafe } from '@/lib/api/http-response';
+import {
+  parseServerJsonSafe,
+  createErrorResponse,
+} from '@/lib/api/server-response';
 
 //===============================================================
 
@@ -49,7 +52,7 @@ export async function GET() {
       );
     }
 
-    const data = await parseJsonSafe<unknown>(response);
+    const data = await parseServerJsonSafe<unknown>(response);
 
     if (!isBackendCurrentUserResponse(data)) {
       return createErrorResponse('Invalid server response.', 500);

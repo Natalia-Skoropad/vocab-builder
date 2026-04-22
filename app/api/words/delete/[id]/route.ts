@@ -3,10 +3,10 @@ import { getSessionCookie } from '@/lib/server/auth/session';
 import { getWordsErrorMessage } from '@/lib/words/words-error';
 
 import {
+  parseServerJsonSafe,
   createErrorResponse,
   createOkResponse,
-  parseJsonSafe,
-} from '@/lib/api/http-response';
+} from '@/lib/api/server-response';
 
 //===============================================================
 
@@ -40,7 +40,7 @@ export async function DELETE(_: Request, context: RouteContext) {
       cache: 'no-store',
     });
 
-    const data = await parseJsonSafe<unknown>(response);
+    const data = await parseServerJsonSafe<unknown>(response);
 
     if (!response.ok) {
       return createErrorResponse(

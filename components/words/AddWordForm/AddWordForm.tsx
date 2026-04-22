@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
 
 import type { AddWordFormValues } from '@/types/forms';
 import { ROUTES } from '@/lib/constants/routes';
@@ -13,6 +12,13 @@ import { wordsService } from '@/lib/services/words.service';
 import { setFormValueWithMeta } from '@/lib/forms/setWordFormValue';
 import { addWordSchema } from '@/lib/validations/addWordSchema';
 import { useCategoriesStore } from '@/store/categories/categoriesStore';
+
+import {
+  handleWordsMutationError,
+  handleWordsMutationSuccess,
+  invalidateDictionaryDashboardQueries,
+} from '@/lib/words/mutation-helpers';
+
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
 import WordFormActions from '@/components/words/WordFormActions/WordFormActions';
 
@@ -95,23 +101,24 @@ function AddWordForm({ onClose }: Props) {
   const createMutation = useMutation({
     mutationFn: wordsService.createWord,
     onSuccess: async () => {
-      toast.success('Word added successfully.');
+      await handleWordsMutationSuccess({
+        queryClient,
+        fallbackMessage: 'Word added successfully.',
+        invalidate: invalidateDictionaryDashboardQueries,
+        onAfterSuccess: async () => {
+          onClose();
 
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['dictionary-words'] }),
-        queryClient.invalidateQueries({ queryKey: ['words-statistics'] }),
-      ]);
-
-      onClose();
-
-      router.push(ROUTES.DICTIONARY, {
-        scroll: false,
+          router.push(ROUTES.DICTIONARY, {
+            scroll: false,
+          });
+        },
       });
     },
     onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to create word.'
-      );
+      handleWordsMutationError({
+        error,
+        fallbackMessage: 'Failed to create word.',
+      });
     },
   });
 

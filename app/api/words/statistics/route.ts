@@ -4,10 +4,10 @@ import { getWordsErrorMessage } from '@/lib/words/words-error';
 import { isStatisticsResponse } from '@/lib/words/words-response';
 
 import {
+  parseServerJsonSafe,
   createErrorResponse,
   createOkResponse,
-  parseJsonSafe,
-} from '@/lib/api/http-response';
+} from '@/lib/api/server-response';
 
 //===============================================================
 
@@ -27,7 +27,7 @@ export async function GET() {
       cache: 'no-store',
     });
 
-    const data = await parseJsonSafe<unknown>(response);
+    const data = await parseServerJsonSafe<unknown>(response);
 
     if (!response.ok) {
       return createErrorResponse(

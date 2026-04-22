@@ -4,7 +4,8 @@ import type {
   BackendCurrentUserResponse,
 } from '@/types/auth';
 
-import { createOkResponse, parseJsonSafe } from '@/lib/api/http-response';
+import { parseClientJsonSafe } from '@/lib/api/client-response';
+import { createOkResponse } from '@/lib/api/server-response';
 
 //===============================================================
 
@@ -38,11 +39,14 @@ export function isBackendCurrentUserResponse(
   if (!data || typeof data !== 'object') return false;
 
   const value = data as Record<string, unknown>;
+  const hasValidId =
+    typeof value._id === 'string' || typeof value.id === 'string';
 
   return (
-    typeof value._id === 'string' &&
+    hasValidId &&
     typeof value.name === 'string' &&
-    typeof value.email === 'string'
+    typeof value.email === 'string' &&
+    typeof value.token === 'string'
   );
 }
 
@@ -61,7 +65,7 @@ export function buildUserFromBackendCurrent(
   data: BackendCurrentUserResponse
 ): AppUser {
   return {
-    id: data._id,
+    id: data._id ?? data.id,
     name: data.name,
     email: data.email,
   };
@@ -83,7 +87,7 @@ export async function parseClientAuthResponse(
   response: Response,
   fallbackMessage: string
 ): Promise<RouteAuthResponse> {
-  const data = await parseJsonSafe<RouteAuthResponse>(response);
+  const data = await parseClientJsonSafe<RouteAuthResponse>(response);
 
   if (!response.ok) {
     throw new Error(data?.message || fallbackMessage);

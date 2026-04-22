@@ -2,10 +2,10 @@ import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
 
 import {
+  parseServerJsonSafe,
   createErrorResponse,
   createOkResponse,
-  parseJsonSafe,
-} from '@/lib/api/http-response';
+} from '@/lib/api/server-response';
 
 //===============================================================
 
@@ -104,9 +104,7 @@ export async function GET() {
       cache: 'no-store',
     });
 
-    const data = await parseJsonSafe<
-      BackendTasksResponse | BackendErrorResponse
-    >(response);
+    const data = await parseServerJsonSafe<unknown>(response);
 
     if (!response.ok) {
       if (response.status === 401) {

@@ -5,6 +5,21 @@ import { wordsQueryKeys } from '@/lib/words/query-keys';
 
 //===============================================================
 
+type MutationSuccessOptions = {
+  queryClient: QueryClient;
+  message?: string;
+  fallbackMessage: string;
+  invalidate?: (queryClient: QueryClient) => Promise<void> | void;
+  onAfterSuccess?: () => Promise<void> | void;
+};
+
+type MutationErrorOptions = {
+  error: unknown;
+  fallbackMessage: string;
+};
+
+//===============================================================
+
 export function showMutationSuccessToast(
   message: string | undefined,
   fallbackMessage: string
@@ -17,6 +32,33 @@ export function showMutationErrorToast(
   fallbackMessage: string
 ) {
   toast.error(error instanceof Error ? error.message : fallbackMessage);
+}
+
+//===============================================================
+
+export async function handleWordsMutationSuccess({
+  queryClient,
+  message,
+  fallbackMessage,
+  invalidate,
+  onAfterSuccess,
+}: MutationSuccessOptions) {
+  showMutationSuccessToast(message, fallbackMessage);
+
+  if (invalidate) {
+    await invalidate(queryClient);
+  }
+
+  if (onAfterSuccess) {
+    await onAfterSuccess();
+  }
+}
+
+export function handleWordsMutationError({
+  error,
+  fallbackMessage,
+}: MutationErrorOptions) {
+  showMutationErrorToast(error, fallbackMessage);
 }
 
 //===============================================================
@@ -36,14 +78,14 @@ export async function invalidateWordsStatisticsQueries(
 
 export async function invalidateDictionaryQueries(queryClient: QueryClient) {
   await queryClient.invalidateQueries({
-    queryKey: ['dictionary-words'],
+    queryKey: wordsQueryKeys.dictionaryRoot,
   });
 }
 
 export async function invalidateRecommendQueries(queryClient: QueryClient) {
   await Promise.all([
     queryClient.invalidateQueries({
-      queryKey: ['recommend-words'],
+      queryKey: wordsQueryKeys.recommendRoot,
     }),
     queryClient.invalidateQueries({
       queryKey: wordsQueryKeys.recommendOwn,

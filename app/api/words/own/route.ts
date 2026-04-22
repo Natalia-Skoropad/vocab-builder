@@ -6,10 +6,10 @@ import { getWordsErrorMessage } from '@/lib/words/words-error';
 import { normalizeOwnWordsResponse } from '@/lib/words/words-response';
 
 import {
+  parseServerJsonSafe,
   createErrorResponse,
   createOkResponse,
-  parseJsonSafe,
-} from '@/lib/api/http-response';
+} from '@/lib/api/server-response';
 
 import type { WordItem, WordSort } from '@/types/word';
 
@@ -150,7 +150,7 @@ async function fetchAllOwnWords(args: {
       cache: 'no-store',
     });
 
-    const data = await parseJsonSafe<unknown>(response);
+    const data = await parseServerJsonSafe<unknown>(response);
 
     if (!response.ok) {
       throw {

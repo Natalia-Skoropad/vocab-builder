@@ -11,7 +11,8 @@ export type BackendAuthResponse = {
 };
 
 export type BackendCurrentUserResponse = {
-  _id: string;
+  _id?: string;
+  id?: string;
   name: string;
   email: string;
   token: string;

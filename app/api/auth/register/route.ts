@@ -8,7 +8,10 @@ import {
   isBackendAuthResponse,
 } from '@/lib/auth/auth-response';
 
-import { createErrorResponse, parseJsonSafe } from '@/lib/api/http-response';
+import {
+  parseServerJsonSafe,
+  createErrorResponse,
+} from '@/lib/api/server-response';
 
 //===============================================================
 
@@ -33,7 +36,7 @@ export async function POST(request: Request) {
       cache: 'no-store',
     });
 
-    const data = await parseJsonSafe<unknown>(response);
+    const data = await parseServerJsonSafe<unknown>(response);
 
     if (!response.ok) {
       return createErrorResponse(

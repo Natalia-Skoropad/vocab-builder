@@ -3,10 +3,9 @@
 import { useCallback, useMemo } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 
-import type { WordsQueryParams } from '@/types/word';
-
 import {
   buildWordsPath,
+  buildWordsQueryParams,
   parseDictionarySegments,
 } from '@/lib/utils/dictionary.query';
 
@@ -59,24 +58,16 @@ export function useWordsRouteState({
     ? searchParams.get('newWordId')?.trim() ?? ''
     : '';
 
-  const queryParams = useMemo<WordsQueryParams>(() => {
-    const nextParams: WordsQueryParams = {
-      page: filters.page,
-      limit: wordsPerPage,
-      keyword: keyword || undefined,
-      category:
-        filters.category !== 'categories' ? filters.category : undefined,
-      isIrregular:
-        filters.category === 'verb' ? filters.isIrregular : undefined,
-      sort: filters.sort,
-    };
-
-    if (includeNewWordId && newWordId) {
-      nextParams.newWordId = newWordId;
-    }
-
-    return nextParams;
-  }, [filters, includeNewWordId, keyword, newWordId, wordsPerPage]);
+  const queryParams = useMemo(
+    () =>
+      buildWordsQueryParams(filters, {
+        wordsPerPage,
+        keyword,
+        includeNewWordId,
+        newWordId,
+      }),
+    [filters, includeNewWordId, keyword, newWordId, wordsPerPage]
+  );
 
   const hasIrregularFilter = typeof filters.isIrregular === 'boolean';
 
@@ -90,12 +81,8 @@ export function useWordsRouteState({
   const buildPageUrl = useCallback(
     (nextPage: number) => {
       const nextPath = buildWordsPath(basePath, {
-        category: filters.category,
-        isIrregular:
-          filters.category === 'verb' ? filters.isIrregular : undefined,
+        ...filters,
         page: nextPage,
-        sort: filters.sort,
-        progress: filters.progress,
       });
 
       const nextParams = new URLSearchParams();

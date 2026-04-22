@@ -3,11 +3,12 @@ import { NextRequest } from 'next/server';
 import { API_BASE_URL } from '@/lib/constants/api';
 import { getSessionCookie } from '@/lib/server/auth/session';
 import { normalizeOwnWordsResponse } from '@/lib/words/words-response';
+
 import {
+  parseServerJsonSafe,
   createErrorResponse,
   createOkResponse,
-  parseJsonSafe,
-} from '@/lib/api/http-response';
+} from '@/lib/api/server-response';
 
 import type { WordItem, WordSort } from '@/types/word';
 
@@ -137,7 +138,7 @@ async function fetchAllRecommendedWords(args: {
       cache: 'no-store',
     });
 
-    const data = await parseJsonSafe<unknown>(response);
+    const data = await parseServerJsonSafe<unknown>(response);
 
     if (!response.ok) {
       throw {

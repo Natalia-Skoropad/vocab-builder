@@ -7,7 +7,7 @@ import {
 
 import { getAuthErrorMessage } from '@/lib/auth/auth-error';
 import { createAuthOkResponse } from '@/lib/auth/auth-response';
-import { createErrorResponse } from '@/lib/api/http-response';
+import { createErrorResponse } from '@/lib/api/server-response';
 
 //===============================================================
 
