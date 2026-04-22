@@ -18,7 +18,7 @@ type Props = {
   variant: 'dictionary' | 'recommend';
   totalCount?: number;
   learnedCount?: number;
-  useFallbackStatistics?: boolean;
+  useFallbackLearnedCount?: boolean;
   showAddWord?: boolean;
   showTrainLink?: boolean;
   onAddWord?: () => void;
@@ -31,7 +31,7 @@ function Dashboard({
   variant,
   totalCount,
   learnedCount,
-  useFallbackStatistics = true,
+  useFallbackLearnedCount = true,
   showAddWord = false,
   showTrainLink = true,
   onAddWord,
@@ -47,7 +47,6 @@ function Dashboard({
           <Filters
             variant={variant}
             isPanelOpen={isFiltersOpen}
-            onOpenPanel={() => setIsFiltersOpen(true)}
             onClosePanel={() => setIsFiltersOpen(false)}
             onAppliedStateChange={setHasAppliedFilters}
           />
@@ -76,7 +75,7 @@ function Dashboard({
           <Statistics
             totalCount={totalCount}
             learnedCount={learnedCount}
-            useFallbackQueries={useFallbackStatistics}
+            useFallbackLearnedCount={useFallbackLearnedCount}
           />
         </div>
 

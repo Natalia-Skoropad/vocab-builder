@@ -40,7 +40,7 @@ type EditWordParams = {
 
 //===============================================================
 
-const LEARNED_COUNT_FALLBACK_LIMIT = 1000;
+const LEARNED_WORDS_COUNT_FALLBACK_LIMIT = 1000;
 
 //===============================================================
 
@@ -236,10 +236,15 @@ async function getStatistics(): Promise<WordsStatisticsResponse> {
 
 //===============================================================
 
-async function getLearnedWordsCount(): Promise<number> {
+/**
+ * Temporary frontend fallback for learned words count.
+ * The backend does not provide a dedicated learned-count endpoint yet,
+ * so we fetch a capped list of own words and count progress >= 100 on the client.
+ */
+async function getLearnedWordsCountFallback(): Promise<number> {
   const response = await getOwnWords({
     page: 1,
-    limit: LEARNED_COUNT_FALLBACK_LIMIT,
+    limit: LEARNED_WORDS_COUNT_FALLBACK_LIMIT,
   });
 
   return getLearnedWordsCountFromResults(response.results);
@@ -335,7 +340,7 @@ export const wordsService = {
   getOwnWords,
   getAllWords,
   getStatistics,
-  getLearnedWordsCount,
+  getLearnedWordsCountFallback,
   deleteWord,
   createWord,
   editWord,

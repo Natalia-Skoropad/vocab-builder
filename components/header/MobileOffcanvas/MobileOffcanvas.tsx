@@ -1,7 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect } from 'react';
+
+import { useBackdropClose } from '@/hooks/useBackdropClose';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useEscapeToClose } from '@/hooks/useEscapeToClose';
 
 import CloseButton from '@/components/common/CloseButton/CloseButton';
 import CompanyLogo from '@/components/common/CompanyLogo/CompanyLogo';
@@ -30,25 +33,14 @@ function MobileOffcanvas({
   userName = 'User',
   onLogout,
 }: Props) {
-  const handleBackdropClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (e.target === e.currentTarget) {
-        onClose();
-      }
-    },
-    [onClose]
-  );
+  useEscapeToClose({
+    isActive: isOpen,
+    onClose,
+  });
 
-  useEffect(() => {
-    if (!isOpen) return;
+  useBodyScrollLock(isOpen);
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, onClose]);
+  const handleBackdropClick = useBackdropClose<HTMLDivElement>(onClose);
 
   if (!isOpen) return null;
 

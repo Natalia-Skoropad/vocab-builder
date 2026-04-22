@@ -2,12 +2,10 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
+import { useState } from 'react';
 
 import { ROUTES } from '@/lib/constants/routes';
-import { useAuth } from '@/hooks/useAuth';
+import { useHeaderAuthActions } from '@/hooks/useHeaderAuthActions';
 
 import CompanyLogo from '@/components/common/CompanyLogo/CompanyLogo';
 import BurgerButton from '@/components/header/BurgerButton/BurgerButton';
@@ -30,49 +28,11 @@ const MobileOffcanvas = dynamic(
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const { user, logout, isAuthReady } = useAuth();
-
-  const isAuthenticated = Boolean(user);
-  const userName = user?.name?.trim() || 'User';
+  const { isAuthReady, isAuthenticated, userName, handleLogout } =
+    useHeaderAuthActions();
 
   const openMenu = () => setIsMenuOpen(true);
   const closeMenu = () => setIsMenuOpen(false);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('Logged out successfully!');
-      closeMenu();
-
-      if (
-        pathname.startsWith(ROUTES.DICTIONARY) ||
-        pathname.startsWith(ROUTES.RECOMMEND) ||
-        pathname.startsWith(ROUTES.TRAINING)
-      ) {
-        router.replace(ROUTES.HOME);
-        return;
-      }
-
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-      toast.error('Logout failed. Please try again.');
-    }
-  };
-
-  useEffect(() => {
-    if (!isMenuOpen) return;
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [isMenuOpen]);
 
   return (
     <header className={css.header}>
@@ -115,7 +75,10 @@ function Header() {
                     variant="header"
                     className={css.desktopBadge}
                   />
-                  <LogoutButton onClick={handleLogout} variant="header" />
+                  <LogoutButton
+                    onClick={() => void handleLogout()}
+                    variant="header"
+                  />
                 </div>
               </>
             ) : (
@@ -151,7 +114,9 @@ function Header() {
           onClose={closeMenu}
           isAuthenticated={isAuthenticated}
           userName={userName}
-          onLogout={isAuthenticated ? handleLogout : undefined}
+          onLogout={
+            isAuthenticated ? () => handleLogout(() => closeMenu()) : undefined
+          }
         />
       ) : null}
     </header>

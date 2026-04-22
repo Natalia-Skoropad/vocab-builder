@@ -1,12 +1,14 @@
 import * as yup from 'yup';
 
+import {
+  EN_WORD_PATTERN,
+  UA_WORD_PATTERN,
+} from '@/lib/validations/wordPatterns';
+
 //===============================================================
 
 const WORD_MIN = 1;
 const WORD_MAX = 60;
-
-const EN_REGEX = /^[A-Za-z'-]+(?:\s+[A-Za-z'-]+)*$/;
-const UA_REGEX = /^(?![A-Za-z])[А-ЯІЄЇҐґа-яієїʼ'`\-\s]+$/u;
 
 //===============================================================
 
@@ -20,7 +22,7 @@ export const uaWordField = yup
   .trim()
   .min(WORD_MIN, 'Enter at least 1 character')
   .max(WORD_MAX, `Maximum ${WORD_MAX} characters`)
-  .matches(UA_REGEX, 'Enter a valid Ukrainian word')
+  .matches(UA_WORD_PATTERN, 'Enter a valid Ukrainian word')
   .required('Enter a valid Ukrainian word');
 
 export const enWordField = yup
@@ -28,5 +30,5 @@ export const enWordField = yup
   .trim()
   .min(WORD_MIN, 'Enter at least 1 character')
   .max(WORD_MAX, `Maximum ${WORD_MAX} characters`)
-  .matches(EN_REGEX, 'Enter a valid English word')
+  .matches(EN_WORD_PATTERN, 'Enter a valid English word')
   .required('Enter a valid English word');

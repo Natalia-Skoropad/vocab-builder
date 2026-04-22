@@ -7,7 +7,7 @@ export const wordsQueryKeys = {
   dictionaryRoot: ['dictionary-words'] as const,
   recommendRoot: ['recommend-words'] as const,
   statistics: ['words-statistics'] as const,
-  learnedCount: ['words-learned-count'] as const,
+  learnedCountFallback: ['words-learned-count-fallback'] as const,
   recommendOwn: ['recommend-own-words'] as const,
 
   dictionary: (params: WordsQueryParams, progress?: WordProgressFilter) =>

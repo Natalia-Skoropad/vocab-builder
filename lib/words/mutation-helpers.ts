@@ -71,7 +71,7 @@ export async function invalidateWordsStatisticsQueries(
       queryKey: wordsQueryKeys.statistics,
     }),
     queryClient.invalidateQueries({
-      queryKey: wordsQueryKeys.learnedCount,
+      queryKey: wordsQueryKeys.learnedCountFallback,
     }),
   ]);
 }

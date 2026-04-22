@@ -1,6 +1,10 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
+
+import { useBackdropClose } from '@/hooks/useBackdropClose';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useEscapeToClose } from '@/hooks/useEscapeToClose';
 
 import CloseButton from '@/components/common/CloseButton/CloseButton';
 
@@ -18,36 +22,21 @@ type Props = {
 //===============================================================
 
 function ModalBase({ isOpen, onClose, children, ariaLabel }: Props) {
-  useEffect(() => {
-    if (!isOpen) return;
+  useEscapeToClose({
+    isActive: isOpen,
+    onClose,
+  });
 
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
+  useBodyScrollLock(isOpen);
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    window.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [isOpen, onClose]);
+  const handleBackdropClick = useBackdropClose<HTMLDivElement>(onClose);
 
   if (!isOpen) return null;
 
   return (
     <div
       className={css.backdrop}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
-      }}
+      onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-label={ariaLabel}

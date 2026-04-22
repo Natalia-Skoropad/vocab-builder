@@ -4,6 +4,11 @@ import type { ChangeEvent } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+import {
+  isValidEnglishWord,
+  isValidUkrainianWord,
+} from '@/lib/validations/wordPatterns';
+
 import Button from '@/components/common/Button/Button';
 import LanguageBadge from '@/components/common/LanguageBadge/LanguageBadge';
 
@@ -23,11 +28,6 @@ type Props = {
   showNext: boolean;
   isSubmitting?: boolean;
 };
-
-//===============================================================
-
-const EN_TRAINING_REGEX = /^[A-Za-z'-]+(?:\s+[A-Za-z'-]+)*$/;
-const UA_TRAINING_REGEX = /^(?![A-Za-z])[А-ЯІЄЇҐґа-яієїʼ'`\-\s]+$/u;
 
 //===============================================================
 
@@ -62,8 +62,8 @@ function TrainingRoom({
   const isAnswerFormatValid =
     !trimmedValue ||
     (isTranslateToEnglish
-      ? EN_TRAINING_REGEX.test(trimmedValue)
-      : UA_TRAINING_REGEX.test(trimmedValue));
+      ? isValidEnglishWord(trimmedValue)
+      : isValidUkrainianWord(trimmedValue));
 
   const validationMessage = isTranslateToEnglish
     ? 'Enter a valid English word or phrase.'

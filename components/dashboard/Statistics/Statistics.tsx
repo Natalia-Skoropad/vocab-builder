@@ -14,7 +14,7 @@ type Props = {
   totalCount?: number;
   learnedCount?: number;
   className?: string;
-  useFallbackQueries?: boolean;
+  useFallbackLearnedCount?: boolean;
 };
 
 //===============================================================
@@ -23,13 +23,12 @@ function Statistics({
   totalCount,
   learnedCount,
   className,
-  useFallbackQueries = true,
+  useFallbackLearnedCount = false,
 }: Props) {
-  const shouldFetchTotalCount =
-    useFallbackQueries && typeof totalCount !== 'number';
+  const shouldFetchTotalCount = typeof totalCount !== 'number';
 
-  const shouldFetchLearnedCount =
-    useFallbackQueries && typeof learnedCount !== 'number';
+  const shouldFetchLearnedCountFallback =
+    useFallbackLearnedCount && typeof learnedCount !== 'number';
 
   const { data: statisticsData } = useQuery({
     queryKey: wordsQueryKeys.statistics,
@@ -39,9 +38,9 @@ function Statistics({
   });
 
   const { data: fallbackLearnedCount } = useQuery({
-    queryKey: wordsQueryKeys.learnedCount,
-    queryFn: wordsService.getLearnedWordsCount,
-    enabled: shouldFetchLearnedCount,
+    queryKey: wordsQueryKeys.learnedCountFallback,
+    queryFn: wordsService.getLearnedWordsCountFallback,
+    enabled: shouldFetchLearnedCountFallback,
     staleTime: 60_000,
   });
 
