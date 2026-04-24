@@ -42,6 +42,16 @@ type EditWordParams = {
 
 const LEARNED_WORDS_COUNT_FALLBACK_LIMIT = 1000;
 
+const WORDS_ENDPOINTS = {
+  own: '/api/words/own',
+  recommend: '/api/words/recommend',
+  statistics: '/api/words/statistics',
+  create: '/api/words/create',
+  delete: (id: string) => `/api/words/delete/${id}`,
+  edit: (id: string) => `/api/words/edit/${id}`,
+  addFromRecommend: (id: string) => `/api/words/add/${id}`,
+} as const;
+
 //===============================================================
 
 function isBaseWordShape(data: unknown): data is {
@@ -186,7 +196,7 @@ async function getOwnWords(
   params: WordsQueryParams = {}
 ): Promise<OwnWordsResponse> {
   const query = buildWordsQuery(params);
-  const url = `/api/words/own${query ? `?${query}` : ''}`;
+  const url = `${WORDS_ENDPOINTS.own}${query ? `?${query}` : ''}`;
 
   const response = await fetch(url, {
     method: 'GET',
@@ -200,7 +210,7 @@ async function getAllWords(
   params: WordsQueryParams = {}
 ): Promise<RecommendedWordsResponse> {
   const query = buildWordsQuery(params);
-  const url = `/api/words/recommend${query ? `?${query}` : ''}`;
+  const url = `${WORDS_ENDPOINTS.recommend}${query ? `?${query}` : ''}`;
 
   const response = await fetch(url, {
     method: 'GET',
@@ -216,7 +226,7 @@ async function getAllWords(
 //===============================================================
 
 async function getStatistics(): Promise<WordsStatisticsResponse> {
-  const response = await fetch('/api/words/statistics', {
+  const response = await fetch(WORDS_ENDPOINTS.statistics, {
     method: 'GET',
     cache: 'no-store',
   });
@@ -253,7 +263,7 @@ async function getLearnedWordsCountFallback(): Promise<number> {
 //===============================================================
 
 async function deleteWord(id: string): Promise<DeleteWordResponse> {
-  const response = await fetch(`/api/words/delete/${id}`, {
+  const response = await fetch(WORDS_ENDPOINTS.delete(id), {
     method: 'DELETE',
     cache: 'no-store',
   });
@@ -271,7 +281,7 @@ async function deleteWord(id: string): Promise<DeleteWordResponse> {
 //===============================================================
 
 async function createWord(values: AddWordFormValues): Promise<WordItem> {
-  const response = await fetch('/api/words/create', {
+  const response = await fetch(WORDS_ENDPOINTS.create, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -296,7 +306,7 @@ async function createWord(values: AddWordFormValues): Promise<WordItem> {
 //===============================================================
 
 async function editWord(params: EditWordParams): Promise<WordItem> {
-  const response = await fetch(`/api/words/edit/${params.id}`, {
+  const response = await fetch(WORDS_ENDPOINTS.edit(params.id), {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -321,7 +331,7 @@ async function editWord(params: EditWordParams): Promise<WordItem> {
 //===============================================================
 
 async function addWordFromRecommend(id: string): Promise<WordItem> {
-  const response = await fetch(`/api/words/add/${id}`, {
+  const response = await fetch(WORDS_ENDPOINTS.addFromRecommend(id), {
     method: 'POST',
     cache: 'no-store',
   });

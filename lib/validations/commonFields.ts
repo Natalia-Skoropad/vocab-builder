@@ -38,8 +38,5 @@ export const passwordSchema = yup
     AUTH_PASSWORD_MAX_LENGTH,
     `Password must be at most ${AUTH_PASSWORD_MAX_LENGTH} characters`
   )
-  .matches(
-    PASSWORD_REGEX,
-    'Password must contain 6 English letters and 1 number'
-  )
+  .matches(PASSWORD_REGEX, 'Must contain 6 English letters and 1 number')
   .required('Password is required');

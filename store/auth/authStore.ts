@@ -20,7 +20,6 @@ type AuthState = {
   user: AppUser | null;
   isLoading: boolean;
   isAuthReady: boolean;
-  isAuthenticated: boolean;
 
   initAuth: () => Promise<void>;
   register: (data: RegisterData) => Promise<AppUser>;
@@ -34,7 +33,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: false,
   isAuthReady: false,
-  isAuthenticated: false,
 
   initAuth: async () => {
     set({ isLoading: true });
@@ -46,7 +44,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         user,
         isLoading: false,
         isAuthReady: true,
-        isAuthenticated: Boolean(user),
       });
     } catch (error) {
       console.error('initAuth error:', error);
@@ -55,7 +52,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: null,
         isLoading: false,
         isAuthReady: true,
-        isAuthenticated: false,
       });
     }
   },
@@ -70,7 +66,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         user,
         isLoading: false,
         isAuthReady: true,
-        isAuthenticated: true,
       });
 
       return user;
@@ -79,6 +74,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false,
         isAuthReady: true,
       });
+
       throw error;
     }
   },
@@ -93,7 +89,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         user,
         isLoading: false,
         isAuthReady: true,
-        isAuthenticated: true,
       });
 
       return user;
@@ -102,6 +97,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false,
         isAuthReady: true,
       });
+
       throw error;
     }
   },
@@ -116,7 +112,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: null,
         isLoading: false,
         isAuthReady: true,
-        isAuthenticated: false,
       });
     } catch (error) {
       set({ isLoading: false });

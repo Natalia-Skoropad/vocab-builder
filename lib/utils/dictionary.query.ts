@@ -1,4 +1,5 @@
 import type { WordCategory, WordsQueryParams, WordSort } from '@/types/word';
+import { WORD_CATEGORIES } from '@/lib/constants/word-categories';
 
 //===============================================================
 
@@ -47,21 +48,7 @@ function slugify(value: string): string {
 }
 
 function unslugCategory(slug: string): WordCategory | null {
-  const categories: WordCategory[] = [
-    'verb',
-    'participle',
-    'noun',
-    'adjective',
-    'pronoun',
-    'numerals',
-    'adverb',
-    'preposition',
-    'conjunction',
-    'phrasal verb',
-    'functional phrase',
-  ];
-
-  return categories.find((item) => slugify(item) === slug) ?? null;
+  return WORD_CATEGORIES.find((item) => slugify(item) === slug) ?? null;
 }
 
 //===============================================================

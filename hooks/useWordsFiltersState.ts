@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-hot-toast';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import type { WordSort } from '@/types/word';
@@ -61,8 +60,16 @@ export function useWordsFiltersState({
   const searchParams = useSearchParams();
 
   const categories = useCategoriesStore((state) => state.categories);
-  const isLoaded = useCategoriesStore((state) => state.isLoaded);
+  const categoriesStatus = useCategoriesStore((state) => state.status);
   const fetchCategories = useCategoriesStore((state) => state.fetchCategories);
+
+  useEffect(() => {
+    if (categoriesStatus === 'success' || categoriesStatus === 'loading') {
+      return;
+    }
+
+    void fetchCategories();
+  }, [categoriesStatus, fetchCategories]);
 
   const rawFiltersParam = params.filters;
   const basePath = variant === 'recommend' ? '/recommend' : '/dictionary';
@@ -89,23 +96,13 @@ export function useWordsFiltersState({
   const [verbType, setVerbType] = useState<'regular' | 'irregular'>(
     routeFilters.isIrregular === true ? 'irregular' : 'regular'
   );
+
   const [sort, setSort] = useState<SortValue>(routeFilters.sort ?? 'sort');
   const [progress, setProgress] = useState<ProgressValue>(
     routeFilters.progress ?? 'progress'
   );
 
   const debouncedKeyword = useDebounce(keyword, 300);
-
-  useEffect(() => {
-    if (isLoaded) return;
-
-    void fetchCategories().catch((error) => {
-      console.error(error);
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to load categories.'
-      );
-    });
-  }, [fetchCategories, isLoaded]);
 
   useEffect(() => {
     setKeyword(initialKeyword);

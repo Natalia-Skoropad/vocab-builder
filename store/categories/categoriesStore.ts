@@ -5,50 +5,52 @@ import { categoriesService } from '@/lib/services/categories.service';
 
 //===============================================================
 
+type CategoriesStatus = 'idle' | 'loading' | 'success' | 'error';
+
 type CategoriesState = {
   categories: WordCategory[];
-  isLoading: boolean;
-  isLoaded: boolean;
-  error: string | null;
+  status: CategoriesStatus;
   fetchCategories: () => Promise<void>;
+  reset: () => void;
+};
+
+//===============================================================
+
+const initialState = {
+  categories: [] as WordCategory[],
+  status: 'idle' as CategoriesStatus,
 };
 
 //===============================================================
 
 export const useCategoriesStore = create<CategoriesState>((set, get) => ({
-  categories: [],
-  isLoading: false,
-  isLoaded: false,
-  error: null,
+  ...initialState,
 
-  fetchCategories: async () => {
-    const { isLoading, isLoaded } = get();
+  async fetchCategories() {
+    const { status } = get();
 
-    if (isLoading || isLoaded) return;
+    if (status === 'loading' || status === 'success') return;
 
-    set({
-      isLoading: true,
-      error: null,
-    });
+    set({ status: 'loading' });
 
     try {
       const categories = await categoriesService.getCategories();
 
       set({
         categories,
-        isLoading: false,
-        isLoaded: true,
-        error: null,
+        status: 'success',
       });
     } catch (error) {
-      set({
-        isLoading: false,
-        isLoaded: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to load categories.',
-      });
+      console.error(error);
 
-      throw error;
+      set({
+        categories: [],
+        status: 'error',
+      });
     }
+  },
+
+  reset() {
+    set(initialState);
   },
 }));

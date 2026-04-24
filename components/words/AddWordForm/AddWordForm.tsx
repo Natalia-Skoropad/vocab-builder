@@ -50,13 +50,16 @@ function AddWordForm({ onClose }: Props) {
   const router = useRouter();
 
   const categories = useCategoriesStore((state) => state.categories);
-  const isLoaded = useCategoriesStore((state) => state.isLoaded);
+  const categoriesStatus = useCategoriesStore((state) => state.status);
   const fetchCategories = useCategoriesStore((state) => state.fetchCategories);
 
   useEffect(() => {
-    if (isLoaded) return;
-    void fetchCategories().catch(() => null);
-  }, [fetchCategories, isLoaded]);
+    if (categoriesStatus === 'success' || categoriesStatus === 'loading') {
+      return;
+    }
+
+    void fetchCategories();
+  }, [categoriesStatus, fetchCategories]);
 
   const {
     control,

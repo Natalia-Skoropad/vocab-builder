@@ -10,7 +10,7 @@ export function useAuth() {
       user: state.user,
       isLoading: state.isLoading,
       isAuthReady: state.isAuthReady,
-      isAuthenticated: state.isAuthenticated,
+      isAuthenticated: Boolean(state.user),
       initAuth: state.initAuth,
       register: state.register,
       login: state.login,
