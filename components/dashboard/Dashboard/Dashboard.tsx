@@ -69,7 +69,7 @@ function Dashboard({
               : 'Open filters'
           }
           aria-expanded={isFiltersOpen}
-          aria-controls="words-filters-offcanvas"
+          aria-controls={isFiltersOpen ? 'words-filters-offcanvas' : undefined}
         >
           <SlidersHorizontal
             className={css.filterButtonIcon}

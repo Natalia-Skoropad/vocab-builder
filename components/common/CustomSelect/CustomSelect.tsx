@@ -99,7 +99,7 @@ function CustomSelect({
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-controls={listboxId}
+        aria-controls={isOpen ? listboxId : undefined}
         aria-label={ariaLabel}
         aria-labelledby={labelledBy}
       >

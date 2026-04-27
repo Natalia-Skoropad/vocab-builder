@@ -245,8 +245,12 @@ function RecommendPageClient() {
   if (isError) {
     return (
       <main className={css.page}>
-        <section className="container">
+        <section className="container" aria-labelledby="recommend-page-title">
           <Breadcrumbs items={breadcrumbItems} />
+
+          <h1 id="recommend-page-title" className="visually-hidden">
+            Recommend
+          </h1>
 
           <Dashboard variant="recommend" showAddWord={false} showTrainLink />
 
@@ -264,10 +268,14 @@ function RecommendPageClient() {
 
   return (
     <main className={css.page}>
-      <section className="container">
+      <section className="container" aria-labelledby="recommend-page-title">
         <Breadcrumbs items={breadcrumbItems} />
 
         <Dashboard variant="recommend" showAddWord={false} showTrainLink />
+
+        <h1 id="recommend-page-title" className="visually-hidden">
+          Recommend
+        </h1>
 
         {showLoader ? (
           <div className={css.loaderWrap}>

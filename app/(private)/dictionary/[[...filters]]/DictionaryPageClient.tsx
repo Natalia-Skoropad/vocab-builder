@@ -178,8 +178,12 @@ function DictionaryPageClient() {
   if (isError) {
     return (
       <main className={css.page}>
-        <section className="container">
+        <section className="container" aria-labelledby="dictionary-page-title">
           <Breadcrumbs items={breadcrumbItems} />
+
+          <h1 id="dictionary-page-title" className="visually-hidden">
+            Dictionary
+          </h1>
 
           <Dashboard
             variant="dictionary"
@@ -204,8 +208,12 @@ function DictionaryPageClient() {
 
   return (
     <main className={css.page}>
-      <section className="container">
+      <section className="container" aria-labelledby="dictionary-page-title">
         <Breadcrumbs items={breadcrumbItems} />
+
+        <h1 id="dictionary-page-title" className="visually-hidden">
+          Dictionary
+        </h1>
 
         <Dashboard
           variant="dictionary"

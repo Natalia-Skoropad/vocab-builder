@@ -117,8 +117,12 @@ function TrainingPageClient() {
   if (isLoading) {
     return (
       <main className={css.page}>
-        <section className="container">
+        <section className="container" aria-labelledby="training-page-title">
           <Breadcrumbs items={breadcrumbItems} />
+
+          <h1 id="training-page-title" className="visually-hidden">
+            Training
+          </h1>
 
           <div className={css.loaderWrap}>
             <InlineLoader
@@ -134,8 +138,12 @@ function TrainingPageClient() {
   if (isError) {
     return (
       <main className={css.page}>
-        <section className="container">
+        <section className="container" aria-labelledby="training-page-title">
           <Breadcrumbs items={breadcrumbItems} />
+
+          <h1 id="training-page-title" className="visually-hidden">
+            Training
+          </h1>
 
           <div className={css.contentWrap}>
             <EmptyState
@@ -158,8 +166,12 @@ function TrainingPageClient() {
   if (!tasks.length) {
     return (
       <main className={css.page}>
-        <section className="container">
+        <section className="container" aria-labelledby="training-page-title">
           <Breadcrumbs items={breadcrumbItems} />
+
+          <h1 id="training-page-title" className="visually-hidden">
+            Training
+          </h1>
 
           <div className={css.topBar}>
             <div className={css.statsWrap}>
@@ -193,8 +205,12 @@ function TrainingPageClient() {
 
   return (
     <main className={css.page}>
-      <section className="container">
+      <section className="container" aria-labelledby="training-page-title">
         <Breadcrumbs items={breadcrumbItems} />
+
+        <h1 id="training-page-title" className="visually-hidden">
+          Training
+        </h1>
 
         <div className={css.topBar}>
           <div className={css.statsWrap}>

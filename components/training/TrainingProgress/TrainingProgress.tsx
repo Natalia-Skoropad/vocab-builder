@@ -17,8 +17,18 @@ function TrainingProgress({ current, total }: Props) {
   const dashOffset = circumference - (percent / 100) * circumference;
 
   return (
-    <div className={css.wrap} aria-label={`Progress ${percent}%`}>
-      <span className={css.value}>{safeCurrent}</span>
+    <div
+      className={css.wrap}
+      role="progressbar"
+      aria-label="Training progress"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={percent}
+      aria-valuetext={`${safeCurrent} of ${safeTotal} tasks completed`}
+    >
+      <span className={css.value} aria-hidden="true">
+        {safeCurrent}
+      </span>
 
       <svg
         className={css.circle}
@@ -27,6 +37,7 @@ function TrainingProgress({ current, total }: Props) {
         aria-hidden="true"
       >
         <circle className={css.track} cx="26" cy="26" r="22" />
+
         <circle
           className={css.progress}
           cx="26"
