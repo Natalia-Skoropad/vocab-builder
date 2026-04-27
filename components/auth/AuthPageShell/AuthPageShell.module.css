@@ -7,11 +7,6 @@
   padding-bottom: 32px;
 }
 
-.breadcrumbsWrap {
-  width: 100%;
-  margin-bottom: 16px;
-}
-
 .content {
   display: flex;
   flex-direction: column;
@@ -65,10 +60,6 @@
     padding-bottom: 40px;
   }
 
-  .breadcrumbsWrap {
-    margin-bottom: 24px;
-  }
-
   .visualSide {
     display: none;
     margin-bottom: 0;
@@ -108,10 +99,6 @@
 
   .shell {
     padding-bottom: 48px;
-  }
-
-  .breadcrumbsWrap {
-    margin-bottom: 32px;
   }
 
   .content {

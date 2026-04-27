@@ -83,7 +83,7 @@ async function getCurrentUser(): Promise<AppUser | null> {
     'Failed to fetch current user.'
   )) as AuthResponse;
 
-  return result.user || null;
+  return result.user ?? null;
 }
 
 //===============================================================

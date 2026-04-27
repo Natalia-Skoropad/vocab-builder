@@ -30,13 +30,9 @@ function AuthPageShell({ children }: Props) {
     : null;
 
   return (
-    <div className={css.page}>
+    <main className={css.page}>
       <div className={`container ${css.shell}`}>
-        {breadcrumbItems ? (
-          <div className={css.breadcrumbsWrap}>
-            <Breadcrumbs items={breadcrumbItems} />
-          </div>
-        ) : null}
+        {breadcrumbItems ? <Breadcrumbs items={breadcrumbItems} /> : null}
 
         <div className={clsx(css.content, isRegisterPage && css.isRegister)}>
           <aside className={css.visualSide} aria-hidden="true">
@@ -47,6 +43,7 @@ function AuthPageShell({ children }: Props) {
                 width={498}
                 height={435}
                 priority
+                fetchPriority="high"
                 className={css.image}
               />
             </div>
@@ -65,7 +62,7 @@ function AuthPageShell({ children }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

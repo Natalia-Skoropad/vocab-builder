@@ -91,6 +91,7 @@ function MobileOffcanvas({
             className={css.illustration}
             sizes="(max-width: 767px) 180px, 220px"
             priority={false}
+            fetchPriority="high"
           />
         </div>
       </div>

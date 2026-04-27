@@ -87,6 +87,7 @@ function Home() {
                   width={568}
                   height={530}
                   priority
+                  fetchPriority="high"
                 />
               </div>
             </div>
