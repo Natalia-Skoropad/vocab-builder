@@ -10,7 +10,7 @@ import {
   createOkResponse,
 } from '@/lib/api/server-response';
 
-import type { WordItem, WordSort } from '@/types/word';
+import type { RecommendedWordItem, WordSort } from '@/types/word';
 
 //===============================================================
 
@@ -20,10 +20,10 @@ const DEFAULT_LIMIT = 7;
 //===============================================================
 
 type BackendWordsResponse = {
-  results: WordItem[];
-  totalPages: number;
-  page: number;
-  perPage: number;
+  results: RecommendedWordItem[];
+  totalPages?: number;
+  page?: number;
+  perPage?: number;
 };
 
 type BackendRequestError = {
@@ -33,7 +33,7 @@ type BackendRequestError = {
 
 //===============================================================
 
-function isWordItem(value: unknown): value is WordItem {
+function isRecommendedWordItem(value: unknown): value is RecommendedWordItem {
   return (
     !!value &&
     typeof value === 'object' &&
@@ -49,10 +49,7 @@ function isBackendWordsResponse(value: unknown): value is BackendWordsResponse {
     !!value &&
     typeof value === 'object' &&
     Array.isArray((value as { results?: unknown }).results) &&
-    (value as { results: unknown[] }).results.every(isWordItem) &&
-    typeof (value as { totalPages?: unknown }).totalPages === 'number' &&
-    typeof (value as { page?: unknown }).page === 'number' &&
-    typeof (value as { perPage?: unknown }).perPage === 'number'
+    (value as { results: unknown[] }).results.every(isRecommendedWordItem)
   );
 }
 
@@ -69,90 +66,177 @@ function getBackendMessage(data: unknown): string | undefined {
   return undefined;
 }
 
-function sortWords(words: WordItem[], sort?: WordSort): WordItem[] {
-  if (!sort) return words;
+function getSafePage(value: number): number {
+  return Number.isInteger(value) && value > 0 ? value : DEFAULT_PAGE;
+}
 
-  const sorted = [...words].sort((a, b) =>
-    a.en.localeCompare(b.en, 'en', { sensitivity: 'base' })
-  );
+function getSafeLimit(value: number): number {
+  return Number.isInteger(value) && value > 0 ? value : DEFAULT_LIMIT;
+}
 
-  return sort === 'z-a' ? sorted.reverse() : sorted;
+function getObjectIdTimestamp(id: string): number {
+  if (id.length < 8) return 0;
+
+  const hex = id.slice(0, 8);
+  const parsed = Number.parseInt(hex, 16);
+
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function sortWords(
+  words: RecommendedWordItem[],
+  sort?: WordSort
+): RecommendedWordItem[] {
+  if (sort === 'a-z') {
+    return [...words].sort((a, b) =>
+      a.en.localeCompare(b.en, 'en', { sensitivity: 'base' })
+    );
+  }
+
+  if (sort === 'z-a') {
+    return [...words].sort((a, b) =>
+      b.en.localeCompare(a.en, 'en', { sensitivity: 'base' })
+    );
+  }
+
+  return [...words].sort((a, b) => {
+    const timeDiff = getObjectIdTimestamp(b._id) - getObjectIdTimestamp(a._id);
+
+    if (timeDiff !== 0) return timeDiff;
+
+    return b._id.localeCompare(a._id);
+  });
 }
 
 function repaginateWords(
-  words: WordItem[],
+  words: RecommendedWordItem[],
   page: number,
   limit: number
-): BackendWordsResponse {
-  const safePage = Number.isInteger(page) && page > 0 ? page : DEFAULT_PAGE;
-  const safeLimit =
-    Number.isInteger(limit) && limit > 0 ? limit : DEFAULT_LIMIT;
+): {
+  results: RecommendedWordItem[];
+  totalPages: number;
+  page: number;
+  perPage: number;
+} {
+  const safePage = getSafePage(page);
+  const safeLimit = getSafeLimit(limit);
 
   const totalPages = Math.max(1, Math.ceil(words.length / safeLimit));
-  const start = (safePage - 1) * safeLimit;
-  const end = start + safeLimit;
+  const currentPage = Math.min(safePage, totalPages);
+  const start = (currentPage - 1) * safeLimit;
 
   return {
-    results: words.slice(start, end),
+    results: words.slice(start, start + safeLimit),
     totalPages,
-    page: safePage,
+    page: currentPage,
     perPage: safeLimit,
   };
 }
 
-async function fetchAllRecommendedWords(args: {
+function buildBackendParams({
+  keyword,
+  category,
+  isIrregular,
+  page,
+  limit,
+}: {
+  keyword?: string;
+  category?: string;
+  isIrregular?: string;
+  page: number;
+  limit: number;
+}) {
+  const params = new URLSearchParams();
+
+  if (keyword) params.set('keyword', keyword);
+  if (category) params.set('category', category);
+  if (isIrregular) params.set('isIrregular', isIrregular);
+
+  params.set('page', String(page));
+  params.set('limit', String(limit));
+
+  return params;
+}
+
+async function fetchRecommendedWordsPage({
+  token,
+  keyword,
+  category,
+  isIrregular,
+  page,
+  limit,
+}: {
   token: string;
   keyword?: string;
   category?: string;
   isIrregular?: string;
-}): Promise<WordItem[]> {
-  const aggregated: WordItem[] = [];
-  let currentPage = 1;
-  let totalPages = 1;
+  page: number;
+  limit: number;
+}): Promise<BackendWordsResponse> {
+  const params = buildBackendParams({
+    keyword,
+    category,
+    isIrregular,
+    page,
+    limit,
+  });
+
+  const response = await fetch(`${API_BASE_URL}/words/all?${params}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: 'no-store',
+  });
+
+  const data = await parseServerJsonSafe<unknown>(response);
+
+  if (!response.ok) {
+    throw {
+      status: response.status,
+      message: getBackendMessage(data),
+    } satisfies BackendRequestError;
+  }
+
+  if (!isBackendWordsResponse(data)) {
+    throw new Error('Invalid recommend words response.');
+  }
+
+  return data;
+}
+
+async function fetchAllRecommendedWords({
+  token,
+  keyword,
+  category,
+  isIrregular,
+}: {
+  token: string;
+  keyword?: string;
+  category?: string;
+  isIrregular?: string;
+}): Promise<RecommendedWordItem[]> {
+  const aggregated: RecommendedWordItem[] = [];
+  let currentPage = DEFAULT_PAGE;
+  let totalPages = DEFAULT_PAGE;
 
   do {
-    const params = new URLSearchParams();
-
-    if (args.keyword) {
-      params.set('keyword', args.keyword);
-    }
-
-    if (args.category) {
-      params.set('category', args.category);
-    }
-
-    if (args.isIrregular === 'true' || args.isIrregular === 'false') {
-      params.set('isIrregular', args.isIrregular);
-    }
-
-    params.set('page', String(currentPage));
-    params.set('limit', String(DEFAULT_LIMIT));
-
-    const backendUrl = `${API_BASE_URL}/words/all?${params.toString()}`;
-
-    const response = await fetch(backendUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${args.token}`,
-      },
-      cache: 'no-store',
+    const data = await fetchRecommendedWordsPage({
+      token,
+      keyword,
+      category,
+      isIrregular,
+      page: currentPage,
+      limit: DEFAULT_LIMIT,
     });
 
-    const data = await parseServerJsonSafe<unknown>(response);
-
-    if (!response.ok) {
-      throw {
-        status: response.status,
-        message: getBackendMessage(data),
-      } satisfies BackendRequestError;
-    }
-
-    if (!isBackendWordsResponse(data)) {
-      throw new Error('Invalid recommend words response.');
-    }
-
     aggregated.push(...data.results);
-    totalPages = data.totalPages;
+
+    totalPages =
+      typeof data.totalPages === 'number' && data.totalPages > 0
+        ? data.totalPages
+        : currentPage;
+
     currentPage += 1;
   } while (currentPage <= totalPages);
 
@@ -170,32 +254,45 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
 
-  const keyword = searchParams.get('keyword')?.trim();
-  const category = searchParams.get('category')?.trim();
-  const isIrregular = searchParams.get('isIrregular');
-  const page = Number(searchParams.get('page') ?? DEFAULT_PAGE);
-  const limit = Number(searchParams.get('limit') ?? DEFAULT_LIMIT);
+  const keyword = searchParams.get('keyword')?.trim() || undefined;
+  const category = searchParams.get('category')?.trim() || undefined;
+  const isIrregular = searchParams.get('isIrregular') ?? undefined;
+
+  const page = getSafePage(Number(searchParams.get('page') ?? DEFAULT_PAGE));
+  const limit = getSafeLimit(
+    Number(searchParams.get('limit') ?? DEFAULT_LIMIT)
+  );
+
   const rawSort = searchParams.get('sort')?.trim();
   const sort =
     rawSort === 'a-z' || rawSort === 'z-a' ? (rawSort as WordSort) : undefined;
 
   try {
+    if (!sort) {
+      const data = await fetchRecommendedWordsPage({
+        token,
+        keyword,
+        category,
+        isIrregular,
+        page,
+        limit,
+      });
+
+      return createOkResponse(normalizeOwnWordsResponse(data, page, limit));
+    }
+
     const allWords = await fetchAllRecommendedWords({
       token,
       keyword,
       category,
-      isIrregular: isIrregular ?? undefined,
+      isIrregular,
     });
 
     const sortedWords = sortWords(allWords, sort);
     const repaginated = repaginateWords(sortedWords, page, limit);
 
     return createOkResponse(
-      normalizeOwnWordsResponse(
-        repaginated,
-        Number.isInteger(page) && page > 0 ? page : DEFAULT_PAGE,
-        Number.isInteger(limit) && limit > 0 ? limit : DEFAULT_LIMIT
-      )
+      normalizeOwnWordsResponse(repaginated, page, limit)
     );
   } catch (error) {
     if (

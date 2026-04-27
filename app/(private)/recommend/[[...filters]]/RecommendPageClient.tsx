@@ -39,6 +39,7 @@ import css from './page.module.css';
 const WORDS_PER_PAGE = 7;
 const OWN_WORDS_LOOKUP_LIMIT = 1000;
 const PROGRESS_FILTER_FALLBACK_LIMIT = 1000;
+const RECOMMEND_CACHE_TIME = 5 * 60 * 1000;
 
 //===============================================================
 
@@ -135,9 +136,12 @@ function RecommendPageClient() {
         limit: OWN_WORDS_LOOKUP_LIMIT,
       }),
     placeholderData: (previousData) => previousData,
+    staleTime: RECOMMEND_CACHE_TIME,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
-  const { data, isLoading, isFetching, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: wordsQueryKeys.recommend(queryParams, filters.progress),
     queryFn: async () => {
       try {
@@ -163,6 +167,10 @@ function RecommendPageClient() {
         throw queryError;
       }
     },
+    placeholderData: (previousData) => previousData,
+    staleTime: RECOMMEND_CACHE_TIME,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const mergedRows = useMemo<WordItem[]>(() => {
@@ -200,6 +208,7 @@ function RecommendPageClient() {
       1,
       Math.ceil(filteredRows.length / WORDS_PER_PAGE)
     );
+
     const currentPage = Math.min(filters.page, totalPages);
     const start = (currentPage - 1) * WORDS_PER_PAGE;
 
@@ -220,8 +229,7 @@ function RecommendPageClient() {
   const totalPages = pagedState.totalPages;
   const currentPage = pagedState.currentPage;
 
-  const showLoader =
-    (isLoading || isFetching) && !addToDictionaryMutation.isPending;
+  const showLoader = !data && isLoading && !addToDictionaryMutation.isPending;
 
   const handleAddToDictionary = async (word: WordItem) => {
     if (addingWordId || word.owner || addToDictionaryMutation.isPending) return;
