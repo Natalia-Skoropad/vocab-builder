@@ -13,6 +13,7 @@ import LogoutButton from '@/components/header/LogoutButton/LogoutButton';
 import MenuNav from '@/components/header/MenuNav/MenuNav';
 import UserBadge from '@/components/header/UserBadge/UserBadge';
 import HeaderAuthPlaceholder from '@/components/header/HeaderAuthPlaceholder/HeaderAuthPlaceholder';
+import HeaderNavPlaceholder from '@/components/header/HeaderNavPlaceholder/HeaderNavPlaceholder';
 
 import css from './Header.module.css';
 
@@ -42,7 +43,11 @@ function Header() {
         {!isAuthReady ? (
           <>
             <div className={css.mobileRight}>
-              <HeaderAuthPlaceholder />
+              <BurgerButton onClick={openMenu} className={css.burger} />
+            </div>
+
+            <div className={css.desktopNav}>
+              <HeaderNavPlaceholder />
             </div>
 
             <div className={css.desktopActions}>
@@ -75,6 +80,7 @@ function Header() {
                     variant="header"
                     className={css.desktopBadge}
                   />
+
                   <LogoutButton
                     onClick={() => void handleLogout()}
                     variant="header"

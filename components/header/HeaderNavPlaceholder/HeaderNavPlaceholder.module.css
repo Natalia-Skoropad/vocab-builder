@@ -1,0 +1,45 @@
+.navPlaceholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+}
+
+.item {
+  display: inline-block;
+  width: 86px;
+  height: 44px;
+  border-radius: 15px;
+  background-color: var(--border-light);
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.item:first-child {
+  width: 62px;
+}
+
+.item:nth-child(2) {
+  width: 118px;
+}
+
+.item:nth-child(3) {
+  width: 104px;
+}
+
+.item:nth-child(4) {
+  width: 88px;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0.45;
+  }
+}
