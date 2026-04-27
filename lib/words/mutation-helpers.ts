@@ -76,6 +76,12 @@ export async function invalidateWordsStatisticsQueries(
   ]);
 }
 
+export async function invalidateTrainingTasksQueries(queryClient: QueryClient) {
+  await queryClient.invalidateQueries({
+    queryKey: wordsQueryKeys.trainingTasks,
+  });
+}
+
 export async function invalidateDictionaryQueries(queryClient: QueryClient) {
   await queryClient.invalidateQueries({
     queryKey: wordsQueryKeys.dictionaryRoot,
@@ -99,6 +105,7 @@ export async function invalidateDictionaryDashboardQueries(
   await Promise.all([
     invalidateDictionaryQueries(queryClient),
     invalidateWordsStatisticsQueries(queryClient),
+    invalidateTrainingTasksQueries(queryClient),
   ]);
 }
 
@@ -109,5 +116,6 @@ export async function invalidateRecommendDashboardQueries(
     invalidateRecommendQueries(queryClient),
     invalidateDictionaryQueries(queryClient),
     invalidateWordsStatisticsQueries(queryClient),
+    invalidateTrainingTasksQueries(queryClient),
   ]);
 }

@@ -6,6 +6,15 @@ import type { TrainingAnswer, TrainingTask } from '@/types/training';
 
 //===============================================================
 
+type TrainingSessionState = {
+  tasksKey: string;
+  currentIndex: number;
+  currentAnswer: string;
+  answers: TrainingAnswer[];
+};
+
+//===============================================================
+
 function upsertAnswer(
   prev: TrainingAnswer[],
   nextAnswer: TrainingAnswer | null
@@ -26,67 +35,127 @@ function upsertAnswer(
   return next;
 }
 
+function buildTasksKey(tasks: TrainingTask[]) {
+  return tasks
+    .map((task) => `${task._id}:${task.task}:${task.en ?? ''}:${task.ua ?? ''}`)
+    .join('|');
+}
+
+function createInitialState(tasksKey: string): TrainingSessionState {
+  return {
+    tasksKey,
+    currentIndex: 0,
+    currentAnswer: '',
+    answers: [],
+  };
+}
+
+function getSyncedState(
+  state: TrainingSessionState,
+  tasksKey: string
+): TrainingSessionState {
+  if (state.tasksKey === tasksKey) return state;
+
+  return createInitialState(tasksKey);
+}
+
 //===============================================================
 
 export function useTrainingSession(tasks: TrainingTask[]) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentAnswer, setCurrentAnswer] = useState('');
-  const [answers, setAnswers] = useState<TrainingAnswer[]>([]);
+  const tasksKey = useMemo(() => buildTasksKey(tasks), [tasks]);
 
-  const currentTask = tasks[currentIndex];
-  const isLastTask = currentIndex === tasks.length - 1;
+  const [state, setState] = useState<TrainingSessionState>(() =>
+    createInitialState(tasksKey)
+  );
 
-  const buildTrainingAnswer = useCallback((): TrainingAnswer | null => {
-    if (!currentTask) return null;
+  const syncedState = getSyncedState(state, tasksKey);
 
-    const trimmedAnswer = currentAnswer.trim();
+  const currentTask = tasks[syncedState.currentIndex];
+  const isLastTask = syncedState.currentIndex === tasks.length - 1;
 
-    if (!trimmedAnswer) return null;
+  const buildTrainingAnswer = useCallback(
+    (
+      task: TrainingTask | undefined = currentTask,
+      answer: string = syncedState.currentAnswer
+    ): TrainingAnswer | null => {
+      if (!task) return null;
 
-    if (currentTask.task === 'en') {
+      const trimmedAnswer = answer.trim();
+
+      if (!trimmedAnswer) return null;
+
+      if (task.task === 'en') {
+        return {
+          _id: task._id,
+          en: trimmedAnswer,
+          ua: task.ua ?? '',
+          task: task.task,
+        };
+      }
+
       return {
-        _id: currentTask._id,
-        en: trimmedAnswer,
-        ua: currentTask.ua ?? '',
-        task: currentTask.task,
+        _id: task._id,
+        en: task.en ?? '',
+        ua: trimmedAnswer,
+        task: task.task,
       };
-    }
+    },
+    [currentTask, syncedState.currentAnswer]
+  );
 
-    return {
-      _id: currentTask._id,
-      en: currentTask.en ?? '',
-      ua: trimmedAnswer,
-      task: currentTask.task,
-    };
-  }, [currentAnswer, currentTask]);
+  const setCurrentAnswer = useCallback(
+    (value: string) => {
+      setState((prev) => ({
+        ...getSyncedState(prev, tasksKey),
+        currentAnswer: value,
+      }));
+    },
+    [tasksKey]
+  );
 
   const buildSubmitPayload = useCallback((): TrainingAnswer[] => {
     const lastAnswer = buildTrainingAnswer();
-    return upsertAnswer(answers, lastAnswer);
-  }, [answers, buildTrainingAnswer]);
+
+    return upsertAnswer(syncedState.answers, lastAnswer);
+  }, [buildTrainingAnswer, syncedState.answers]);
 
   const goToNextTask = useCallback(() => {
-    if (!currentTask || isLastTask) return;
+    setState((prev) => {
+      const baseState = getSyncedState(prev, tasksKey);
+      const task = tasks[baseState.currentIndex];
+      const lastTask = baseState.currentIndex === tasks.length - 1;
 
-    const nextAnswer = buildTrainingAnswer();
+      if (!task || lastTask) return baseState;
 
-    setAnswers((prev) => upsertAnswer(prev, nextAnswer));
-    setCurrentAnswer('');
-    setCurrentIndex((prev) => prev + 1);
-  }, [buildTrainingAnswer, currentTask, isLastTask]);
+      const nextAnswer = buildTrainingAnswer(task, baseState.currentAnswer);
 
-  const applySubmittedPayload = useCallback((payload: TrainingAnswer[]) => {
-    setAnswers(payload);
-  }, []);
+      return {
+        ...baseState,
+        answers: upsertAnswer(baseState.answers, nextAnswer),
+        currentAnswer: '',
+        currentIndex: baseState.currentIndex + 1,
+      };
+    });
+  }, [buildTrainingAnswer, tasks, tasksKey]);
 
-  const progressCount = useMemo(() => answers.length, [answers.length]);
+  const applySubmittedPayload = useCallback(
+    (payload: TrainingAnswer[]) => {
+      setState((prev) => ({
+        ...getSyncedState(prev, tasksKey),
+        answers: payload,
+      }));
+    },
+    [tasksKey]
+  );
+
+  const progressCount = syncedState.answers.length;
 
   return {
-    currentIndex,
+    currentIndex: syncedState.currentIndex,
     currentTask,
-    currentAnswer,
+    currentAnswer: syncedState.currentAnswer,
     setCurrentAnswer,
-    answers,
+    answers: syncedState.answers,
     progressCount,
     isLastTask,
     buildTrainingAnswer,

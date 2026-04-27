@@ -14,7 +14,7 @@ import { editWordSchema } from '@/lib/validations/editWordSchema';
 import {
   handleWordsMutationError,
   handleWordsMutationSuccess,
-  invalidateDictionaryQueries,
+  invalidateDictionaryDashboardQueries,
 } from '@/lib/words/mutation-helpers';
 
 import WordFormActions from '@/components/words/WordFormActions/WordFormActions';
@@ -72,7 +72,7 @@ function EditWordForm({ word, onClose }: Props) {
       await handleWordsMutationSuccess({
         queryClient,
         fallbackMessage: 'Word updated successfully.',
-        invalidate: invalidateDictionaryQueries,
+        invalidate: invalidateDictionaryDashboardQueries,
         onAfterSuccess: onClose,
       });
     },

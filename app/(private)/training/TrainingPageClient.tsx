@@ -13,6 +13,7 @@ import { useTrainingSession } from '@/hooks/useTrainingSession';
 
 import {
   invalidateDictionaryQueries,
+  invalidateTrainingTasksQueries,
   invalidateWordsStatisticsQueries,
 } from '@/lib/words/mutation-helpers';
 
@@ -40,9 +41,11 @@ function TrainingPageClient() {
   );
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['training-tasks'],
+    queryKey: wordsQueryKeys.trainingTasks,
     queryFn: trainingService.getTasks,
     retry: false,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const tasks = data?.words ?? [];
@@ -90,6 +93,7 @@ function TrainingPageClient() {
       await Promise.all([
         invalidateDictionaryQueries(queryClient),
         invalidateWordsStatisticsQueries(queryClient),
+        invalidateTrainingTasksQueries(queryClient),
         queryClient.invalidateQueries({
           queryKey: wordsQueryKeys.recommendOwn,
         }),
@@ -175,7 +179,7 @@ function TrainingPageClient() {
 
           <div className={css.topBar}>
             <div className={css.statsWrap}>
-              <Statistics />
+              <Statistics useFallbackLearnedCount />
             </div>
 
             <div className={css.progressWrap}>
@@ -214,7 +218,7 @@ function TrainingPageClient() {
 
         <div className={css.topBar}>
           <div className={css.statsWrap}>
-            <Statistics />
+            <Statistics useFallbackLearnedCount />
           </div>
 
           <div className={css.progressWrap}>

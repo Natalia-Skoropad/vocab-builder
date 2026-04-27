@@ -17,8 +17,7 @@ import { useWordsRouteState } from '@/hooks/useWordsRouteState';
 import { buildWordsBreadcrumbs } from '@/lib/utils/words-breadcrumbs';
 
 import {
-  invalidateDictionaryQueries,
-  invalidateWordsStatisticsQueries,
+  invalidateRecommendDashboardQueries,
   showMutationErrorToast,
   showMutationSuccessToast,
 } from '@/lib/words/mutation-helpers';
@@ -112,10 +111,7 @@ function RecommendPageClient() {
         (previousData) => appendOwnWordToCache(previousData, addedWord)
       );
 
-      await Promise.all([
-        invalidateDictionaryQueries(queryClient),
-        invalidateWordsStatisticsQueries(queryClient),
-      ]);
+      await invalidateRecommendDashboardQueries(queryClient);
     },
     onError: (mutationError) => {
       showMutationErrorToast(
