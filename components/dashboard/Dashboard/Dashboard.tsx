@@ -39,6 +39,7 @@ function Dashboard({
 }: Props) {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [hasAppliedFilters, setHasAppliedFilters] = useState(false);
+  const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
   return (
     <div className={clsx(css.dashboard, className)}>
@@ -48,7 +49,10 @@ function Dashboard({
             variant={variant}
             isPanelOpen={isFiltersOpen}
             onClosePanel={() => setIsFiltersOpen(false)}
-            onAppliedStateChange={setHasAppliedFilters}
+            onAppliedStateChange={(value, count) => {
+              setHasAppliedFilters(value);
+              setActiveFiltersCount(count);
+            }}
           />
         </div>
 
@@ -59,7 +63,11 @@ function Dashboard({
             hasAppliedFilters && css.filterButtonActive
           )}
           onClick={() => setIsFiltersOpen(true)}
-          aria-label="Open filters"
+          aria-label={
+            activeFiltersCount > 0
+              ? `Open filters. ${activeFiltersCount} active filters`
+              : 'Open filters'
+          }
           aria-expanded={isFiltersOpen}
           aria-controls="words-filters-offcanvas"
         >
@@ -67,6 +75,11 @@ function Dashboard({
             className={css.filterButtonIcon}
             aria-hidden="true"
           />
+
+          <span className={css.filterButtonText}>
+            Filter
+            {activeFiltersCount > 0 ? ` (${activeFiltersCount})` : ''}
+          </span>
         </button>
       </div>
 

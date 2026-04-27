@@ -16,7 +16,7 @@ type Props = {
   variant: 'dictionary' | 'recommend';
   isPanelOpen: boolean;
   onClosePanel: () => void;
-  onAppliedStateChange?: (value: boolean) => void;
+  onAppliedStateChange?: (value: boolean, count: number) => void;
 };
 
 //===============================================================
@@ -56,6 +56,8 @@ function Filters({
     hasAppliedSort,
     hasAppliedCategory,
     hasAppliedProgress,
+    activeFiltersCount,
+    resetFilters,
     categoryOptions,
     verbOptions,
     sortOptions,
@@ -94,6 +96,7 @@ function Filters({
           hasAppliedSort={hasAppliedSort}
           hasAppliedCategory={hasAppliedCategory}
           hasAppliedProgress={hasAppliedProgress}
+          activeFiltersCount={activeFiltersCount}
           categoryOptions={categoryOptions}
           sortOptions={sortOptions}
           progressOptions={progressOptions}
@@ -102,6 +105,7 @@ function Filters({
           onSortChange={setSort}
           onProgressChange={setProgress}
           onVerbTypeChange={setVerbType}
+          onResetFilters={resetFilters}
         />
       </div>
 
@@ -116,6 +120,7 @@ function Filters({
         hasAppliedSort={hasAppliedSort}
         hasAppliedCategory={hasAppliedCategory}
         hasAppliedProgress={hasAppliedProgress}
+        activeFiltersCount={activeFiltersCount}
         categoryOptions={categoryOptions}
         sortOptions={sortOptions}
         progressOptions={progressOptions}
@@ -124,6 +129,7 @@ function Filters({
         onSortChange={setSort}
         onProgressChange={setProgress}
         onVerbTypeChange={setVerbType}
+        onResetFilters={resetFilters}
         onClose={onClosePanel}
         sortLabelId={sortLabelId}
         progressLabelId={progressLabelId}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import type { WordSort } from '@/types/word';
@@ -46,7 +46,7 @@ const progressOptions = [
 
 type Options = {
   variant: Variant;
-  onAppliedStateChange?: (value: boolean) => void;
+  onAppliedStateChange?: (value: boolean, count: number) => void;
 };
 
 //===============================================================
@@ -137,12 +137,19 @@ export function useWordsFiltersState({
   const hasAppliedSort = sort !== 'sort';
   const hasAppliedCategory = category !== 'categories';
   const hasAppliedProgress = progress !== 'progress';
-  const hasAppliedFilters =
-    hasAppliedSort || hasAppliedCategory || hasAppliedProgress;
+  const hasAppliedVerbType = category === 'verb' && verbType === 'irregular';
+
+  const activeFiltersCount = [
+    hasAppliedCategory,
+    hasAppliedProgress,
+    hasAppliedVerbType,
+  ].filter(Boolean).length;
+
+  const hasAppliedFilters = activeFiltersCount > 0;
 
   useEffect(() => {
-    onAppliedStateChange?.(hasAppliedFilters);
-  }, [hasAppliedFilters, onAppliedStateChange]);
+    onAppliedStateChange?.(hasAppliedFilters, activeFiltersCount);
+  }, [activeFiltersCount, hasAppliedFilters, onAppliedStateChange]);
 
   useEffect(() => {
     const currentKeyword = searchParams.get('keyword')?.trim() ?? '';
@@ -199,6 +206,23 @@ export function useWordsFiltersState({
     verbType,
   ]);
 
+  const resetFilters = useCallback(() => {
+    setKeyword('');
+    setCategory('categories');
+    setVerbType('regular');
+    setProgress('progress');
+
+    const nextPath = buildWordsPath(basePath, {
+      category: 'categories',
+      isIrregular: undefined,
+      page: 1,
+      sort: effectiveSort,
+      progress: undefined,
+    });
+
+    router.replace(nextPath, { scroll: false });
+  }, [basePath, effectiveSort, router]);
+
   const categoryOptions = useMemo(
     () => [
       { value: 'categories', label: 'Categories' },
@@ -233,6 +257,10 @@ export function useWordsFiltersState({
     hasAppliedSort,
     hasAppliedCategory,
     hasAppliedProgress,
+    hasAppliedVerbType,
+    hasAppliedFilters,
+    activeFiltersCount,
+    resetFilters,
 
     categoryOptions,
     verbOptions,

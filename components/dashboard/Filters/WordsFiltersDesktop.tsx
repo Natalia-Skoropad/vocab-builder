@@ -4,6 +4,8 @@ import type { WordCategory } from '@/types/word';
 import type { SortValue, ProgressValue } from '@/hooks/useWordsFiltersState';
 
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
+import ResetFiltersButton from '@/components/common/ResetFiltersButton/ResetFiltersButton';
+
 import RadioGroup, {
   type RadioOption,
 } from '@/components/common/RadioGroup/RadioGroup';
@@ -26,6 +28,7 @@ type Props = {
   hasAppliedSort: boolean;
   hasAppliedCategory: boolean;
   hasAppliedProgress: boolean;
+  activeFiltersCount: number;
   categoryOptions: Option[];
   sortOptions: Option[];
   progressOptions: Option[];
@@ -34,6 +37,7 @@ type Props = {
   onSortChange: (value: SortValue) => void;
   onProgressChange: (value: ProgressValue) => void;
   onVerbTypeChange: (value: 'regular' | 'irregular') => void;
+  onResetFilters: () => void;
 };
 
 //===============================================================
@@ -47,6 +51,7 @@ function WordsFiltersDesktop({
   hasAppliedSort,
   hasAppliedCategory,
   hasAppliedProgress,
+  activeFiltersCount,
   categoryOptions,
   sortOptions,
   progressOptions,
@@ -55,20 +60,10 @@ function WordsFiltersDesktop({
   onSortChange,
   onProgressChange,
   onVerbTypeChange,
+  onResetFilters,
 }: Props) {
   return (
     <div className={css.desktopControls}>
-      <div className={css.sortWrap}>
-        <CustomSelect
-          value={sort}
-          options={sortOptions}
-          onChange={(nextValue) => onSortChange(nextValue as SortValue)}
-          placeholder="Sort"
-          isActive={hasAppliedSort}
-          ariaLabel="Sort words"
-        />
-      </div>
-
       <div className={css.progressWrap}>
         <CustomSelect
           value={progress}
@@ -105,6 +100,23 @@ function WordsFiltersDesktop({
           ariaLabel="Verb type"
         />
       ) : null}
+
+      <ResetFiltersButton
+        count={activeFiltersCount}
+        onClick={onResetFilters}
+        className={css.resetButton}
+      />
+
+      <div className={css.sortWrap}>
+        <CustomSelect
+          value={sort}
+          options={sortOptions}
+          onChange={(nextValue) => onSortChange(nextValue as SortValue)}
+          placeholder="Sort"
+          isActive={hasAppliedSort}
+          ariaLabel="Sort words"
+        />
+      </div>
     </div>
   );
 }

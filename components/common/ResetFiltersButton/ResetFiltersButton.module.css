@@ -1,0 +1,49 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: var(--fw-medium);
+
+  cursor: pointer;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.button:hover,
+.button:focus-visible {
+  opacity: 0.72;
+}
+
+.button:focus-visible {
+  outline: none;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--error);
+  stroke-width: 2;
+}
+
+.text {
+  position: relative;
+  display: inline-block;
+}
+
+.light {
+  color: var(--background-1);
+}
+
+.light .text {
+  color: var(--background-1);
+}

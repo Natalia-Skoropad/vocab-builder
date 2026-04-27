@@ -53,6 +53,10 @@
   display: none;
 }
 
+.resetButton {
+  flex: 0 0 auto;
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -118,6 +122,11 @@
   color: rgba(252, 252, 252, 0.8);
 }
 
+.panelResetButton {
+  margin-top: 4px;
+  width: fit-content;
+}
+
 .modalRadioGroup {
   gap: 18px;
 }
@@ -154,26 +163,23 @@
 
 @media only screen and (min-width: 1440px) {
   .filters {
-    flex-direction: row;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 274px minmax(0, 1fr);
     align-items: center;
     gap: 16px;
   }
 
   .searchWrap {
-    flex: 0 0 274px;
-    max-width: 274px;
+    max-width: none;
   }
 
   .desktopControls {
     display: flex;
     align-items: center;
     gap: 12px;
-    flex: 0 0 auto;
-  }
-
-  .sortWrap {
-    flex: 0 0 160px;
-    max-width: 160px;
+    min-width: 0;
+    width: 100%;
   }
 
   .progressWrap {
@@ -184,6 +190,12 @@
   .selectWrap {
     flex: 0 0 164px;
     max-width: 164px;
+  }
+
+  .sortWrap {
+    flex: 0 0 160px;
+    max-width: 160px;
+    margin-left: auto;
   }
 
   .searchInput {

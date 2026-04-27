@@ -9,6 +9,7 @@ import { useEscapeToClose } from '@/hooks/useEscapeToClose';
 
 import CloseButton from '@/components/common/CloseButton/CloseButton';
 import CustomSelect from '@/components/common/CustomSelect/CustomSelect';
+import ResetFiltersButton from '@/components/common/ResetFiltersButton/ResetFiltersButton';
 
 import RadioGroup, {
   type RadioOption,
@@ -34,6 +35,7 @@ type Props = {
   hasAppliedSort: boolean;
   hasAppliedCategory: boolean;
   hasAppliedProgress: boolean;
+  activeFiltersCount: number;
   categoryOptions: Option[];
   sortOptions: Option[];
   progressOptions: Option[];
@@ -42,6 +44,7 @@ type Props = {
   onSortChange: (value: SortValue) => void;
   onProgressChange: (value: ProgressValue) => void;
   onVerbTypeChange: (value: 'regular' | 'irregular') => void;
+  onResetFilters: () => void;
   onClose: () => void;
   sortLabelId: string;
   progressLabelId: string;
@@ -67,6 +70,7 @@ function WordsFiltersPanel({
   hasAppliedSort,
   hasAppliedCategory,
   hasAppliedProgress,
+  activeFiltersCount,
   categoryOptions,
   sortOptions,
   progressOptions,
@@ -75,6 +79,7 @@ function WordsFiltersPanel({
   onSortChange,
   onProgressChange,
   onVerbTypeChange,
+  onResetFilters,
   onClose,
   sortLabelId,
   progressLabelId,
@@ -92,6 +97,11 @@ function WordsFiltersPanel({
   });
 
   const handleBackdropClick = useBackdropClose<HTMLDivElement>(onClose);
+
+  const handleResetFilters = () => {
+    onResetFilters();
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -183,6 +193,13 @@ function WordsFiltersPanel({
               />
             </div>
           ) : null}
+
+          <ResetFiltersButton
+            count={activeFiltersCount}
+            onClick={handleResetFilters}
+            variant="light"
+            className={css.panelResetButton}
+          />
         </div>
 
         <div className={css.illustrationWrap} aria-hidden="true">
