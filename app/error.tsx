@@ -5,6 +5,7 @@ import Image from 'next/image';
 
 import { ROUTES } from '@/lib/constants/routes';
 
+import BackButton from '@/components/common/Button/BackButton';
 import ButtonLink from '@/components/common/Button/ButtonLink';
 
 import css from './shared-hero.module.css';
@@ -51,14 +52,9 @@ function ErrorPage({ error }: Props) {
                     Back to home
                   </ButtonLink>
 
-                  <ButtonLink
-                    href={ROUTES.DICTIONARY}
-                    variant="secondary"
-                    fullWidth={false}
-                    className={css.ctaButton}
-                  >
-                    Go to dictionary
-                  </ButtonLink>
+                  <BackButton className={css.ctaButton} fullWidth={false}>
+                    Go back
+                  </BackButton>
                 </div>
               </div>
 

@@ -56,7 +56,9 @@
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 12px;
 }
 
 .ctaButton {
@@ -157,6 +159,7 @@
 
   .actions {
     justify-content: flex-start;
+    gap: 16px;
   }
 
   .imageWrap {

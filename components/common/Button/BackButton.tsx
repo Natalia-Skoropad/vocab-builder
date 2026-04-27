@@ -10,11 +10,18 @@ import Button from '@/components/common/Button/Button';
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
+  fullWidth?: boolean;
 };
 
 //===========================================================================
 
-function BackButton({ className, onClick, children, ...props }: Props) {
+function BackButton({
+  className,
+  onClick,
+  children,
+  fullWidth = true,
+  ...props
+}: Props) {
   const router = useRouter();
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -29,6 +36,7 @@ function BackButton({ className, onClick, children, ...props }: Props) {
     <Button
       type="button"
       variant="secondary"
+      fullWidth={fullWidth}
       className={clsx(className)}
       onClick={handleClick}
       {...props}

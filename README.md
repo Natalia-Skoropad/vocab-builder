@@ -320,7 +320,8 @@ What makes this project especially interesting:
 ## Author
 
 **Nataliia Skoropad**  
-Frontend Developer / UX/UI Designer
+Frontend Developer  
+UX/UI redesign and user experience improvements
 
 ---
 
