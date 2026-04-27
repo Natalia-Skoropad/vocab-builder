@@ -8,19 +8,27 @@
 
   border-radius: var(--btn-radius);
   border: 1px solid transparent;
+  background-color: transparent;
 
+  font-family: var(--font-family);
   font-size: var(--btn-font-size);
   line-height: var(--btn-line-height);
   font-weight: var(--btn-font-weight);
   text-align: center;
   text-decoration: none;
 
+  cursor: pointer;
+
   transition: background-color var(--motion-duration-fast)
       var(--motion-ease-standard),
     border-color var(--motion-duration-fast) var(--motion-ease-standard),
     color var(--motion-duration-fast) var(--motion-ease-standard),
-    opacity var(--motion-duration-fast) var(--motion-ease-standard),
-    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard),
+    opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.linkButton {
+  text-decoration: none;
 }
 
 .fullWidth {
@@ -32,92 +40,109 @@
   box-shadow: var(--btn-focus-ring);
 }
 
+/* ===============================================================
+   Primary: green button on light background
+   =============================================================== */
+
 .primary {
-  background-color: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-}
-
-.primary:hover,
-.primary:focus-visible {
-  background-color: var(--btn-primary-bg-hover);
-}
-
-.secondary {
-  background-color: transparent;
+  background-color: var(--green-main);
+  border-color: var(--green-main);
   color: var(--background-1);
-  border: 1px solid var(--panel-border-white);
 }
 
-.secondary:hover,
-.secondary:focus-visible {
-  background-color: var(--surface-hover-white);
-  border-color: var(--panel-border-white-strong);
+.primary:hover:not(:disabled),
+.primary:focus-visible:not(:disabled) {
+  background-color: var(--green-inactive);
+  border-color: var(--green-inactive);
+  color: var(--background-1);
 }
 
-.dark {
-  background-color: var(--btn-dark-bg);
-  color: var(--btn-dark-text);
+.primary:disabled {
+  background-color: rgba(133, 170, 159, 0.32);
+  border-color: transparent;
+  color: rgba(18, 20, 23, 0.42);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-.dark:hover,
-.dark:focus-visible {
-  background-color: var(--btn-dark-bg-hover);
-}
+/* ===============================================================
+   Primary light: light button on dark/green background
+   =============================================================== */
 
-.light {
+.primaryLight {
   background-color: var(--background-1);
+  border-color: var(--background-1);
   color: var(--text-main);
 }
 
-.light:hover,
-.light:focus-visible {
+.primaryLight:hover:not(:disabled),
+.primaryLight:focus-visible:not(:disabled) {
   background-color: var(--text-white);
+  border-color: var(--text-white);
+  color: var(--text-main);
 }
 
-.outlineGreen {
-  background-color: var(--background-1);
-  color: var(--green-main);
-  border: 1px solid var(--green-main);
+.primaryLight:disabled {
+  background-color: rgba(252, 252, 252, 0.38);
+  border-color: transparent;
+  color: rgba(18, 20, 23, 0.46);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-.outlineGreen:hover,
-.outlineGreen:focus-visible {
-  background-color: var(--surface-hover-light);
-  color: var(--green-main);
+/* ===============================================================
+   Secondary: green border button on light background
+   =============================================================== */
+
+.secondary {
+  background-color: transparent;
   border-color: var(--green-main);
+  color: var(--green-main);
 }
 
-/* disabled state styles */
-.button:disabled[data-disabled-style='auth'] {
-  background-color: var(--disabled-bg-green-soft);
-  color: var(--disabled-text-neutral-soft);
-  border-color: transparent;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.button:disabled[data-disabled-style='default'] {
-  background-color: var(--border-3);
-  color: var(--disabled-text-neutral);
-  border-color: transparent;
-  cursor: not-allowed;
-  box-shadow: none;
+.secondary:hover:not(:disabled),
+.secondary:focus-visible:not(:disabled) {
+  background-color: rgba(133, 170, 159, 0.08);
+  border-color: var(--green-inactive);
+  color: var(--green-main);
 }
 
 .secondary:disabled {
-  background-color: var(--disabled-bg-white-soft);
-  color: var(--disabled-text-on-dark);
-  border-color: var(--disabled-border-white);
-  box-shadow: none;
+  background-color: transparent;
+  border-color: rgba(133, 170, 159, 0.35);
+  color: rgba(133, 170, 159, 0.5);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.outlineGreen:disabled {
-  background-color: var(--background-1);
-  color: rgba(133, 170, 159, 0.55);
-  border-color: var(--disabled-border-green);
-  box-shadow: none;
+/* ===============================================================
+   Secondary light: light border button on dark/green background
+   =============================================================== */
+
+.secondaryLight {
+  background-color: transparent;
+  border-color: rgba(252, 252, 252, 0.45);
+  color: var(--background-1);
+}
+
+.secondaryLight:hover:not(:disabled),
+.secondaryLight:focus-visible:not(:disabled) {
+  background-color: rgba(252, 252, 252, 0.08);
+  border-color: rgba(252, 252, 252, 0.78);
+  color: var(--background-1);
+}
+
+.secondaryLight:disabled {
+  background-color: transparent;
+  border-color: rgba(252, 252, 252, 0.2);
+  color: rgba(252, 252, 252, 0.46);
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+.button:disabled:hover,
+.button:disabled:focus-visible {
+  box-shadow: none;
 }
 
 @media only screen and (min-width: 768px) {

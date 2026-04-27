@@ -74,7 +74,9 @@ function TrainingRoom({
   };
 
   const handleNextClick = () => {
-    if (trimmedValue && !isAnswerFormatValid) {
+    if (!trimmedValue) return;
+
+    if (!isAnswerFormatValid) {
       toast.error(validationMessage);
       return;
     }
@@ -83,7 +85,9 @@ function TrainingRoom({
   };
 
   const handleSaveClick = () => {
-    if (trimmedValue && !isAnswerFormatValid) {
+    if (!trimmedValue) return;
+
+    if (!isAnswerFormatValid) {
       toast.error(validationMessage);
       return;
     }
@@ -91,8 +95,10 @@ function TrainingRoom({
     onSave();
   };
 
-  const isNextDisabled = !showNext || isSubmitting;
-  const isSaveDisabled = isSubmitting;
+  const isNextDisabled =
+    !showNext || isSubmitting || !trimmedValue || !isAnswerFormatValid;
+
+  const isSaveDisabled = isSubmitting || !trimmedValue || !isAnswerFormatValid;
 
   return (
     <div className={css.card}>
@@ -166,15 +172,15 @@ function TrainingRoom({
           variant="primary"
           onClick={handleSaveClick}
           disabled={isSaveDisabled}
-          className={`${css.actionButton} ${css.saveButton}`}
+          className={css.actionButton}
           fullWidth={false}
         >
-          Save
+          {isSubmitting ? 'Saving...' : 'Save'}
         </Button>
 
         <Button
           type="button"
-          variant="outlineGreen"
+          variant="secondary"
           onClick={onCancel}
           disabled={isSubmitting}
           className={css.actionButton}

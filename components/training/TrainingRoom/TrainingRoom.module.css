@@ -171,17 +171,6 @@
   min-width: 0;
 }
 
-.saveButton {
-  background-color: var(--green-main);
-  color: var(--background-1);
-  border-color: transparent;
-}
-
-.saveButton:hover,
-.saveButton:focus-visible {
-  background-color: var(--green-inactive);
-}
-
 @media only screen and (min-width: 768px) {
   .outer {
     padding: 16px;

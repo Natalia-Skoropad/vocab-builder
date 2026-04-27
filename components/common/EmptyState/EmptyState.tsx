@@ -65,7 +65,7 @@ function EmptyState({
               {secondaryActionLabel ? (
                 <Button
                   type="button"
-                  variant="outlineGreen"
+                  variant="secondary"
                   className={css.secondaryButton}
                   onClick={onSecondaryAction}
                 >

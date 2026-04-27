@@ -139,7 +139,6 @@ function RegisterForm() {
         type="submit"
         className={css.submitBtn}
         disabled={isSubmitDisabled}
-        disabledStyle="auth"
         variant="primary"
       >
         {isSubmitting ? 'Registering...' : 'Register'}

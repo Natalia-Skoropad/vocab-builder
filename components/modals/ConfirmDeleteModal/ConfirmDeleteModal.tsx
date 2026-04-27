@@ -48,9 +48,8 @@ function ConfirmDeleteModal({
           <li>
             <Button
               type="button"
-              variant="light"
+              variant="primaryLight"
               disabled={isSubmitting}
-              disabledStyle="default"
               className={css.confirmButton}
               onClick={onConfirm}
             >
@@ -61,7 +60,7 @@ function ConfirmDeleteModal({
           <li>
             <Button
               type="button"
-              variant="secondary"
+              variant="secondaryLight"
               className={css.cancelButton}
               disabled={isSubmitting}
               onClick={onClose}

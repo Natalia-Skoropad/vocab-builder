@@ -28,7 +28,7 @@ function BackButton({ className, onClick, children, ...props }: Props) {
   return (
     <Button
       type="button"
-      variant="dark"
+      variant="secondary"
       className={clsx(className)}
       onClick={handleClick}
       {...props}

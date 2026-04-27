@@ -27,9 +27,8 @@ function WordFormActions({
     <div className={css.actions}>
       <Button
         type="submit"
-        variant="light"
+        variant="primaryLight"
         disabled={isSubmitDisabled}
-        disabledStyle="default"
         className={css.button}
         fullWidth={false}
       >
@@ -38,7 +37,7 @@ function WordFormActions({
 
       <Button
         type="button"
-        variant="secondary"
+        variant="secondaryLight"
         disabled={isBusy}
         onClick={onCancel}
         className={css.button}

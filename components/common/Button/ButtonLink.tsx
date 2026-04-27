@@ -1,16 +1,17 @@
-import type { ReactNode } from 'react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
+
+import type { ButtonVariant } from './Button';
 
 import css from './Button.module.css';
 
 //===============================================================
 
-type Props = {
+type Props = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
   href: string;
   children: ReactNode;
-  className?: string;
-  variant?: 'primary' | 'secondary' | 'dark';
+  variant?: ButtonVariant;
   fullWidth?: boolean;
 };
 
@@ -19,23 +20,22 @@ type Props = {
 function ButtonLink({
   href,
   children,
-  className,
   variant = 'primary',
   fullWidth = true,
+  className,
+  ...props
 }: Props) {
   return (
     <Link
       href={href}
       className={clsx(
         css.button,
-        {
-          [css.primary]: variant === 'primary',
-          [css.secondary]: variant === 'secondary',
-          [css.dark]: variant === 'dark',
-          [css.fullWidth]: fullWidth,
-        },
+        css.linkButton,
+        css[variant],
+        fullWidth && css.fullWidth,
         className
       )}
+      {...props}
     >
       {children}
     </Link>
